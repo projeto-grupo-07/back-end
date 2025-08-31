@@ -11,7 +11,7 @@ public class Funcionario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String nome;
-    private String cnpj;
+    private String cpf;
     private Double salario;
     private Double comissao;
 
@@ -31,12 +31,12 @@ public class Funcionario {
         this.nome = nome;
     }
 
-    public String getCnpj() {
-        return cnpj;
+    public String getCpf() {
+        return cpf;
     }
 
-    public void setCnpj(String cnpj) {
-        this.cnpj = cnpj;
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
 
     public Double getSalario() {
