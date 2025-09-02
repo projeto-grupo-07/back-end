@@ -4,7 +4,7 @@ API Backend do projeto de gerenciamento de agendas, clientes e materiais do site
 
 ## Instalação: 
 ```bash
-  git clone https://github.com/Projeto-de-extensao-Grupo-06/spring-boot.git
+  git clone https://github.com/projeto-grupo-07/spring-boot
 ```
 
 ## Variáveis de Ambiente: 
