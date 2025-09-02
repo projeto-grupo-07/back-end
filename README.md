@@ -1,6 +1,6 @@
 # Repositório Backend Spring Boot
 
-API Backend do projeto de gerenciamento de agendas, clientes e materiais do site da empresa Solarize
+API Backend do projeto de gerenciamento/controle de caixa, feito para loja BrinkCalçados.
 
 ## Instalação: 
 ```bash
