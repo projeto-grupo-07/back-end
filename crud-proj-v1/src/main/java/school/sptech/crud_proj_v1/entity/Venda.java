@@ -1,4 +1,4 @@
-package school.sptech.crud_proj_v1.venda;
+package school.sptech.crud_proj_v1.entity;
 
 import jakarta.persistence.*;
 

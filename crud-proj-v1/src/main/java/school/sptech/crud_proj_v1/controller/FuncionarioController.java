@@ -1,7 +1,9 @@
-package school.sptech.crud_proj_v1.pessoa;
+package school.sptech.crud_proj_v1.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import school.sptech.crud_proj_v1.entity.Funcionario;
+import school.sptech.crud_proj_v1.repository.FuncionarioRepository;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package school.sptech.crud_proj_v1.pessoa;
+package school.sptech.crud_proj_v1.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

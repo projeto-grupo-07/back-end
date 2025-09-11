@@ -1,7 +1,9 @@
-package school.sptech.crud_proj_v1.produto;
+package school.sptech.crud_proj_v1.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import school.sptech.crud_proj_v1.entity.Produto;
+import school.sptech.crud_proj_v1.repository.ProdutoReposiitory;
 
 import java.util.List;
 
