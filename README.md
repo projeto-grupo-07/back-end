@@ -14,7 +14,10 @@ Colocar no application.properties
   spring.jpa.properties.hibernate.format_sql=true
 
   spring.h2.console.enabled=true
-  spring.datasource.url=jdbc:h2:mem:banco 
+  spring.datasource.url=jdbc:h2:mem:banco
+
+  server.error.include-message=always
+  server.error.include-binding-errors=always
 ```
     
 ## Documentação da API
