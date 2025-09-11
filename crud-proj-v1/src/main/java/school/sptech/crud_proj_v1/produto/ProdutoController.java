@@ -1,4 +1,4 @@
-package school.sptech.crud_proj_v1;
+package school.sptech.crud_proj_v1.produto;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

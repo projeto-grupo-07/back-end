@@ -1,4 +1,4 @@
-package school.sptech.crud_proj_v1;
+package school.sptech.crud_proj_v1.venda;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

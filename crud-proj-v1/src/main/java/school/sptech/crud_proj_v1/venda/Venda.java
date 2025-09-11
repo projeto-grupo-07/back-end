@@ -1,9 +1,8 @@
-package school.sptech.crud_proj_v1;
+package school.sptech.crud_proj_v1.venda;
 
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 public class Venda {
