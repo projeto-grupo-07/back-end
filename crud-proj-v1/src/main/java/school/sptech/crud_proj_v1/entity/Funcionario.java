@@ -4,15 +4,30 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.*;
+import org.hibernate.validator.constraints.br.CPF;
 
 @Entity
 public class Funcionario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @NotBlank
+    @Size(min = 2, max = 50)
     private String nome;
+
+    @CPF
+    @NotBlank
     private String cpf;
+
+    @Positive
     private Double salario;
+
+    @NotNull
+    @Email
+    private String email;
+
     private Double comissao;
 
     public Integer getId() {
@@ -53,5 +68,13 @@ public class Funcionario {
 
     public void setComissao(Double comissao) {
         this.comissao = comissao;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
