@@ -5,6 +5,6 @@ import school.sptech.crud_proj_v1.entity.Produto;
 
 import java.util.List;
 
-public interface ProdutoReposiitory extends JpaRepository<Produto, Integer> {
-    List<Produto> findByCategoriaContainingIgnoreCase(String valor);
+public interface ProdutoRepository extends JpaRepository<Produto, Integer> {
+    List<Produto> findByCategoriaDescricaoContainingIgnoreCase(String descricao);
 }
