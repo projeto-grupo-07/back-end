@@ -10,7 +10,7 @@ public class Produto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String nome;
+//    private String nome;
     @ManyToOne
     private Categoria categoria;
     private Double precoCusto;
@@ -24,9 +24,9 @@ public class Produto {
 
     public Produto(){}
 
-    public Produto(Integer id, String nome, Categoria categoria, Double precoCusto, Double precoVenda, String marca, String modelo, String tamanho, String cor) {
+    public Produto(Integer id, Categoria categoria, Double precoCusto, Double precoVenda, String marca, String modelo, String tamanho, String cor) {
         this.id = id;
-        this.nome = nome;
+//        this.nome = nome;
         this.categoria = categoria;
         this.precoCusto = precoCusto;
         this.precoVenda = precoVenda;
@@ -45,13 +45,13 @@ public class Produto {
         this.id = id;
     }
 
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+//    public String getNome() {
+//        return nome;
+//    }
+//
+//    public void setNome(String nome) {
+//        this.nome = nome;
+//    }
 
     public Categoria getCategoria() {
         return categoria;

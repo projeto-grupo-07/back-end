@@ -5,7 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.sptech.crud_proj_v1.dto.Produto.ProdutoListDTO;
 import school.sptech.crud_proj_v1.dto.Produto.ProdutoRequestDTO;
+import school.sptech.crud_proj_v1.dto.ProdutoVenda.ProdutosVendaResponseDTO;
 import school.sptech.crud_proj_v1.entity.Produto;
+import school.sptech.crud_proj_v1.mapper.ProdutoMapper;
 import school.sptech.crud_proj_v1.repository.ProdutoRepository;
 import school.sptech.crud_proj_v1.service.ProdutoService;
 
@@ -65,6 +67,23 @@ public class ProdutoController {
             return ResponseEntity.status(204).build();
         }
         return ResponseEntity.status(404).build();
+    }
+
+    // EndPoint Gaby
+    @GetMapping("/por-modelo")
+    public ResponseEntity<List<ProdutoListDTO>> buscarPorModelo(@RequestParam String modelo){
+
+        List<Produto> produtosEncontrados = repository.findByModeloContainingIgnoreCase(modelo);
+
+        if(produtosEncontrados.isEmpty()){
+            return ResponseEntity.status(204).build();
+        }
+
+        List<ProdutoListDTO> resposta = produtosEncontrados.stream()
+                .map(ProdutoMapper::toDTO)
+                .toList();
+
+        return ResponseEntity.status(200).body(resposta);
     }
 
 

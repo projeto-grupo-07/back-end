@@ -1,5 +1,6 @@
 package school.sptech.crud_proj_v1.dto.Produto;
 
+import school.sptech.crud_proj_v1.entity.Categoria;
 import school.sptech.crud_proj_v1.entity.Produto;
 
 public class ProdutoListDTO {
@@ -25,6 +26,9 @@ public class ProdutoListDTO {
         } else {
             this.nomeCategoria = null;
         }
+    }
+
+    public ProdutoListDTO(Integer id, String modelo, String marca, Double precoVenda, Categoria categoria) {
     }
 
 
