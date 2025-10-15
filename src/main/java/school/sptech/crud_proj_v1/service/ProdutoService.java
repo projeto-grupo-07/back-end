@@ -13,7 +13,6 @@ import school.sptech.crud_proj_v1.repository.CategoriaRepository;
 import school.sptech.crud_proj_v1.repository.ProdutoRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ProdutoService {
@@ -43,6 +42,12 @@ public class ProdutoService {
         Produto produtoSalvo = produtoRepository.save(novoProduto);
 
         return ProdutoMapper.toDTO(produtoSalvo);
+    }
+
+    public List<ProdutoListDTO> buscarProdutoPorMarca(String marca){
+        List<Produto> produtos = produtoRepository.findByMarcaContainingIgnoreCase(marca);
+
+        return ProdutoMapper.toListDTO(produtos);
     }
 
 

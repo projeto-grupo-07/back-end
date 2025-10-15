@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.sptech.crud_proj_v1.dto.Produto.ProdutoListDTO;
 import school.sptech.crud_proj_v1.dto.Produto.ProdutoRequestDTO;
-import school.sptech.crud_proj_v1.dto.ProdutoVenda.ProdutosVendaResponseDTO;
 import school.sptech.crud_proj_v1.entity.Produto;
 import school.sptech.crud_proj_v1.mapper.ProdutoMapper;
 import school.sptech.crud_proj_v1.repository.ProdutoRepository;
@@ -84,6 +83,16 @@ public class ProdutoController {
                 .toList();
 
         return ResponseEntity.status(200).body(resposta);
+    }
+
+    //EndPoint Gabriel
+    @GetMapping("/por-marca/{marca}")
+    public ResponseEntity<List<ProdutoListDTO>> bucarProdutoPorMarca(@PathVariable String marca) {
+        List<ProdutoListDTO> produtos = service.buscarProdutoPorMarca(marca);
+
+        if (produtos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        } return ResponseEntity.status(200).body(produtos);
     }
 
 
