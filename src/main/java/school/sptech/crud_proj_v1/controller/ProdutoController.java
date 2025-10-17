@@ -76,6 +76,7 @@ public class ProdutoController {
 
     // EndPoint Gaby
     @GetMapping("/por-modelo")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<ProdutoListDTO>> buscarPorModelo(@RequestParam String modelo){
 
         List<Produto> produtosEncontrados = repository.findByModeloContainingIgnoreCase(modelo);
@@ -93,6 +94,7 @@ public class ProdutoController {
 
     //EndPoint Gabriel
     @GetMapping("/por-marca/{marca}")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<ProdutoListDTO>> bucarProdutoPorMarca(@PathVariable String marca) {
         List<ProdutoListDTO> produtos = service.buscarProdutoPorMarca(marca);
 
