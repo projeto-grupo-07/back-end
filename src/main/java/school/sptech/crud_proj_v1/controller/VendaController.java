@@ -35,8 +35,8 @@ public class VendaController {
 
     @GetMapping("/vendedor/{nome}")
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<List<Venda>> buscarVendasPorNomeDoVendedor(@PathVariable String nome){
-        List<Venda> vendasByNome = repository.findByFuncionarioNomeContainingIgnoreCase(nome);
+    public ResponseEntity<List<VendaResponseDTO>> buscarVendasPorNomeDoVendedor(@PathVariable String nome){
+        List<VendaResponseDTO> vendasByNome = service.buscarPorNomeVendedor(nome);
         if (vendasByNome.isEmpty()){
             return ResponseEntity.status(404).build();
         }
