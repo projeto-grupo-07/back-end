@@ -1,5 +1,6 @@
 package school.sptech.crud_proj_v1.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,7 @@ public class ProdutoController {
     }
 
     @GetMapping
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<ProdutoListDTO>> listarProdutos(){
         List<ProdutoListDTO> listaProdutos = service.listarTodos();
 
@@ -35,12 +37,14 @@ public class ProdutoController {
     }
 
     @PostMapping
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<ProdutoListDTO> cadastrarProduto(@RequestBody @Valid ProdutoRequestDTO novoProdutoDTO){
         ProdutoListDTO produtoSalvo = service.criar(novoProdutoDTO);
         return ResponseEntity.status(201).body(produtoSalvo);
     }
 
     @GetMapping("/por-categoria")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<Produto>> buscarProdutoPorCategoria(@RequestParam String categoria){
         List<Produto> achados = repository.findByCategoriaDescricaoContainingIgnoreCase(categoria);
         if (achados.isEmpty()){
@@ -50,6 +54,7 @@ public class ProdutoController {
     }
 
     @PutMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Produto> atualizarProdutoPorId(@PathVariable Integer id, @RequestBody Produto prod){
         prod.setId(id);
         if (repository.existsById(id)){
@@ -60,6 +65,7 @@ public class ProdutoController {
     }
 
     @DeleteMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Void> deletarProdutoPorId(@PathVariable Integer id){
         if (repository.existsById(id)){
             repository.deleteById(id);

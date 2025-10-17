@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface FuncionarioRepository extends JpaRepository<Funcionario, Integer> {
 
+    Optional<Funcionario> findByEmail(String email);
     Boolean existsByCpf(String valor);
     Optional<Funcionario> findBycpfContainingIgnoreCase(String valor);
 }

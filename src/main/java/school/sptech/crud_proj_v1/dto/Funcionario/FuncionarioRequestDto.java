@@ -1,18 +1,10 @@
-package school.sptech.crud_proj_v1.entity;
+package school.sptech.crud_proj_v1.dto.Funcionario;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+
 import jakarta.validation.constraints.*;
 import org.hibernate.validator.constraints.br.CPF;
 
-@Entity
-public class Funcionario {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-
+public class FuncionarioRequestDto {
     @NotBlank
     @Size(min = 2, max = 50)
     private String nome;
@@ -20,25 +12,12 @@ public class Funcionario {
     @CPF
     @NotBlank
     private String cpf;
-
     @Positive
     private Double salario;
-
     @NotNull
     @Email
     private String email;
-
-    private Double comissao;
-
     private String senha;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public String getNome() {
         return nome;
@@ -62,14 +41,6 @@ public class Funcionario {
 
     public void setSalario(Double salario) {
         this.salario = salario;
-    }
-
-    public Double getComissao() {
-        return comissao;
-    }
-
-    public void setComissao(Double comissao) {
-        this.comissao = comissao;
     }
 
     public String getEmail() {

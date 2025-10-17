@@ -3,9 +3,14 @@ package school.sptech.crud_proj_v1.controller;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioLoginDto;
+import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioResponseDto;
+import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioTokenDto;
 import school.sptech.crud_proj_v1.entity.Funcionario;
+import school.sptech.crud_proj_v1.mapper.FuncionarioMapper;
 import school.sptech.crud_proj_v1.repository.FuncionarioRepository;
 import school.sptech.crud_proj_v1.service.FuncionarioService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,8 +25,9 @@ public class FuncionarioController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Funcionario>> listarFuncionarios(){
-        List<Funcionario> all = service.listar();
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<List<FuncionarioResponseDto>> listarFuncionarios(){
+        List<FuncionarioResponseDto> all = service.listar();
 
         if (all.isEmpty()){
             return ResponseEntity.status(204).build();
@@ -30,24 +36,36 @@ public class FuncionarioController {
     }
 
     @PostMapping
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Funcionario> cadastrarFuncionario(@Valid @RequestBody Funcionario func){
         service.cadastrar(func);
         return ResponseEntity.status(201).body(func);
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<FuncionarioTokenDto> login(@RequestBody FuncionarioLoginDto funcionarioLoginDto) {
+        final Funcionario funcionario = FuncionarioMapper.of(funcionarioLoginDto);
+        FuncionarioTokenDto funcionarioTokenDto = this.service.autenticar(funcionario);
+
+        return ResponseEntity.status(200).body(funcionarioTokenDto);
+    }
+
     @GetMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Funcionario> buscarFuncPorId(@PathVariable int id){
         Funcionario func = service.buscarPorId(id);
         return ResponseEntity.status(200).body(func);
     }
 
     @PutMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Funcionario> atualizarFuncionarioPorId(@Valid @PathVariable Integer id, @RequestBody Funcionario func){
         service.atualizarPorId(id, func);
         return ResponseEntity.status(200).body(func);
     }
 
     @DeleteMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Void> deletarFuncionarioPorId(@PathVariable Integer id){
         service.deletarPorId(id);
         return ResponseEntity.status(204).build();

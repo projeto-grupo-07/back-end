@@ -1,5 +1,6 @@
 package school.sptech.crud_proj_v1.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.sptech.crud_proj_v1.dto.Venda.VendaRequestDTO;
@@ -22,6 +23,7 @@ public class VendaController {
     }
 
     @GetMapping
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<VendaResponseDTO>> listarVendas(){
         List<VendaResponseDTO> all = service.listarTodasVendas();
 
@@ -32,6 +34,7 @@ public class VendaController {
     }
 
     @PostMapping
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<VendaResponseDTO> cadastrarVenda(@RequestBody VendaRequestDTO venda){
        VendaResponseDTO vendaCriada = service.cadastrarVenda(venda);
         return ResponseEntity.status(201).body(vendaCriada);
@@ -40,6 +43,7 @@ public class VendaController {
     }
 
     @GetMapping("/{nome}")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<Venda>> buscarVendasPorNomeDoVendedor(@PathVariable String nome){
         List<Venda> vendasByNome = repository.findByFuncionarioNomeContainingIgnoreCase(nome);
         if (vendasByNome.isEmpty()){
@@ -49,6 +53,7 @@ public class VendaController {
     }
 
     @PutMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Venda> atualizarVendaPorId(@PathVariable Integer id, @RequestBody Venda venda){
         venda.setId(id);
         if (repository.existsById(id)){
@@ -59,6 +64,7 @@ public class VendaController {
     }
 
     @DeleteMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
     public ResponseEntity<Void> deletarVendaPorId(@PathVariable Integer id){
         if (repository.existsById(id)){
             repository.deleteById(id);
