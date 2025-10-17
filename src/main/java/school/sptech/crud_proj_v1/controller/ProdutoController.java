@@ -26,7 +26,7 @@ public class ProdutoController {
 
     @GetMapping
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<List<ProdutoListDTO>> listarProdutos(){
+    public ResponseEntity<List<ProdutoListDTO>> listarProdutos() {
         List<ProdutoListDTO> listaProdutos = service.listarTodos();
 
         if (listaProdutos.isEmpty()) {
@@ -36,55 +36,16 @@ public class ProdutoController {
         return ResponseEntity.ok(listaProdutos);
     }
 
-    @PostMapping
-    @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<ProdutoListDTO> cadastrarProduto(@RequestBody @Valid ProdutoRequestDTO novoProdutoDTO){
-        ProdutoListDTO produtoSalvo = service.criar(novoProdutoDTO);
-        return ResponseEntity.status(201).body(produtoSalvo);
-    }
-
-    @GetMapping("/por-categoria")
-    @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<List<Produto>> buscarProdutoPorCategoria(@RequestParam String categoria){
-        List<Produto> achados = repository.findByCategoriaDescricaoContainingIgnoreCase(categoria);
-        if (achados.isEmpty()){
-            return ResponseEntity.status(204).build();
-        }
-        return ResponseEntity.status(200).body(achados);
-    }
-
-    @PutMapping("/{id}")
-    @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<Produto> atualizarProdutoPorId(@PathVariable Integer id, @RequestBody Produto prod){
-        prod.setId(id);
-        if (repository.existsById(id)){
-            repository.save(prod);
-            return ResponseEntity.status(200).body(prod);
-        }
-        return ResponseEntity.status(404).build();
-    }
-
-    @DeleteMapping("/{id}")
-    @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<Void> deletarProdutoPorId(@PathVariable Integer id){
-        if (repository.existsById(id)){
-            repository.deleteById(id);
-            return ResponseEntity.status(204).build();
-        }
-        return ResponseEntity.status(404).build();
-    }
-
     // EndPoint Gaby
     @GetMapping("/por-modelo")
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<List<ProdutoListDTO>> buscarPorModelo(@RequestParam String modelo){
+    public ResponseEntity<List<ProdutoListDTO>> buscarPorModelo(@RequestParam String modelo) {
 
         List<Produto> produtosEncontrados = repository.findByModeloContainingIgnoreCase(modelo);
 
-        if(produtosEncontrados.isEmpty()){
+        if (produtosEncontrados.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
-
         List<ProdutoListDTO> resposta = produtosEncontrados.stream()
                 .map(ProdutoMapper::toDTO)
                 .toList();
@@ -100,8 +61,45 @@ public class ProdutoController {
 
         if (produtos.isEmpty()) {
             return ResponseEntity.status(204).build();
-        } return ResponseEntity.status(200).body(produtos);
+        }
+        return ResponseEntity.status(200).body(produtos);
     }
 
+    @GetMapping("/por-categoria")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<List<Produto>> buscarProdutoPorCategoria(@RequestParam String categoria) {
+        List<Produto> achados = repository.findByCategoriaDescricaoContainingIgnoreCase(categoria);
+        if (achados.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(200).body(achados);
+    }
 
+    @PostMapping
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<ProdutoListDTO> cadastrarProduto(@RequestBody @Valid ProdutoRequestDTO novoProdutoDTO) {
+        ProdutoListDTO produtoSalvo = service.criar(novoProdutoDTO);
+        return ResponseEntity.status(201).body(produtoSalvo);
+    }
+
+    @PutMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Produto> atualizarProdutoPorId(@PathVariable Integer id, @RequestBody Produto prod) {
+        prod.setId(id);
+        if (repository.existsById(id)) {
+            repository.save(prod);
+            return ResponseEntity.status(200).body(prod);
+        }
+        return ResponseEntity.status(404).build();
+    }
+
+    @DeleteMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<Void> deletarProdutoPorId(@PathVariable Integer id) {
+        if (repository.existsById(id)) {
+            repository.deleteById(id);
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(404).build();
+    }
 }
