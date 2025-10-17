@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import school.sptech.crud_proj_v1.dto.Venda.VendaRequestDTO;
 import school.sptech.crud_proj_v1.dto.Venda.VendaResponseDTO;
-import school.sptech.crud_proj_v1.entity.Produto;
 import school.sptech.crud_proj_v1.entity.ProdutoVenda;
 import school.sptech.crud_proj_v1.entity.Venda;
 import school.sptech.crud_proj_v1.exception.EntidadeNotFoundException;
@@ -98,6 +97,11 @@ public class VendaService {
 
     public List<VendaResponseDTO> buscarPorNomeVendedor(String nome) {
         List<Venda> vendas = vendaRepository.findByFuncionarioNomeContainingIgnoreCase(nome);
+        return VendaMapper.toVendaResponseDTO(vendas);
+    }
+
+    public List<VendaResponseDTO> buscarPorFormaPagamento(String formPgto){
+        List<Venda> vendas = vendaRepository.findByformaDePagamentoContainingIgnoreCase(formPgto);
         return VendaMapper.toVendaResponseDTO(vendas);
     }
 }

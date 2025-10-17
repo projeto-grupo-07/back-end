@@ -33,16 +33,7 @@ public class VendaController {
         return ResponseEntity.status(200).body(all);
     }
 
-    @PostMapping
-    @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<VendaResponseDTO> cadastrarVenda(@RequestBody VendaRequestDTO venda){
-       VendaResponseDTO vendaCriada = service.cadastrarVenda(venda);
-        return ResponseEntity.status(201).body(vendaCriada);
-
-
-    }
-
-    @GetMapping("/{nome}")
+    @GetMapping("/vendedor/{nome}")
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<Venda>> buscarVendasPorNomeDoVendedor(@PathVariable String nome){
         List<Venda> vendasByNome = repository.findByFuncionarioNomeContainingIgnoreCase(nome);
@@ -50,6 +41,26 @@ public class VendaController {
             return ResponseEntity.status(404).build();
         }
         return ResponseEntity.status(200).body(vendasByNome);
+    }
+
+    //endpoint Augusto
+    @GetMapping("/forma-pagamento/{formaPgto}")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<List<VendaResponseDTO>> buscarPorFormaDePagamento(@PathVariable String formaPgto){
+        List<VendaResponseDTO> vendasByFormaPagto = service.buscarPorFormaPagamento(formaPgto);
+        if (vendasByFormaPagto.isEmpty()){
+            return ResponseEntity.status(404).build();
+        }
+        return ResponseEntity.status(200).body(vendasByFormaPagto);
+    }
+
+    @PostMapping
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<VendaResponseDTO> cadastrarVenda(@RequestBody VendaRequestDTO venda){
+       VendaResponseDTO vendaCriada = service.cadastrarVenda(venda);
+        return ResponseEntity.status(201).body(vendaCriada);
+
+
     }
 
     @PutMapping("/{id}")

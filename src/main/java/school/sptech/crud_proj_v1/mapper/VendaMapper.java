@@ -29,7 +29,7 @@ public class VendaMapper {
             List<ProdutosVendaResponseDTO> itensDto = venda.getItens().stream()
                     .map(ProdutosVendaMapper::toProdutosVendaResponseDTO)
                     .collect(Collectors.toList());
-            dto.setProdutos(itensDto);
+            dto.setItensDaVenda(itensDto);
         }
 
         return dto;

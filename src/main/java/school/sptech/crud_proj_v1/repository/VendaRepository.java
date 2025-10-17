@@ -9,4 +9,5 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
     // aqui vai conter as queries personalizadas
 
     List<Venda> findByFuncionarioNomeContainingIgnoreCase(String valor);
+    List<Venda> findByformaDePagamentoContainingIgnoreCase(String formPgto);
 }
