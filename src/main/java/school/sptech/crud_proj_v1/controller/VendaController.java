@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import school.sptech.crud_proj_v1.dto.Venda.VendaRequestDTO;
 import school.sptech.crud_proj_v1.dto.Venda.VendaResponseDTO;
 import school.sptech.crud_proj_v1.entity.Venda;
+import school.sptech.crud_proj_v1.mapper.VendaMapper;
 import school.sptech.crud_proj_v1.repository.VendaRepository;
 import school.sptech.crud_proj_v1.service.VendaService;
 
@@ -26,7 +27,6 @@ public class VendaController {
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<VendaResponseDTO>> listarVendas(){
         List<VendaResponseDTO> all = service.listarTodasVendas();
-
         if (all.isEmpty()){
             return ResponseEntity.status(204).build();
         }
@@ -59,17 +59,15 @@ public class VendaController {
     public ResponseEntity<VendaResponseDTO> cadastrarVenda(@RequestBody VendaRequestDTO venda){
        VendaResponseDTO vendaCriada = service.cadastrarVenda(venda);
         return ResponseEntity.status(201).body(vendaCriada);
-
-
     }
 
     @PutMapping("/{id}")
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<Venda> atualizarVendaPorId(@PathVariable Integer id, @RequestBody Venda venda){
+    public ResponseEntity<VendaResponseDTO> atualizarVendaPorId(@PathVariable Integer id, @RequestBody Venda venda){
         venda.setId(id);
         if (repository.existsById(id)){
             repository.save(venda);
-            return ResponseEntity.status(200).body(venda);
+            return ResponseEntity.status(200).body(VendaMapper.toVendaResponseDTO(venda));
         }
         return ResponseEntity.status(404).build();
     }
