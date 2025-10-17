@@ -23,6 +23,13 @@ public class VendaController {
         this.service = service;
     }
 
+    //endpoint Augusto (2)
+    @GetMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<VendaResponseDTO> buscarPorId(@PathVariable Integer id){
+        return ResponseEntity.status(200).body(service.buscarVendaPorId(id));
+    }
+
     @GetMapping
     @SecurityRequirement(name = "Bearer")
     public ResponseEntity<List<VendaResponseDTO>> listarVendas(){
@@ -61,13 +68,14 @@ public class VendaController {
         return ResponseEntity.status(201).body(vendaCriada);
     }
 
+    //ATUALIZAR NÃO TA ATUALIZANDO, ELE TA CRIANDO OUTRA VENDA, ATUALIZAR OQ PEDE MAS O RESTO FICA TUDO NULL, PRECISA FAZER DTO DE UPDATE.
     @PutMapping("/{id}")
     @SecurityRequirement(name = "Bearer")
-    public ResponseEntity<VendaResponseDTO> atualizarVendaPorId(@PathVariable Integer id, @RequestBody Venda venda){
-        venda.setId(id);
+    public ResponseEntity<VendaResponseDTO> atualizarVendaPorId(@PathVariable Integer id, @RequestBody VendaRequestDTO vendaRequest){
+        Venda vendaCadastrada = VendaMapper.toEntity(vendaRequest);
         if (repository.existsById(id)){
-            repository.save(venda);
-            return ResponseEntity.status(200).body(VendaMapper.toVendaResponseDTO(venda));
+            repository.save(vendaCadastrada);
+            return ResponseEntity.status(200).body(VendaMapper.toVendaResponseDTO(vendaCadastrada));
         }
         return ResponseEntity.status(404).build();
     }

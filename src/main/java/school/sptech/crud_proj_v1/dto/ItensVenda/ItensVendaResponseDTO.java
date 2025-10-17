@@ -1,15 +1,14 @@
-package school.sptech.crud_proj_v1.dto.ProdutoVenda;
+package school.sptech.crud_proj_v1.dto.ItensVenda;
 
-import java.math.BigDecimal;
 
-public class ProdutosVendaResponseDTO {
+public class ItensVendaResponseDTO {
 
     private Integer id;
     private Integer quantidade;
     private Double precoVenda;
 
 
-    private ProdutoVendaItemDTO produto;
+    private ItensVendaDTO produto;
 
     public Integer getId() {
         return id;
@@ -35,11 +34,11 @@ public class ProdutosVendaResponseDTO {
         this.precoVenda = precoVenda;
     }
 
-    public ProdutoVendaItemDTO getProduto() {
+    public ItensVendaDTO getProduto() {
         return produto;
     }
 
-    public void setProduto(ProdutoVendaItemDTO produto) {
+    public void setProduto(ItensVendaDTO produto) {
         this.produto = produto;
     }
 }

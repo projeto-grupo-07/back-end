@@ -5,8 +5,8 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "PRODUTOS_VENDA")
-public class ProdutoVenda {
+@Table(name = "ITENS_VENDA")
+public class ItensVenda {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -25,7 +25,7 @@ public class ProdutoVenda {
     private Double precoVenda;
 
 
-    public ProdutoVenda(){}
+    public ItensVenda(){}
 
     public Integer getId() {
         return id;

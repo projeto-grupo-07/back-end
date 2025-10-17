@@ -1,10 +1,9 @@
-package school.sptech.crud_proj_v1.dto.ProdutoVenda;
+package school.sptech.crud_proj_v1.dto.ItensVenda;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import java.math.BigDecimal;
 
-public class ProdutoVendaItemRequestDTO {
+public class ItensVendaRequestDTO {
 
     @NotNull()
     private Integer idProduto;
@@ -17,7 +16,7 @@ public class ProdutoVendaItemRequestDTO {
     @Min(value = 0)
     private Double precoVenda;
 
-    public ProdutoVendaItemRequestDTO(Integer idProduto, Integer quantidade, Double precoVenda) {
+    public ItensVendaRequestDTO(Integer idProduto, Integer quantidade, Double precoVenda) {
         this.idProduto = idProduto;
         this.quantidade = quantidade;
         this.precoVenda = precoVenda;

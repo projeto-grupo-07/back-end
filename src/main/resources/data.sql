@@ -10,11 +10,11 @@ INSERT INTO EMPRESA (razao_social, cnpj, responsavel, fk_endereco) VALUES
 INSERT INTO CATEGORIA (descricao) VALUES ('Calçados');
 -- CATEGORIA ID: 1
 
-INSERT INTO PRODUTO (modelo, marca, tamanho, cor, preco_custo, categoria_id) VALUES
-('Tênis Runner Pro', 'SpeedMax', '40', 'Preto/Vermelho', 299.99, 1), -- ID 1
-('Scarpin Salto Fino', 'Elegance', '36', 'Nude', 159.50, 1),      -- ID 2
-('Sapatênis Confort', 'UrbanWear', '42', 'Marrom', 99.00, 1),       -- ID 3
-('Bota Coturno Couro', 'Aventureiro', '38', 'Preto Fosco', 350.00, 1); -- ID 4
+INSERT INTO PRODUTO (modelo, marca, tamanho, cor, preco_custo, preco_venda, categoria_id) VALUES
+('Tênis Runner Pro', 'SpeedMax', '40', 'Preto/Vermelho', 299.99, 479.99, 1), -- ID 1
+('Scarpin Salto Fino', 'Elegance', '36', 'Nude', 159.50, 259.90, 1),      -- ID 2
+('Sapatênis Confort', 'UrbanWear', '42', 'Marrom', 99.00, 179.99, 1),       -- ID 3
+('Bota Coturno Couro', 'Aventureiro', '38', 'Preto Fosco', 199.50, 350.00, 1); -- ID 4
 
 ---------------------------------------------------
 -- NOVO PASSO: Insere um Funcionário (Vendedor) --
@@ -44,12 +44,12 @@ VALUES
 ----------------------------------------------------------------------
 
 -- Itens da VENDA 1 (2x Tênis)
-INSERT INTO PRODUTOS_VENDA (fk_produto, fk_venda, quantidade, preco_venda)
+INSERT INTO ITENS_VENDA (fk_produto, fk_venda, quantidade, preco_venda)
 VALUES
 (1, 1, 2, 299.99);
 
 -- Itens da VENDA 2 (1x Scarpin e 1x Sapatênis)
-INSERT INTO PRODUTOS_VENDA (fk_produto, fk_venda, quantidade, preco_venda)
+INSERT INTO ITENS_VENDA (fk_produto, fk_venda, quantidade, preco_venda)
 VALUES
 (2, 2, 1, 159.50),
 (3, 2, 1, 99.00);

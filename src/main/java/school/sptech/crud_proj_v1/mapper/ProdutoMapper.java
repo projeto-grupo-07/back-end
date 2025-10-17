@@ -2,7 +2,7 @@ package school.sptech.crud_proj_v1.mapper;
 
 import school.sptech.crud_proj_v1.dto.Produto.ProdutoListDTO;
 import school.sptech.crud_proj_v1.dto.Produto.ProdutoRequestDTO;
-import school.sptech.crud_proj_v1.dto.ProdutoVenda.ProdutoVendaItemDTO;
+import school.sptech.crud_proj_v1.dto.ItensVenda.ItensVendaDTO;
 import school.sptech.crud_proj_v1.entity.Produto;
 
 import java.util.List;
@@ -10,12 +10,12 @@ import java.util.stream.Collectors;
 
 public class ProdutoMapper {
 
-    public static ProdutoVendaItemDTO toProdutoVendaItemDTO(Produto produto) {
+    public static ItensVendaDTO toItensVendaDTO(Produto produto) {
         if (produto == null) {
             return null;
         }
 
-        ProdutoVendaItemDTO dto = new ProdutoVendaItemDTO();
+        ItensVendaDTO dto = new ItensVendaDTO();
 
         dto.setId(produto.getId());
         dto.setModelo(produto.getModelo());

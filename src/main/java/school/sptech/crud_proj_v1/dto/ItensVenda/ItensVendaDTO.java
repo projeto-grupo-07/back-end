@@ -1,6 +1,6 @@
-package school.sptech.crud_proj_v1.dto.ProdutoVenda;
+package school.sptech.crud_proj_v1.dto.ItensVenda;
 
-public class ProdutoVendaItemDTO {
+public class ItensVendaDTO {
 
     private Integer id;
     private String modelo;

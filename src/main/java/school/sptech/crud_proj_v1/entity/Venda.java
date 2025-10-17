@@ -2,7 +2,6 @@ package school.sptech.crud_proj_v1.entity;
 
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,7 +18,7 @@ public class Venda {
     @Column(name = "VALOR_TOTAL")
     private Double totalVenda;
     @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL)
-    private List<ProdutoVenda> itens;
+    private List<ItensVenda> itens;
     private LocalDateTime dataHora;
 
     public Integer getId() {
@@ -38,11 +37,11 @@ public class Venda {
         this.funcionario = funcionario;
     }
 
-    public List<ProdutoVenda> getItens() {
+    public List<ItensVenda> getItens() {
         return itens;
     }
 
-    public void setItens(List<ProdutoVenda> itens) {
+    public void setItens(List<ItensVenda> itens) {
         this.itens = itens;
     }
 

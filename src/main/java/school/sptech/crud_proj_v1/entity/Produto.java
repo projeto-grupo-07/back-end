@@ -20,7 +20,7 @@ public class Produto {
     private String tamanho;
     private String cor;
     @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL)
-    private List<ProdutoVenda> vendas;
+    private List<ItensVenda> vendas;
 
     public Produto(){}
 
@@ -109,11 +109,11 @@ public class Produto {
         this.cor = cor;
     }
 
-    public List<ProdutoVenda> getVendas() {
+    public List<ItensVenda> getVendas() {
         return vendas;
     }
 
-    public void setVendas(List<ProdutoVenda> vendas) {
+    public void setVendas(List<ItensVenda> vendas) {
         this.vendas = vendas;
     }
 }

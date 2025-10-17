@@ -1,6 +1,6 @@
 package school.sptech.crud_proj_v1.dto.Venda;
 
-import school.sptech.crud_proj_v1.dto.ProdutoVenda.ProdutosVendaResponseDTO;
+import school.sptech.crud_proj_v1.dto.ItensVenda.ItensVendaResponseDTO;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,7 +14,7 @@ public class VendaResponseDTO {
     private String formaPagamento;
     private LocalDateTime dataHora;
 
-    private List<ProdutosVendaResponseDTO> itensDaVenda;
+    private List<ItensVendaResponseDTO> itensDaVenda;
 
     public Integer getId() {
         return id;
@@ -56,11 +56,11 @@ public class VendaResponseDTO {
         this.dataHora = dataHora;
     }
 
-    public List<ProdutosVendaResponseDTO> getItensDaVenda() {
+    public List<ItensVendaResponseDTO> getItensDaVenda() {
         return itensDaVenda;
     }
 
-    public void setItensDaVenda(List<ProdutosVendaResponseDTO> itensDaVenda) {
+    public void setItensDaVenda(List<ItensVendaResponseDTO> itensDaVenda) {
         this.itensDaVenda = itensDaVenda;
     }
 }

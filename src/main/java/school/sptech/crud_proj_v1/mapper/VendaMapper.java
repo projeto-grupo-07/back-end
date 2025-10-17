@@ -1,6 +1,7 @@
 package school.sptech.crud_proj_v1.mapper;
 
-import school.sptech.crud_proj_v1.dto.ProdutoVenda.ProdutosVendaResponseDTO;
+import school.sptech.crud_proj_v1.dto.ItensVenda.ItensVendaResponseDTO;
+import school.sptech.crud_proj_v1.dto.Venda.VendaRequestDTO;
 import school.sptech.crud_proj_v1.dto.Venda.VendaResponseDTO;
 import school.sptech.crud_proj_v1.entity.Venda;
 
@@ -8,6 +9,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class VendaMapper {
+
+    public static Venda toEntity(VendaRequestDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+        Venda venda = new Venda();
+        venda.setFormaDePagamento(dto.getFormaPagamento());
+        return venda;
+    }
 
     public static VendaResponseDTO toVendaResponseDTO(Venda venda) {
         if (venda == null) {
@@ -26,12 +36,11 @@ public class VendaMapper {
         }
 
         if (venda.getItens() != null) {
-            List<ProdutosVendaResponseDTO> itensDto = venda.getItens().stream()
-                    .map(ProdutosVendaMapper::toProdutosVendaResponseDTO)
+            List<ItensVendaResponseDTO> itensDto = venda.getItens().stream()
+                    .map(ItensVendaMapper::toProdutosVendaResponseDTO)
                     .collect(Collectors.toList());
             dto.setItensDaVenda(itensDto);
         }
-
         return dto;
     }
 
