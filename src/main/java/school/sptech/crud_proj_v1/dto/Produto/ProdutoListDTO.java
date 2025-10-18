@@ -1,14 +1,21 @@
 package school.sptech.crud_proj_v1.dto.Produto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import school.sptech.crud_proj_v1.entity.Categoria;
 import school.sptech.crud_proj_v1.entity.Produto;
 
+@Schema(description = "DTO utilizado para exibir as informações dos produtos")
 public class ProdutoListDTO {
 
+    @Schema(name = "ID do Produto", example = "1", description = "Esse campo representa o identificador único dos produtos. Ele se auto incrementa")
     private Integer id;
+    @Schema(example = "Court Vision Low", description = "Esse campo representa o modelo do produto")
     private String modelo;
+    @Schema(example = "Nike", description = "Esse campo representa a marca do produto")
     private String marca;
+    @Schema(example = "122.99", description = "Esse campo representa o valor que o produto foi vendido")
     private Double precoVenda;
+    @Schema(description = "Esse campo é um objeto da classe Categoria. Representa a categoria do produto")
     private String nomeCategoria;
 
 

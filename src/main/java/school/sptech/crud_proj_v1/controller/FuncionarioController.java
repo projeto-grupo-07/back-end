@@ -1,5 +1,7 @@
 package school.sptech.crud_proj_v1.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.util.List;
 import java.util.Optional;
 
+@Tag(name = "Funcionário")
 @RestController
 @RequestMapping("/funcionarios")
 public class FuncionarioController {
@@ -26,6 +29,7 @@ public class FuncionarioController {
 
     @GetMapping
     @SecurityRequirement(name = "Bearer")
+    @Tag(name = "Funcionário")
     public ResponseEntity<List<FuncionarioResponseDto>> listarFuncionarios(){
         List<FuncionarioResponseDto> all = service.listar();
 
@@ -37,6 +41,7 @@ public class FuncionarioController {
 
     @PostMapping
     @SecurityRequirement(name = "Bearer")
+    @Operation(summary = "Esse método lista todos os funcionários cadastrados")
     public ResponseEntity<Funcionario> cadastrarFuncionario(@Valid @RequestBody Funcionario func){
         service.cadastrar(func);
         return ResponseEntity.status(201).body(func);
@@ -52,6 +57,7 @@ public class FuncionarioController {
 
     @GetMapping("/{id}")
     @SecurityRequirement(name = "Bearer")
+    @Operation(summary = "Esse método busca um funcionário por seu id")
     public ResponseEntity<Funcionario> buscarFuncPorId(@PathVariable int id){
         Funcionario func = service.buscarPorId(id);
         return ResponseEntity.status(200).body(func);
@@ -59,6 +65,7 @@ public class FuncionarioController {
 
     @PutMapping("/{id}")
     @SecurityRequirement(name = "Bearer")
+    @Operation(summary = "Esse método atualiza algum campo do funcionário pelo id")
     public ResponseEntity<Funcionario> atualizarFuncionarioPorId(@Valid @PathVariable Integer id, @RequestBody Funcionario func){
         service.atualizarPorId(id, func);
         return ResponseEntity.status(200).body(func);
@@ -66,6 +73,7 @@ public class FuncionarioController {
 
     @DeleteMapping("/{id}")
     @SecurityRequirement(name = "Bearer")
+    @Operation(summary = "Esse método deleta um funcionário pelo id")
     public ResponseEntity<Void> deletarFuncionarioPorId(@PathVariable Integer id){
         service.deletarPorId(id);
         return ResponseEntity.status(204).build();
