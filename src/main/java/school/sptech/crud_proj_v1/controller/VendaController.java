@@ -68,6 +68,20 @@ public class VendaController {
         return ResponseEntity.status(200).body(vendasByFormaPagto);
     }
 
+    // Endpoint Kaio
+    // Obs: Posteriormente fazer filtrando por data
+    @GetMapping("/total")
+    @SecurityRequirement(name = "Bearer")
+    @Operation(summary = "Esse método retorna o valor total de todas as vendas cadastradas")
+    public ResponseEntity<Double> calcularTotalVendas() {
+        Double total = service.calcularTotalVendas();
+
+        if(total == 0 || total == null){
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(200).body(total);
+    }
+
     @PostMapping
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método cadastra uma venda")
@@ -99,6 +113,8 @@ public class VendaController {
         }
         return ResponseEntity.status(404).build();
     }
+
+
 
 
 }

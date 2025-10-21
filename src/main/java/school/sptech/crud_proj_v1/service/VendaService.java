@@ -98,4 +98,12 @@ public class VendaService {
         List<Venda> vendas = vendaRepository.findByformaDePagamentoContainingIgnoreCase(formPgto);
         return VendaMapper.toVendaResponseDTO(vendas);
     }
+
+    public Double calcularTotalVendas() {
+        List<Venda> vendas = vendaRepository.findAll();
+
+        return vendas.stream()
+                .mapToDouble(Venda::getTotalVenda)
+                .sum();
+    }
 }
