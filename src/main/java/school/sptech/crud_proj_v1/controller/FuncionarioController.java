@@ -41,7 +41,7 @@ public class FuncionarioController {
 
     @PostMapping
     @SecurityRequirement(name = "Bearer")
-    @Operation(summary = "Esse método lista todos os funcionários cadastrados")
+    @Operation(summary = "Esse método cadastra um novo funcionário")
     public ResponseEntity<Funcionario> cadastrarFuncionario(@Valid @RequestBody Funcionario func){
         service.cadastrar(func);
         return ResponseEntity.status(201).body(func);
