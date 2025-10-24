@@ -12,12 +12,19 @@ public class FuncionarioRequestDto {
     @CPF
     @NotBlank
     private String cpf;
+
     @Positive
     private Double salario;
+
     @NotNull
     @Email
     private String email;
+
+    @NotBlank
     private String senha;
+
+    @NotNull
+    private Double comissao;
 
     public String getNome() {
         return nome;
@@ -57,5 +64,13 @@ public class FuncionarioRequestDto {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    public Double getComissao() {
+        return comissao;
+    }
+
+    public void setComissao(Double comissao) {
+        this.comissao = comissao;
     }
 }

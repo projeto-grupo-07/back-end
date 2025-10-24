@@ -10,6 +10,7 @@ public class FuncionarioResponseDto {
     private String cpf;
     private Double salario;
     private String email;
+    private Double comissao;
 
     public Integer getId() {
         return id;
@@ -49,5 +50,13 @@ public class FuncionarioResponseDto {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Double getComissao() {
+        return comissao;
+    }
+
+    public void setComissao(Double comissao) {
+        this.comissao = comissao;
     }
 }

@@ -6,16 +6,15 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioLoginDto;
+import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioRequestDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioResponseDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioTokenDto;
 import school.sptech.crud_proj_v1.entity.Funcionario;
 import school.sptech.crud_proj_v1.mapper.FuncionarioMapper;
-import school.sptech.crud_proj_v1.repository.FuncionarioRepository;
 import school.sptech.crud_proj_v1.service.FuncionarioService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 import java.util.List;
-import java.util.Optional;
 
 @Tag(name = "Funcionário")
 @RestController
@@ -42,9 +41,9 @@ public class FuncionarioController {
     @PostMapping
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método cadastra um novo funcionário")
-    public ResponseEntity<Funcionario> cadastrarFuncionario(@Valid @RequestBody Funcionario func){
-        service.cadastrar(func);
-        return ResponseEntity.status(201).body(func);
+    public ResponseEntity<FuncionarioResponseDto> cadastrarFuncionario(@Valid @RequestBody FuncionarioRequestDto func){
+        FuncionarioResponseDto funcionarioResponse = service.cadastrarFuncionario(func);
+        return ResponseEntity.status(201).body(funcionarioResponse);
     }
 
     @PostMapping("/login")
@@ -58,17 +57,18 @@ public class FuncionarioController {
     @GetMapping("/{id}")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método busca um funcionário por seu id")
-    public ResponseEntity<Funcionario> buscarFuncPorId(@PathVariable int id){
-        Funcionario func = service.buscarPorId(id);
-        return ResponseEntity.status(200).body(func);
+    public ResponseEntity<FuncionarioResponseDto> buscarFuncPorId(@PathVariable int id){
+        FuncionarioResponseDto funcionarioResponse = FuncionarioMapper.of(service.buscarPorId(id));
+        return ResponseEntity.status(200).body(funcionarioResponse);
     }
 
     @PutMapping("/{id}")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método atualiza algum campo do funcionário pelo id")
-    public ResponseEntity<Funcionario> atualizarFuncionarioPorId(@Valid @PathVariable Integer id, @RequestBody Funcionario func){
-        service.atualizarPorId(id, func);
-        return ResponseEntity.status(200).body(func);
+    public ResponseEntity<FuncionarioResponseDto> atualizarFuncionarioPorId(@Valid @PathVariable Integer id, @RequestBody FuncionarioRequestDto func){
+        Funcionario funcionarioAtualizado = service.atualizarPorId(id, func);
+        FuncionarioResponseDto funcionarioResponse = FuncionarioMapper.of(funcionarioAtualizado);
+        return ResponseEntity.status(200).body(funcionarioResponse);
     }
 
     @DeleteMapping("/{id}")
