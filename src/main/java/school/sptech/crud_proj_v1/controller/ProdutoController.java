@@ -82,6 +82,16 @@ public class ProdutoController {
         return ResponseEntity.status(200).body(achados);
     }
 
+    @GetMapping("/por-categoria-ordenado-preco-desc")
+    @SecurityRequirement(name = "Bearer")
+    @Operation(summary = "Esse método lista todos os produtos de uma determiada categoria ordenados pelo preço de forma decrescente")
+    public ResponseEntity<List<ProdutoListDTO>> buscarProdutoPorCategoriaOrdenadoPorPrecoDesc(@RequestParam String categoria) {
+        List<ProdutoListDTO> produtos = service.buscarProdutoPorCategoriaOrdenadoPorPrecoDesc(categoria);
+        if (produtos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        } return ResponseEntity.status(200).body(produtos);
+    }
+
     @PostMapping
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método cadastra um produto")

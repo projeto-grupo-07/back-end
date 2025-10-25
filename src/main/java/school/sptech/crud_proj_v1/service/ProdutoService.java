@@ -50,6 +50,12 @@ public class ProdutoService {
         return ProdutoMapper.toListDTO(produtos);
     }
 
+    public List<ProdutoListDTO> buscarProdutoPorCategoriaOrdenadoPorPrecoDesc(String categoria) {
+        List<Produto> produtos = produtoRepository.findByCategoriaDescricaoContainingIgnoreCaseOrderByPrecoVendaDesc(categoria);
+
+        return ProdutoMapper.toListDTO(produtos);
+    }
+
 
 
 }
