@@ -52,8 +52,7 @@ public class FuncionarioService {
             Funcionario funcionarioSalvo = FuncionarioMapper.toEntity(func);
             funcionarioSalvo.setSenha(senhaCriptograda);
             funcionarioRepository.save(funcionarioSalvo);
-            FuncionarioResponseDto funcionarioResponse = FuncionarioMapper.of(funcionarioSalvo);
-            return funcionarioResponse;
+            return FuncionarioMapper.of(funcionarioSalvo);
         }
     }
 
@@ -72,16 +71,13 @@ public class FuncionarioService {
         return FuncionarioMapper.of(funcionarioAutenticado, token);
     }
 
-    public Funcionario buscarPorId(Integer id){
-        Optional<Funcionario> opt = funcionarioRepository.findById(id);
-        if (opt.isEmpty()){
-            throw new EntidadeNotFoundException("Não encontrado");
-        } else {
-            return opt.get();
-        }
+    public FuncionarioResponseDto buscarPorId(Integer id){
+        Funcionario funcionarioFound = funcionarioRepository.findById(id)
+                .orElseThrow(() -> new EntidadeNotFoundException("Funcionário com id não encontrado: " + id));
+        return FuncionarioMapper.of(funcionarioFound);
     }
 
-    public Funcionario atualizarPorId(Integer id, FuncionarioRequestDto dto) {
+    public FuncionarioResponseDto atualizarPorId(Integer id, FuncionarioRequestDto dto) {
 
         Funcionario funcionarioParaAtualizar = funcionarioRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNotFoundException("Funcionário com id não encontrado: " + id));
@@ -96,9 +92,7 @@ public class FuncionarioService {
             funcionarioParaAtualizar.setSenha(passwordEncoder.encode(dto.getSenha()));
         }
 
-        Funcionario funcionarioSalvo = funcionarioRepository.save(funcionarioParaAtualizar);
-
-        return funcionarioSalvo;
+        return FuncionarioMapper.of(funcionarioRepository.save(funcionarioParaAtualizar));
     }
 
     public void deletarPorId(Integer id){
@@ -108,6 +102,4 @@ public class FuncionarioService {
         }
         throw new EntidadeNotFoundException("funcionario nao encontrado/existente");
     }
-
-
 }

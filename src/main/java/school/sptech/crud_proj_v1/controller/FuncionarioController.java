@@ -31,7 +31,6 @@ public class FuncionarioController {
     @Tag(name = "Funcionário")
     public ResponseEntity<List<FuncionarioResponseDto>> listarFuncionarios(){
         List<FuncionarioResponseDto> all = service.listar();
-
         if (all.isEmpty()){
             return ResponseEntity.status(204).build();
         }
@@ -42,15 +41,13 @@ public class FuncionarioController {
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método cadastra um novo funcionário")
     public ResponseEntity<FuncionarioResponseDto> cadastrarFuncionario(@Valid @RequestBody FuncionarioRequestDto func){
-        FuncionarioResponseDto funcionarioResponse = service.cadastrarFuncionario(func);
-        return ResponseEntity.status(201).body(funcionarioResponse);
+        return ResponseEntity.status(201).body(service.cadastrarFuncionario(func));
     }
 
     @PostMapping("/login")
     public ResponseEntity<FuncionarioTokenDto> login(@RequestBody FuncionarioLoginDto funcionarioLoginDto) {
         final Funcionario funcionario = FuncionarioMapper.of(funcionarioLoginDto);
         FuncionarioTokenDto funcionarioTokenDto = this.service.autenticar(funcionario);
-
         return ResponseEntity.status(200).body(funcionarioTokenDto);
     }
 
@@ -58,17 +55,14 @@ public class FuncionarioController {
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método busca um funcionário por seu id")
     public ResponseEntity<FuncionarioResponseDto> buscarFuncPorId(@PathVariable int id){
-        FuncionarioResponseDto funcionarioResponse = FuncionarioMapper.of(service.buscarPorId(id));
-        return ResponseEntity.status(200).body(funcionarioResponse);
+        return ResponseEntity.status(200).body(service.buscarPorId(id));
     }
 
     @PutMapping("/{id}")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método atualiza algum campo do funcionário pelo id")
     public ResponseEntity<FuncionarioResponseDto> atualizarFuncionarioPorId(@Valid @PathVariable Integer id, @RequestBody FuncionarioRequestDto func){
-        Funcionario funcionarioAtualizado = service.atualizarPorId(id, func);
-        FuncionarioResponseDto funcionarioResponse = FuncionarioMapper.of(funcionarioAtualizado);
-        return ResponseEntity.status(200).body(funcionarioResponse);
+        return ResponseEntity.status(200).body(service.atualizarPorId(id, func));
     }
 
     @DeleteMapping("/{id}")
@@ -78,6 +72,4 @@ public class FuncionarioController {
         service.deletarPorId(id);
         return ResponseEntity.status(204).build();
     }
-
-
 }
