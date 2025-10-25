@@ -3,6 +3,7 @@ package school.sptech.crud_proj_v1.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.sptech.crud_proj_v1.dto.Venda.VendaRequestDTO;
@@ -18,11 +19,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/vendas")
 public class VendaController {
-    private final VendaRepository repository;
     private final VendaService service;
 
-    public VendaController(VendaRepository repository, VendaService service) {
-        this.repository = repository;
+    public VendaController(VendaService service) {
         this.service = service;
     }
 
@@ -31,14 +30,14 @@ public class VendaController {
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método busca a venda pelo id")
     public ResponseEntity<VendaResponseDTO> buscarPorId(@PathVariable Integer id){
-        return ResponseEntity.status(200).body(service.buscarVendaPorId(id));
+        return ResponseEntity.status(200).body(service.buscarPorId(id));
     }
 
     @GetMapping
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método lista todas as vendas cadastrados")
     public ResponseEntity<List<VendaResponseDTO>> listarVendas(){
-        List<VendaResponseDTO> all = service.listarTodasVendas();
+        List<VendaResponseDTO> all = service.listar();
         if (all.isEmpty()){
             return ResponseEntity.status(204).build();
         }
@@ -51,7 +50,7 @@ public class VendaController {
     public ResponseEntity<List<VendaResponseDTO>> buscarVendasPorNomeDoVendedor(@PathVariable String nome){
         List<VendaResponseDTO> vendasByNome = service.buscarPorNomeVendedor(nome);
         if (vendasByNome.isEmpty()){
-            return ResponseEntity.status(404).build();
+            return ResponseEntity.status(204).build();
         }
         return ResponseEntity.status(200).body(vendasByNome);
     }
@@ -63,7 +62,7 @@ public class VendaController {
     public ResponseEntity<List<VendaResponseDTO>> buscarPorFormaDePagamento(@PathVariable String formaPgto){
         List<VendaResponseDTO> vendasByFormaPagto = service.buscarPorFormaPagamento(formaPgto);
         if (vendasByFormaPagto.isEmpty()){
-            return ResponseEntity.status(404).build();
+            return ResponseEntity.status(204).build();
         }
         return ResponseEntity.status(200).body(vendasByFormaPagto);
     }
@@ -74,7 +73,7 @@ public class VendaController {
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método retorna o valor total de todas as vendas cadastradas")
     public ResponseEntity<Double> calcularTotalVendas() {
-        Double total = service.calcularTotalVendas();
+        Double total = service.calcularTotal();
 
         if(total == 0 || total == null){
             return ResponseEntity.status(204).build();
@@ -86,32 +85,24 @@ public class VendaController {
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método cadastra uma venda")
     public ResponseEntity<VendaResponseDTO> cadastrarVenda(@RequestBody VendaRequestDTO venda){
-       VendaResponseDTO vendaCriada = service.cadastrarVenda(venda);
+       VendaResponseDTO vendaCriada = service.cadastrar(venda);
         return ResponseEntity.status(201).body(vendaCriada);
     }
 
-    //ATUALIZAR NÃO TA ATUALIZANDO, ELE TA CRIANDO OUTRA VENDA, ATUALIZAR OQ PEDE MAS O RESTO FICA TUDO NULL, PRECISA FAZER DTO DE UPDATE.
     @PutMapping("/{id}")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método atualiza algum campo da venda pelo id")
-    public ResponseEntity<VendaResponseDTO> atualizarVendaPorId(@PathVariable Integer id, @RequestBody VendaRequestDTO vendaRequest){
-        Venda vendaCadastrada = VendaMapper.toEntity(vendaRequest);
-        if (repository.existsById(id)){
-            repository.save(vendaCadastrada);
-            return ResponseEntity.status(200).body(VendaMapper.toVendaResponseDTO(vendaCadastrada));
-        }
-        return ResponseEntity.status(404).build();
+    public ResponseEntity<VendaResponseDTO> atualizarVendaPorId(@PathVariable Integer id, @RequestBody @Valid VendaRequestDTO vendaRequest){
+        VendaResponseDTO vendaAtualizada = service.atualizarPorId(id, vendaRequest);
+        return ResponseEntity.status(200).body(vendaAtualizada);
     }
 
     @DeleteMapping("/{id}")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método deleta uma venda pelo id")
     public ResponseEntity<Void> deletarVendaPorId(@PathVariable Integer id){
-        if (repository.existsById(id)){
-            repository.deleteById(id);
-            return ResponseEntity.status(204).build();
-        }
-        return ResponseEntity.status(404).build();
+        service.deletarVendaPorId(id);
+        return ResponseEntity.status(204).build();
     }
 
 

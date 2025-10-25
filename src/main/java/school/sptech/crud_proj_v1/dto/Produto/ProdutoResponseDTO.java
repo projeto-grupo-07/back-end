@@ -1,11 +1,12 @@
 package school.sptech.crud_proj_v1.dto.Produto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import school.sptech.crud_proj_v1.dto.Categoria.CategoriaResponseDto;
 import school.sptech.crud_proj_v1.entity.Categoria;
 import school.sptech.crud_proj_v1.entity.Produto;
 
 @Schema(description = "DTO utilizado para exibir as informações dos produtos")
-public class ProdutoListDTO {
+public class ProdutoResponseDTO {
 
     @Schema(name = "ID do Produto", example = "1", description = "Esse campo representa o identificador único dos produtos. Ele se auto incrementa")
     private Integer id;
@@ -15,29 +16,19 @@ public class ProdutoListDTO {
     private String marca;
     @Schema(example = "122.99", description = "Esse campo representa o valor que o produto foi vendido")
     private Double precoVenda;
-    @Schema(description = "Esse campo é um objeto da classe Categoria. Representa a categoria do produto")
-    private String nomeCategoria;
+    @Schema(description = "Esse campo é um Response Dto da classe Categoria. Representa a categoria do produto como resposta")
+    private CategoriaResponseDto categoria;
 
-
-    public ProdutoListDTO() {
+    public ProdutoResponseDTO(Integer id, String modelo, String marca, Double precoVenda, CategoriaResponseDto categoria) {
+        this.id = id;
+        this.modelo = modelo;
+        this.marca = marca;
+        this.precoVenda = precoVenda;
+        this.categoria = categoria;
     }
 
-    public ProdutoListDTO(Produto produto) {
-        this.id = produto.getId();
-        this.modelo = produto.getModelo();
-        this.marca = produto.getMarca();
-        this.precoVenda = produto.getPrecoVenda();
-
-        if (produto.getCategoria() != null) {
-            this.nomeCategoria = produto.getCategoria().getDescricao();
-        } else {
-            this.nomeCategoria = null;
-        }
+    public ProdutoResponseDTO() {
     }
-
-    public ProdutoListDTO(Integer id, String modelo, String marca, Double precoVenda, Categoria categoria) {
-    }
-
 
     public Integer getId() {
         return id;
@@ -71,11 +62,11 @@ public class ProdutoListDTO {
         this.precoVenda = precoVenda;
     }
 
-    public String getNomeCategoria() {
-        return nomeCategoria;
+    public CategoriaResponseDto getCategoria() {
+        return categoria;
     }
 
-    public void setNomeCategoria(String nomeCategoria) {
-        this.nomeCategoria = nomeCategoria;
+    public void setCategoria(CategoriaResponseDto categoria) {
+        this.categoria = categoria;
     }
 }

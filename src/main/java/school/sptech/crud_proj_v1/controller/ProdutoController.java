@@ -6,11 +6,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import school.sptech.crud_proj_v1.dto.Produto.ProdutoListDTO;
+import school.sptech.crud_proj_v1.dto.Produto.ProdutoResponseDTO;
 import school.sptech.crud_proj_v1.dto.Produto.ProdutoRequestDTO;
 import school.sptech.crud_proj_v1.entity.Produto;
-import school.sptech.crud_proj_v1.mapper.ProdutoMapper;
-import school.sptech.crud_proj_v1.repository.ProdutoRepository;
 import school.sptech.crud_proj_v1.service.ProdutoService;
 
 import java.util.List;
@@ -19,19 +17,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/produtos")
 public class ProdutoController {
-    private final ProdutoRepository repository;
     private final ProdutoService service;
 
-    public ProdutoController(ProdutoRepository repository, ProdutoService service) {
-        this.repository = repository;
+    public ProdutoController(ProdutoService service) {
         this.service = service;
     }
 
     @GetMapping
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método lista todos os produtos cadastrados")
-    public ResponseEntity<List<ProdutoListDTO>> listarProdutos() {
-        List<ProdutoListDTO> listaProdutos = service.listarTodos();
+    public ResponseEntity<List<ProdutoResponseDTO>> listarProdutos() {
+        List<ProdutoResponseDTO> listaProdutos = service.listarTodos();
 
         if (listaProdutos.isEmpty()) {
             return ResponseEntity.status(204).build();
@@ -44,27 +40,20 @@ public class ProdutoController {
     @GetMapping("/por-modelo")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método lista os produtos por modelo")
-    public ResponseEntity<List<ProdutoListDTO>> buscarPorModelo(@RequestParam String modelo) {
-
-        List<Produto> produtosEncontrados = repository.findByModeloContainingIgnoreCase(modelo);
-
-        if (produtosEncontrados.isEmpty()) {
+    public ResponseEntity<List<ProdutoResponseDTO>> buscarPorModelo(@RequestParam String modelo) {
+        List<ProdutoResponseDTO> produtosResponse = service.buscarProdutoPorModelo(modelo);
+        if (produtosResponse.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
-        List<ProdutoListDTO> resposta = produtosEncontrados.stream()
-                .map(ProdutoMapper::toDTO)
-                .toList();
-
-        return ResponseEntity.status(200).body(resposta);
+        return ResponseEntity.status(200).body(produtosResponse);
     }
 
     //EndPoint Gabriel
     @GetMapping("/por-marca/{marca}")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método lista os produtos por marca")
-    public ResponseEntity<List<ProdutoListDTO>> bucarProdutoPorMarca(@PathVariable String marca) {
-        List<ProdutoListDTO> produtos = service.buscarProdutoPorMarca(marca);
-
+    public ResponseEntity<List<ProdutoResponseDTO>> bucarProdutoPorMarca(@PathVariable String marca) {
+        List<ProdutoResponseDTO> produtos = service.buscarProdutoPorMarca(marca);
         if (produtos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
@@ -74,8 +63,8 @@ public class ProdutoController {
     @GetMapping("/por-categoria")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método lista os produtos por categoria")
-    public ResponseEntity<List<Produto>> buscarProdutoPorCategoria(@RequestParam String categoria) {
-        List<Produto> achados = repository.findByCategoriaDescricaoContainingIgnoreCase(categoria);
+    public ResponseEntity<List<ProdutoResponseDTO>> buscarProdutoPorCategoria(@RequestParam String categoria) {
+        List<ProdutoResponseDTO> achados = service.buscarProdutoPorCategoria(categoria);
         if (achados.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
@@ -85,8 +74,8 @@ public class ProdutoController {
     @GetMapping("/por-categoria-ordenado-preco-desc")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método lista todos os produtos de uma determiada categoria ordenados pelo preço de forma decrescente")
-    public ResponseEntity<List<ProdutoListDTO>> buscarProdutoPorCategoriaOrdenadoPorPrecoDesc(@RequestParam String categoria) {
-        List<ProdutoListDTO> produtos = service.buscarProdutoPorCategoriaOrdenadoPorPrecoDesc(categoria);
+    public ResponseEntity<List<ProdutoResponseDTO>> buscarProdutoPorCategoriaOrdenadoPorPrecoDesc(@RequestParam String categoria) {
+        List<ProdutoResponseDTO> produtos = service.buscarProdutoPorCategoriaOrdenadoPorPrecoDesc(categoria);
         if (produtos.isEmpty()) {
             return ResponseEntity.status(204).build();
         } return ResponseEntity.status(200).body(produtos);
@@ -95,31 +84,24 @@ public class ProdutoController {
     @PostMapping
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método cadastra um produto")
-    public ResponseEntity<ProdutoListDTO> cadastrarProduto(@RequestBody @Valid ProdutoRequestDTO novoProdutoDTO) {
-        ProdutoListDTO produtoSalvo = service.criar(novoProdutoDTO);
+    public ResponseEntity<ProdutoResponseDTO> cadastrar(@RequestBody @Valid ProdutoRequestDTO novoProdutoDTO) {
+        ProdutoResponseDTO produtoSalvo = service.criar(novoProdutoDTO);
         return ResponseEntity.status(201).body(produtoSalvo);
     }
 
     @PutMapping("/{id}")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método atualiza algum campo do produto pelo id")
-    public ResponseEntity<Produto> atualizarProdutoPorId(@PathVariable Integer id, @RequestBody Produto prod) {
-        prod.setId(id);
-        if (repository.existsById(id)) {
-            repository.save(prod);
-            return ResponseEntity.status(200).body(prod);
-        }
-        return ResponseEntity.status(404).build();
+    public ResponseEntity<ProdutoResponseDTO> atualizarProdutoPorId(@PathVariable Integer id, @RequestBody ProdutoRequestDTO dto) {
+        ProdutoResponseDTO produtoAtualizado = service.atualizarPorId(id, dto);
+        return ResponseEntity.status(200).body(produtoAtualizado);
     }
 
     @DeleteMapping("/{id}")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método deleta um produto pelo id")
     public ResponseEntity<Void> deletarProdutoPorId(@PathVariable Integer id) {
-        if (repository.existsById(id)) {
-            repository.deleteById(id);
-            return ResponseEntity.status(204).build();
-        }
-        return ResponseEntity.status(404).build();
+        service.deletarPorId(id);
+        return ResponseEntity.status(204).build();
     }
 }

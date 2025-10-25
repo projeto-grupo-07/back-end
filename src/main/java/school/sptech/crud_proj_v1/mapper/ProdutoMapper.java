@@ -1,6 +1,8 @@
 package school.sptech.crud_proj_v1.mapper;
 
-import school.sptech.crud_proj_v1.dto.Produto.ProdutoListDTO;
+import org.springframework.stereotype.Component;
+import school.sptech.crud_proj_v1.dto.Categoria.CategoriaResponseDto;
+import school.sptech.crud_proj_v1.dto.Produto.ProdutoResponseDTO;
 import school.sptech.crud_proj_v1.dto.Produto.ProdutoRequestDTO;
 import school.sptech.crud_proj_v1.dto.ItensVenda.ItensVendaDTO;
 import school.sptech.crud_proj_v1.entity.Produto;
@@ -8,15 +10,21 @@ import school.sptech.crud_proj_v1.entity.Produto;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class ProdutoMapper {
 
-    public static ItensVendaDTO toItensVendaDTO(Produto produto) {
+    private final CategoriaMapper categoriaMapper;
+
+    public ProdutoMapper(CategoriaMapper categoriaMapper) {
+        this.categoriaMapper = categoriaMapper;
+    }
+
+    public ItensVendaDTO toItensVendaDTO(Produto produto) {
         if (produto == null) {
             return null;
         }
 
         ItensVendaDTO dto = new ItensVendaDTO();
-
         dto.setId(produto.getId());
         dto.setModelo(produto.getModelo());
         dto.setMarca(produto.getMarca());
@@ -26,31 +34,32 @@ public class ProdutoMapper {
         return dto;
     }
 
-    public static ProdutoListDTO toDTO(Produto produto) {
+    public ProdutoResponseDTO toResponseDTO(Produto produto) {
         if (produto == null) {
             return null;
         }
 
-
-        ProdutoListDTO dto = new ProdutoListDTO();
+        ProdutoResponseDTO dto = new ProdutoResponseDTO();
         dto.setId(produto.getId());
         dto.setModelo(produto.getModelo());
         dto.setMarca(produto.getMarca());
         dto.setPrecoVenda(produto.getPrecoVenda());
 
         if (produto.getCategoria() != null) {
-            dto.setNomeCategoria(produto.getCategoria().getDescricao());
+            CategoriaResponseDto categoriaDto = categoriaMapper.toResponseDto(produto.getCategoria());
+            dto.setCategoria(categoriaDto);
         }
 
         return dto;
     }
 
-    public static List<ProdutoListDTO> toListDTO(List<Produto> produtos) {
+    public List<ProdutoResponseDTO> produtoResponseDTOS(List<Produto> produtos) {
         if (produtos == null) {
             return null;
         }
+
         return produtos.stream()
-                .map(ProdutoMapper::toDTO)
+                .map(produto -> toResponseDTO(produto))
                 .collect(Collectors.toList());
     }
 

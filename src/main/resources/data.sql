@@ -53,3 +53,5 @@ INSERT INTO ITENS_VENDA (fk_produto, fk_venda, quantidade, preco_venda)
 VALUES
 (2, 2, 1, 159.50),
 (3, 2, 1, 99.00);
+
+INSERT INTO CATEGORIA (descricao) VALUES ('Calçados');

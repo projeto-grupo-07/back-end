@@ -1,13 +1,13 @@
 package school.sptech.crud_proj_v1.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import school.sptech.crud_proj_v1.dto.Produto.ProdutoListDTO;
+import school.sptech.crud_proj_v1.dto.Produto.ProdutoResponseDTO;
 import school.sptech.crud_proj_v1.dto.Produto.ProdutoRequestDTO;
 import school.sptech.crud_proj_v1.entity.Categoria;
 import school.sptech.crud_proj_v1.entity.Produto;
+import school.sptech.crud_proj_v1.exception.EntidadeNotFoundException;
 import school.sptech.crud_proj_v1.mapper.ProdutoMapper;
 import school.sptech.crud_proj_v1.repository.CategoriaRepository;
 import school.sptech.crud_proj_v1.repository.ProdutoRepository;
@@ -16,19 +16,25 @@ import java.util.List;
 
 @Service
 public class ProdutoService {
-    @Autowired
-    private ProdutoRepository produtoRepository;
-    @Autowired
-    private CategoriaRepository categoriaRepository;
+    private final ProdutoRepository produtoRepository;
+    private final CategoriaRepository categoriaRepository;
+    private final ProdutoMapper produtoMapper;
 
-    public List<ProdutoListDTO> listarTodos() {
-        List<Produto> produtos = produtoRepository.findAll();
-
-        return ProdutoMapper.toListDTO(produtos);
+    public ProdutoService(ProdutoRepository produtoRepository, CategoriaRepository categoriaRepository, ProdutoMapper produtoMapper) {
+        this.produtoRepository = produtoRepository;
+        this.categoriaRepository = categoriaRepository;
+        this.produtoMapper = produtoMapper;
     }
 
-    public ProdutoListDTO criar(ProdutoRequestDTO novoProdutoDTO) {
-        Produto novoProduto = ProdutoMapper.toEntity(novoProdutoDTO);
+
+    public List<ProdutoResponseDTO> listarTodos() {
+        List<Produto> produtos = produtoRepository.findAll();
+
+        return produtoMapper.produtoResponseDTOS(produtos);
+    }
+
+    public ProdutoResponseDTO criar(ProdutoRequestDTO novoProdutoDTO) {
+        Produto novoProduto = produtoMapper.toEntity(novoProdutoDTO);
 
         if (novoProdutoDTO.getCategoriaId() != null) {
             Categoria categoriaEncontrada = categoriaRepository
@@ -41,21 +47,50 @@ public class ProdutoService {
         }
         Produto produtoSalvo = produtoRepository.save(novoProduto);
 
-        return ProdutoMapper.toDTO(produtoSalvo);
+        return produtoMapper.toResponseDTO(produtoSalvo);
     }
 
-    public List<ProdutoListDTO> buscarProdutoPorMarca(String marca){
-        List<Produto> produtos = produtoRepository.findByMarcaContainingIgnoreCase(marca);
+    public ProdutoResponseDTO atualizarPorId(Integer id, ProdutoRequestDTO dto) {
+        Produto produtoParaAtualizar = produtoRepository.findById(id)
+                .orElseThrow(() -> new EntidadeNotFoundException("Produto não encontrado pelo ID: " + id));
 
-        return ProdutoMapper.toListDTO(produtos);
+        Categoria novaCategoria = categoriaRepository.findById(dto.getCategoriaId())
+                .orElseThrow(() -> new EntidadeNotFoundException("Categoria não encontrado pelo ID: " + dto.getCategoriaId()));
+
+        produtoParaAtualizar.setModelo(dto.getModelo());
+        produtoParaAtualizar.setMarca(dto.getMarca());
+        produtoParaAtualizar.setTamanho(dto.getTamanho());
+        produtoParaAtualizar.setCor(dto.getCor());
+        produtoParaAtualizar.setPrecoCusto(dto.getPrecoCusto());
+        produtoParaAtualizar.setPrecoVenda(dto.getPrecoVenda());
+
+        produtoParaAtualizar.setCategoria(novaCategoria);
+
+        Produto produtoSalvo = produtoRepository.save(produtoParaAtualizar);
+
+        return produtoMapper.toResponseDTO(produtoSalvo);
     }
 
-    public List<ProdutoListDTO> buscarProdutoPorCategoriaOrdenadoPorPrecoDesc(String categoria) {
-        List<Produto> produtos = produtoRepository.findByCategoriaDescricaoContainingIgnoreCaseOrderByPrecoVendaDesc(categoria);
-
-        return ProdutoMapper.toListDTO(produtos);
+    public List<ProdutoResponseDTO> buscarProdutoPorModelo(String modelo){
+        return produtoMapper.produtoResponseDTOS(produtoRepository.findByModeloContainingIgnoreCase(modelo));
     }
 
+    public List<ProdutoResponseDTO> buscarProdutoPorMarca(String marca){
+        return produtoMapper.produtoResponseDTOS(produtoRepository.findByMarcaContainingIgnoreCase(marca));
+    }
 
+    public List<ProdutoResponseDTO> buscarProdutoPorCategoria(String categoria){
+        return produtoMapper.produtoResponseDTOS(produtoRepository.findByCategoriaDescricaoContainingIgnoreCase(categoria));
+    }
 
+    public List<ProdutoResponseDTO> buscarProdutoPorCategoriaOrdenadoPorPrecoDesc(String categoria) {
+        return produtoMapper.produtoResponseDTOS(produtoRepository.findByCategoriaDescricaoContainingIgnoreCaseOrderByPrecoVendaDesc(categoria));
+    }
+
+    public void deletarPorId(Integer id) {
+        if (!produtoRepository.existsById(id)) {
+            throw new EntidadeNotFoundException("Produto não encontrado pelo ID: " + id);
+        }
+        produtoRepository.deleteById(id);
+    }
 }
