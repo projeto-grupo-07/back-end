@@ -4,9 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*; // Importações corrigidas
 
 @Entity
 public class Endereco {
@@ -15,12 +13,12 @@ public class Endereco {
     private Integer id;
 
     @NotBlank
-    @Size(min = 9,max = 9) //precisar ter hífen
-    @Pattern(regexp = "^\\d{5}-?\\d{3}$")
+    @Size(min = 9, max = 9, message = "O CEP deve ter 9 caracteres (ex: 00000-000)")
+    @Pattern(regexp = "^\\d{5}-\\d{3}$", message = "O CEP deve seguir o formato 00000-000")
     private String cep;
 
     @NotBlank
-    @Size(min = 2, max = 2)
+    @Size(min = 2, max = 2, message = "O Estado deve ter 2 caracteres (ex: SP)")
     private String estado;
 
     @NotBlank
@@ -35,12 +33,74 @@ public class Endereco {
     @Size(max = 45)
     private String logradouro;
 
-    @NotBlank
-    @Size(max = 10)
+    @NotNull(message = "O número é obrigatório")
+    @Positive(message = "O número deve ser positivo")
     private Integer numero;
 
     @Size(max = 100)
     private String complemento;
 
-    // como é classe so pra armazenar pro banco, não tem getter setter construtor etc
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getCep() {
+        return cep;
+    }
+
+    public void setCep(String cep) {
+        this.cep = cep;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+
+    public String getCidade() {
+        return cidade;
+    }
+
+    public void setCidade(String cidade) {
+        this.cidade = cidade;
+    }
+
+    public String getBairro() {
+        return bairro;
+    }
+
+    public void setBairro(String bairro) {
+        this.bairro = bairro;
+    }
+
+    public String getLogradouro() {
+        return logradouro;
+    }
+
+    public void setLogradouro(String logradouro) {
+        this.logradouro = logradouro;
+    }
+
+    public Integer getNumero() {
+        return numero;
+    }
+
+    public void setNumero(Integer numero) {
+        this.numero = numero;
+    }
+
+    public String getComplemento() {
+        return complemento;
+    }
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento;
+    }
 }
