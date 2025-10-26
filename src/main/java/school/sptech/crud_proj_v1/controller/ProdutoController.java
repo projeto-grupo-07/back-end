@@ -104,4 +104,12 @@ public class ProdutoController {
         service.deletarPorId(id);
         return ResponseEntity.status(204).build();
     }
+
+    @PatchMapping("/{id}")
+    @SecurityRequirement(name = "Bearer")
+    @Operation(summary = "Esse método atualiza o preço venda de um produto pelo id")
+    public ResponseEntity<ProdutoResponseDTO> atualizarPrecoVendaPorId(@PathVariable Integer id, @RequestBody ProdutoRequestDTO dto){
+        ProdutoResponseDTO produtoAtualizado = service.atualizarPrecoVendaPorId(id, dto);
+        return ResponseEntity.status(200).body(produtoAtualizado);
+    }
 }

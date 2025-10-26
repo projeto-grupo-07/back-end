@@ -103,4 +103,15 @@ public class ProdutoService {
         }
         produtoRepository.deleteById(id);
     }
+
+    public ProdutoResponseDTO atualizarPrecoVendaPorId(Integer id, ProdutoRequestDTO dto){
+        Produto produtoParaAtualizar = produtoRepository.findById(id)
+                .orElseThrow(() -> new EntidadeNotFoundException("Produto não encontrado pelo ID: " + id));
+
+        produtoParaAtualizar.setPrecoVenda(dto.getPrecoVenda());
+
+        Produto produtoSalvo = produtoRepository.save(produtoParaAtualizar);
+
+        return produtoMapper.toResponseDTO(produtoSalvo);
+    }
 }
