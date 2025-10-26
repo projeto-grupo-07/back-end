@@ -2,6 +2,7 @@
 
     import io.swagger.v3.oas.annotations.media.Schema;
     import jakarta.persistence.*;
+    import school.sptech.crud_proj_v1.enumeration.FormaDePagamento;
 
     import java.time.LocalDateTime;
     import java.util.List;
@@ -17,8 +18,9 @@
         @Schema(description = "Esse campo é um objeto da classe Funcionario. Representa o funcionário que fez a venda")
         private Funcionario funcionario;
         @Column(name = "FORMA_PAGAMENTO")
-        @Schema(example = "PIX", description = "Esse campo representa qual foi a forma de pagamento da venda")
-        private String formaDePagamento;
+        @Enumerated(EnumType.STRING)
+        @Schema(example = "PIX", description = "Esse campo representa qual foi a forma de pagamento da venda (DEBITO, CREDITO, PIX)")
+        private FormaDePagamento formaDePagamento;
         @Column(name = "VALOR_TOTAL")
         @Schema(example = "239.90", description = "Esse campo representa o valor final da venda a ser pago ")
         private Double totalVenda;
@@ -58,11 +60,11 @@
             this.totalVenda = totalVenda;
         }
 
-        public String getFormaDePagamento() {
+        public FormaDePagamento getFormaDePagamento() {
             return formaDePagamento;
         }
 
-        public void setFormaDePagamento(String formaDePagamento) {
+        public void setFormaDePagamento(FormaDePagamento formaDePagamento) {
             this.formaDePagamento = formaDePagamento;
         }
 

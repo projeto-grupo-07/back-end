@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import school.sptech.crud_proj_v1.dto.Venda.VendaRequestDTO;
 import school.sptech.crud_proj_v1.dto.Venda.VendaResponseDTO;
 import school.sptech.crud_proj_v1.entity.Venda;
+import school.sptech.crud_proj_v1.enumeration.FormaDePagamento;
 import school.sptech.crud_proj_v1.mapper.VendaMapper;
 import school.sptech.crud_proj_v1.repository.VendaRepository;
 import school.sptech.crud_proj_v1.service.VendaService;
@@ -56,11 +57,12 @@ public class VendaController {
     }
 
     //endpoint Augusto
-    @GetMapping("/forma-pagamento/{formaPgto}")
+    @GetMapping("/forma-pagamento/{formaDePagamento}")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método lista todas as vendas através de uma determinada forma de papgamento")
-    public ResponseEntity<List<VendaResponseDTO>> buscarPorFormaDePagamento(@PathVariable String formaPgto){
-        List<VendaResponseDTO> vendasByFormaPagto = service.buscarPorFormaPagamento(formaPgto);
+    public ResponseEntity<List<VendaResponseDTO>> buscarPorFormaDePagamento(@PathVariable String formaDePagamento){
+        FormaDePagamento forma = FormaDePagamento.valueOf(formaDePagamento.toUpperCase());
+        List<VendaResponseDTO> vendasByFormaPagto = service.buscarPorFormaPagamento(forma);
         if (vendasByFormaPagto.isEmpty()){
             return ResponseEntity.status(204).build();
         }

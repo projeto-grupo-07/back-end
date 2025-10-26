@@ -9,6 +9,7 @@ import school.sptech.crud_proj_v1.entity.Funcionario;
 import school.sptech.crud_proj_v1.entity.Produto;
 import school.sptech.crud_proj_v1.entity.ItensVenda;
 import school.sptech.crud_proj_v1.entity.Venda;
+import school.sptech.crud_proj_v1.enumeration.FormaDePagamento;
 import school.sptech.crud_proj_v1.exception.EntidadeNotFoundException;
 import school.sptech.crud_proj_v1.mapper.VendaMapper;
 import school.sptech.crud_proj_v1.repository.FuncionarioRepository;
@@ -95,8 +96,8 @@ public class VendaService {
         return vendaMapper.toVendaResponseDTO(vendas);
     }
 
-    public List<VendaResponseDTO> buscarPorFormaPagamento(String formPgto){
-        List<Venda> vendas = vendaRepository.findByformaDePagamentoContainingIgnoreCase(formPgto);
+    public List<VendaResponseDTO> buscarPorFormaPagamento(FormaDePagamento formaDePagamento){
+        List<Venda> vendas = vendaRepository.findByFormaDePagamento(formaDePagamento);
         return vendaMapper.toVendaResponseDTO(vendas);
     }
 

@@ -2,6 +2,7 @@ package school.sptech.crud_proj_v1.dto.Venda;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import school.sptech.crud_proj_v1.dto.ItensVenda.ItensVendaResponseDTO;
+import school.sptech.crud_proj_v1.enumeration.FormaDePagamento;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,7 +17,7 @@ public class VendaResponseDTO {
     @Schema(example = "239.90", description = "Esse campo representa o valor final da venda a ser pago ")
     private Double valorTotal;
     @Schema(example = "PIX", description = "Esse campo representa qual foi a forma de pagamento da venda")
-    private String formaPagamento;
+    private FormaDePagamento formaPagamento;
     private LocalDateTime dataHora;
 
     private List<ItensVendaResponseDTO> itensDaVenda;
@@ -45,11 +46,11 @@ public class VendaResponseDTO {
         this.valorTotal = valorTotal;
     }
 
-    public String getFormaPagamento() {
+    public FormaDePagamento getFormaPagamento() {
         return formaPagamento;
     }
 
-    public void setFormaPagamento(String formaPagamento) {
+    public void setFormaPagamento(FormaDePagamento formaPagamento) {
         this.formaPagamento = formaPagamento;
     }
 

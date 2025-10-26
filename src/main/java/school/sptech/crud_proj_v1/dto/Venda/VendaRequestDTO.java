@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import school.sptech.crud_proj_v1.dto.ItensVenda.ItensVendaRequestDTO;
+import school.sptech.crud_proj_v1.enumeration.FormaDePagamento;
 
 import java.util.List;
 
@@ -14,15 +15,15 @@ public class VendaRequestDTO {
     //não tem id pq é request
     @Schema(description = "Esse campo representa a foreign key do funcionário que fez a venda", example = "1")
     private Integer idVendedor;
-    @NotBlank()
+    @NotNull()
     @Schema(example = "PIX", description = "Esse campo representa qual foi a forma de pagamento da venda")
-    private String formaPagamento;
+    private FormaDePagamento formaPagamento;
 
     @NotNull()
     @NotEmpty()
     private List<ItensVendaRequestDTO> itensVenda;
 
-    public VendaRequestDTO(Integer idVendedor, String formaPagamento, List<ItensVendaRequestDTO> itensVenda) {
+    public VendaRequestDTO(Integer idVendedor, FormaDePagamento formaPagamento, List<ItensVendaRequestDTO> itensVenda) {
         this.idVendedor = idVendedor;
         this.formaPagamento = formaPagamento;
         this.itensVenda = itensVenda;
@@ -38,11 +39,11 @@ public class VendaRequestDTO {
         this.idVendedor = idVendedor;
     }
 
-    public String getFormaPagamento() {
+    public FormaDePagamento getFormaPagamento() {
         return formaPagamento;
     }
 
-    public void setFormaPagamento(String formaPagamento) {
+    public void setFormaPagamento(FormaDePagamento formaPagamento) {
         this.formaPagamento = formaPagamento;
     }
 

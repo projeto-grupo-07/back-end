@@ -36,7 +36,7 @@ VALUES
 -- VENDA 2: Compra de Sapatos (159.50 + 99.00 = 258.50)
 INSERT INTO VENDA (data_hora, valor_total, forma_pagamento, fk_vendedor)
 VALUES
-('2025-09-26 14:00:00', 258.50, 'Cartão de Débito', 1); -- fk_vendedor = 1
+('2025-09-26 14:00:00', 258.50, 'DEBITO', 1); -- fk_vendedor = 1
 -- VENDA ID: 2
 
 ----------------------------------------------------------------------
