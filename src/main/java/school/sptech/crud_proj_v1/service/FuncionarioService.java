@@ -13,13 +13,14 @@ import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioRequestDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioResponseDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioTokenDto;
 import school.sptech.crud_proj_v1.entity.Funcionario;
+import school.sptech.crud_proj_v1.entity.Produto;
+import school.sptech.crud_proj_v1.event.ProdutoCadastradoEvent;
 import school.sptech.crud_proj_v1.exception.EntidadeConflitoException;
 import school.sptech.crud_proj_v1.exception.EntidadeNotFoundException;
 import school.sptech.crud_proj_v1.mapper.FuncionarioMapper;
 import school.sptech.crud_proj_v1.repository.FuncionarioRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class FuncionarioService {
@@ -101,5 +102,17 @@ public class FuncionarioService {
             return;
         }
         throw new EntidadeNotFoundException("funcionario nao encontrado/existente");
+    }
+
+    public void handleProdutoCadastrado(ProdutoCadastradoEvent event){
+        Produto produto = event.getProduto();
+        List<Funcionario> funcionarios = funcionarioRepository.findAll();
+        enviarNotificacao(funcionarios, produto);
+    }
+
+    private void enviarNotificacao(List<Funcionario> funcionarios, Produto produto){
+        for (Funcionario f : funcionarios) {
+            System.out.println("Enviando email para " + f.getEmail() + " sobre adição do produto: " + produto.getModelo());
+        }
     }
 }

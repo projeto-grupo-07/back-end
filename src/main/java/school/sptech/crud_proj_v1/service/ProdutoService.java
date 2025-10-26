@@ -1,5 +1,6 @@
 package school.sptech.crud_proj_v1.service;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -7,6 +8,7 @@ import school.sptech.crud_proj_v1.dto.Produto.ProdutoResponseDTO;
 import school.sptech.crud_proj_v1.dto.Produto.ProdutoRequestDTO;
 import school.sptech.crud_proj_v1.entity.Categoria;
 import school.sptech.crud_proj_v1.entity.Produto;
+import school.sptech.crud_proj_v1.event.ProdutoCadastradoEvent;
 import school.sptech.crud_proj_v1.exception.EntidadeNotFoundException;
 import school.sptech.crud_proj_v1.mapper.ProdutoMapper;
 import school.sptech.crud_proj_v1.repository.CategoriaRepository;
@@ -18,12 +20,16 @@ import java.util.List;
 public class ProdutoService {
     private final ProdutoRepository produtoRepository;
     private final CategoriaRepository categoriaRepository;
+    private final ApplicationEventPublisher eventPublisher;
     private final ProdutoMapper produtoMapper;
+    private final FuncionarioService funcionarioService;
 
-    public ProdutoService(ProdutoRepository produtoRepository, CategoriaRepository categoriaRepository, ProdutoMapper produtoMapper) {
+    public ProdutoService(ProdutoRepository produtoRepository, CategoriaRepository categoriaRepository, ApplicationEventPublisher eventPublisher, ProdutoMapper produtoMapper, FuncionarioService funcionarioService) {
         this.produtoRepository = produtoRepository;
         this.categoriaRepository = categoriaRepository;
+        this.eventPublisher = eventPublisher;
         this.produtoMapper = produtoMapper;
+        this.funcionarioService = funcionarioService;
     }
 
 
@@ -42,11 +48,15 @@ public class ProdutoService {
                     .orElseThrow(() -> new ResponseStatusException(
                             HttpStatus.NOT_FOUND, "Categoria com o ID informado não foi encontrada.")
                     );
-
             novoProduto.setCategoria(categoriaEncontrada);
         }
-        Produto produtoSalvo = produtoRepository.save(novoProduto);
 
+        var evento = new ProdutoCadastradoEvent(novoProduto);
+        eventPublisher.publishEvent(evento);
+        funcionarioService.handleProdutoCadastrado(evento);
+
+        Produto produtoSalvo = produtoRepository.save(novoProduto);
+        System.out.println("Produto " + produtoSalvo.getModelo() + " salvo!");
         return produtoMapper.toResponseDTO(produtoSalvo);
     }
 
