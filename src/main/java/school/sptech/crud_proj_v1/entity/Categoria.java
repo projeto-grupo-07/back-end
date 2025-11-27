@@ -7,8 +7,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 
 @Entity
+@Data
 public class Categoria {
 
     @Id
@@ -21,19 +23,4 @@ public class Categoria {
     @Schema(example = "Calçados", description = "Esse campo representa a descrição do produto da loja, se ele é um 'Calçado' ou 'Outro'")
     private String descricao;
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
 }

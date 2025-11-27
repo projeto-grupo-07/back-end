@@ -77,7 +77,7 @@ public class VendaController {
     public ResponseEntity<Double> calcularTotalVendas() {
         Double total = service.calcularTotal();
 
-        if(total == 0 || total == null){
+        if(total == null || total == 0){
             return ResponseEntity.status(204).build();
         }
         return ResponseEntity.status(200).body(total);
