@@ -27,6 +27,9 @@
         @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL)
         private List<ItensVenda> itens;
         private LocalDateTime dataHora;
+        @OneToOne(mappedBy = "venda", cascade = CascadeType.ALL)
+        private Comissao comissao;
+
 
         public Integer getId() {
             return id;

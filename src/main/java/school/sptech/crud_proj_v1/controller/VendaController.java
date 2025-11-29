@@ -87,6 +87,7 @@ public class VendaController {
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método cadastra uma venda")
     public ResponseEntity<VendaResponseDTO> cadastrarVenda(@RequestBody VendaRequestDTO venda){
+
        VendaResponseDTO vendaCriada = service.cadastrar(venda);
         return ResponseEntity.status(201).body(vendaCriada);
     }

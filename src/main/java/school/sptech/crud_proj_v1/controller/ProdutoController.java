@@ -89,6 +89,7 @@ public class ProdutoController {
         return ResponseEntity.status(201).body(produtoSalvo);
     }
 
+
     @PutMapping("/{id}")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método atualiza algum campo do produto pelo id")

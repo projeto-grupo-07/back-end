@@ -27,16 +27,18 @@ public class VendaService {
     private final FuncionarioRepository funcionarioRepository;
     private final ProdutoRepository produtoRepository;
     private final VendaMapper vendaMapper;
+    private final ComissaoService comissaoService;
 
     public VendaService(
             VendaRepository vendaRepository,
             FuncionarioRepository funcionarioRepository,
-            ProdutoRepository produtoRepository, VendaMapper vendaMapper
+            ProdutoRepository produtoRepository, VendaMapper vendaMapper, ComissaoService comissaoService
     ) {
         this.vendaRepository = vendaRepository;
         this.funcionarioRepository = funcionarioRepository;
         this.produtoRepository = produtoRepository;
         this.vendaMapper = vendaMapper;
+        this.comissaoService = comissaoService;
     }
 
     @Transactional
@@ -76,6 +78,8 @@ public class VendaService {
         novaVenda.setTotalVenda(valorTotal);
 
         Venda vendaSalva = vendaRepository.save(novaVenda);
+
+        comissaoService.calcularComissao(vendaSalva);
 
         return vendaMapper.toVendaResponseDTO(vendaSalva);
     }
