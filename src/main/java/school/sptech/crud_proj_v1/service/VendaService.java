@@ -28,17 +28,19 @@ public class VendaService {
     private final ProdutoRepository produtoRepository;
     private final VendaMapper vendaMapper;
     private final ComissaoService comissaoService;
+    private final ProdutoService produtoService;
 
     public VendaService(
             VendaRepository vendaRepository,
             FuncionarioRepository funcionarioRepository,
-            ProdutoRepository produtoRepository, VendaMapper vendaMapper, ComissaoService comissaoService
+            ProdutoRepository produtoRepository, VendaMapper vendaMapper, ComissaoService comissaoService, ProdutoService produtoService
     ) {
         this.vendaRepository = vendaRepository;
         this.funcionarioRepository = funcionarioRepository;
         this.produtoRepository = produtoRepository;
         this.vendaMapper = vendaMapper;
         this.comissaoService = comissaoService;
+        this.produtoService = produtoService;
     }
 
     @Transactional
@@ -78,6 +80,10 @@ public class VendaService {
         novaVenda.setTotalVenda(valorTotal);
 
         Venda vendaSalva = vendaRepository.save(novaVenda);
+
+        for (ItensVenda item : vendaSalva.getItens()) {
+            produtoService.diminuirEstoque(item.getProduto().getId(), item.getQuantidade());
+        }
 
         comissaoService.calcularComissao(vendaSalva);
 

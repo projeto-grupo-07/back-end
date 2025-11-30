@@ -114,4 +114,12 @@ public class ProdutoService {
 
         return produtoMapper.toResponseDTO(produtoSalvo);
     }
+
+    public void diminuirEstoque(Integer idProduto, Integer quantidadeVendida){
+        Produto produto = produtoRepository.findById(idProduto)
+                .orElseThrow(() -> new  EntidadeNotFoundException("Produto não encontrado pelo ID: " + idProduto));
+
+        produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - quantidadeVendida);
+        produtoRepository.save(produto);
+    }
 }
