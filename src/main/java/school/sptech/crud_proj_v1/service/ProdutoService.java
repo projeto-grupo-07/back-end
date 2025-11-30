@@ -140,10 +140,10 @@ public class ProdutoService {
 
     public CalcadoProdutoResponse atualizarCalcado(Integer id, CalcadoProdutoRequest dto) {
 
-        Produto produtoGenérico = produtoRepository.findById(id)
+        Produto produtoGenerico = produtoRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNotFoundException("Produto não encontrado pelo ID: " + id));
 
-        if (produtoGenérico instanceof CalcadoProduto calcado) {
+        if (produtoGenerico instanceof CalcadoProduto calcado) {
             calcadoMapper.toUpdate(dto, calcado);
 
             if (dto.getIdCategoria() != null) {
@@ -248,7 +248,7 @@ public class ProdutoService {
         Produto produto = produtoRepository.findById(idProduto)
                 .orElseThrow(() -> new  EntidadeNotFoundException("Produto não encontrado pelo ID: " + idProduto));
 
-        produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - quantidadeVendida);
+        produto.setQuantidade(produto.getQuantidade() - quantidadeVendida);
         produtoRepository.save(produto);
     }
 }
