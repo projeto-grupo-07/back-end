@@ -5,7 +5,12 @@ import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioLoginDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioRequestDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioResponseDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioTokenDto;
+import school.sptech.crud_proj_v1.dto.Tela.TelaDto;
 import school.sptech.crud_proj_v1.entity.Funcionario;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class FuncionarioMapper {
@@ -48,18 +53,32 @@ public class FuncionarioMapper {
     }
 
     public static FuncionarioTokenDto of(Funcionario funcionario, String token) {
-        FuncionarioTokenDto funcionarioTokenDto = new FuncionarioTokenDto();
+        FuncionarioTokenDto dto = new FuncionarioTokenDto();
 
-        funcionarioTokenDto.setId(funcionario.getId());
-        funcionarioTokenDto.setEmail(funcionario.getEmail());
-        funcionarioTokenDto.setNome(funcionario.getNome());
-        funcionarioTokenDto.setToken(token);
+        dto.setId(funcionario.getId());
+        dto.setEmail(funcionario.getEmail());
+        dto.setNome(funcionario.getNome());
+        dto.setToken(token);
 
         if (funcionario.getPerfil() != null) {
-            funcionarioTokenDto.setPerfil(funcionario.getPerfil().name());
+            dto.setPerfil(funcionario.getPerfil().getNome());
+
+            if (funcionario.getPerfil().getTelas() != null) {
+                List<TelaDto> menu = funcionario.getPerfil().getTelas().stream()
+                        .map(tela -> new TelaDto(
+                                tela.getTitulo(),
+                                tela.getPath(),
+                                tela.getComponentKey(),
+                                tela.getOrdem()
+                        ))
+                        .sorted(Comparator.comparingInt(TelaDto::getOrdem))
+                        .collect(Collectors.toList());
+
+                dto.setMenu(menu);
+            }
         }
 
-        return funcionarioTokenDto;
+        return dto;
     }
 
     public static FuncionarioResponseDto of(Funcionario funcionario) {

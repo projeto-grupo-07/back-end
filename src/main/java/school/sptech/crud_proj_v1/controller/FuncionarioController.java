@@ -71,6 +71,20 @@ public class FuncionarioController {
                 .body(funcionarioTokenDto);
     }
 
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        ResponseCookie cookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
+    }
+
     @GetMapping("/me")
     public ResponseEntity<FuncionarioTokenDto> getUsuarioLogado(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {

@@ -7,139 +7,69 @@ import org.hibernate.validator.constraints.br.CPF;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import school.sptech.crud_proj_v1.enumeration.Perfil;
 
 import java.util.Collection;
 import java.util.List;
 
 @Entity
 public class Funcionario implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Schema(example = "1", description = "Esse campo representa o identificador único dos funcionários. Ele se auto incrementa")
     private Integer id;
 
     @NotBlank
-    @Size(min = 2, max = 50)
-    @Schema(example = "Alexandre Lima", description = "Esse campo representa o nome do funcionário")
     private String nome;
 
     @CPF
     @NotBlank
-    @Schema(example = "734.698.110-32", description = "Esse campo representa o CPF do funcionário, é importante que siga o padrão estabelecido: XXX.XXX.XXX-XX")
     private String cpf;
 
     @Positive
-    @Schema(example = "2025.50", description = "Esse campo representa o salário do funcionário, é importante que siga o padrão estabelecido: XXXX.XX")
     private Double salario;
 
     @NotNull
     @Email
-    @Schema(example = "alexandre.lima@gmail.com", description = "Esse campo representa o email do funcionário, é importante que siga o padrão estabelecido: XXXXXXX@XXXXXXX.com")
     private String email;
 
-    @Schema(example = "0.10", description = "Esse campo representa o percentual da comissão que o funcionário recebe para realizar o cálculo acima de cada venda, é importante que siga o padrão estabelecido: 0.XX")
     private Double comissao;
 
-    @Schema(description = "Esse campo representa a senha do funcionário")
     private String senha;
 
-    @Enumerated(EnumType.STRING)
+
+    @ManyToOne
+    @JoinColumn(name = "perfil_id") // Cria a FK no banco
     private Perfil perfil;
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if (this.perfil == null) return List.of();
-
-        return List.of(new SimpleGrantedAuthority("ROLE_" + this.perfil.name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + this.perfil.getNome()));
     }
 
-    @Override
-    public String getPassword() {
-        return this.senha;
-    }
-
-    @Override
-    public String getUsername() {
-        return this.email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
+    public String getCpf() { return cpf; }
+    public void setCpf(String cpf) { this.cpf = cpf; }
+    public Double getSalario() { return salario; }
+    public void setSalario(Double salario) { this.salario = salario; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public Double getComissao() { return comissao; }
+    public void setComissao(Double comissao) { this.comissao = comissao; }
+    public String getSenha() { return senha; }
+    public void setSenha(String senha) { this.senha = senha; }
 
     public Perfil getPerfil() { return perfil; }
     public void setPerfil(Perfil perfil) { this.perfil = perfil; }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    public String getCpf() {
-        return cpf;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
-
-    public Double getSalario() {
-        return salario;
-    }
-
-    public void setSalario(Double salario) {
-        this.salario = salario;
-    }
-
-    public Double getComissao() {
-        return comissao;
-    }
-
-    public void setComissao(Double comissao) {
-        this.comissao = comissao;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getSenha() {
-        return senha;
-    }
-
-    public void setSenha(String senha) {
-        this.senha = senha;
-    }
+    @Override public String getPassword() { return this.senha; }
+    @Override public String getUsername() { return this.email; }
+    @Override public boolean isAccountNonExpired() { return true; }
+    @Override public boolean isAccountNonLocked() { return true; }
+    @Override public boolean isCredentialsNonExpired() { return true; }
+    @Override public boolean isEnabled() { return true; }
 }

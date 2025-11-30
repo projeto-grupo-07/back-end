@@ -19,8 +19,33 @@ INSERT INTO PRODUTO (modelo, marca, tamanho, cor, preco_custo, preco_venda, cate
 ---------------------------------------------------
 -- NOVO PASSO: Insere um Funcionário (Vendedor) --
 ---------------------------------------------------
-INSERT INTO FUNCIONARIO (nome, cpf, email, salario, comissao, senha, perfil)
-VALUES ('VagaDev', '123.456.789-00', 'vaga.dev@brink.com', 2000.00, 0.05, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 'ADMIN');
+-- INSERT INTO FUNCIONARIO (nome, cpf, email, salario, comissao, senha, perfil)
+-- VALUES ('VagaDev', '123.456.789-00', 'vaga.dev@brink.com', 2000.00, 0.05, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 'ADMIN');
+INSERT INTO tela (titulo, path, component_key, ordem) VALUES
+('Vendas', '/vendas', 'VENDAS_PAGE', 1),
+('Produtos', '/produtos', 'PRODUTOS_PAGE', 2),
+('Funcionários', '/funcionarios', 'FUNCIONARIOS_PAGE', 3),
+('Comissão', '/comissao', 'COMISSAO_PAGE', 4),
+('Desempenho', '/desempenho', 'DESEMPENHO_PAGE', 5);
+
+-- 2. Inserir Perfis
+INSERT INTO perfil (nome, descricao) VALUES
+('ADMIN', 'Acesso total ao sistema'),
+('GERENTE', 'Gestão de pessoas e vendas'),
+('VENDEDOR', 'Operacional de vendas');
+
+INSERT INTO perfil_tela (perfil_id, tela_id) VALUES
+(1, 1), (1, 2), (1, 3), (1, 4), (1, 5);
+
+INSERT INTO perfil_tela (perfil_id, tela_id) VALUES
+(2, 1), (2, 2), (2, 3), (2, 4), (2, 5);
+
+INSERT INTO perfil_tela (perfil_id, tela_id) VALUES
+(3, 1), (3, 2);
+INSERT INTO funcionario (nome, email, senha, cpf, perfil_id) VALUES
+('Vinicius Admin', 'admin@brink.com', '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', '12345678900', 1),
+('Gerente Teste', 'gerente@brink.com', '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', '12345678901', 2),
+('Vendedor Teste', 'vendedor@brink.com', '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', '12345678902', 3);
 -- FUNCIONARIO ID: 1 (Usaremos este ID como fk_vendedor)
 
 --------------------------------------------------
