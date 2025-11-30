@@ -1,95 +1,31 @@
 package school.sptech.crud_proj_v1.mapper;
 
+import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate; // <--- Importante
 import org.springframework.stereotype.Component;
-import school.sptech.crud_proj_v1.dto.Categoria.CategoriaResponseDto;
-import school.sptech.crud_proj_v1.dto.Produto.ProdutoResponseDTO;
-import school.sptech.crud_proj_v1.dto.Produto.ProdutoRequestDTO;
-import school.sptech.crud_proj_v1.dto.ItensVenda.ItensVendaDTO;
-import school.sptech.crud_proj_v1.entity.Produto;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import school.sptech.crud_proj_v1.dto.Produto.ProdutoResponse;
+import school.sptech.crud_proj_v1.entity.CalcadoProduto;
+import school.sptech.crud_proj_v1.entity.OutrosProduto;
+import school.sptech.crud_proj_v1.entity.abstrato.Produto;
 
 @Component
+@RequiredArgsConstructor
 public class ProdutoMapper {
 
-    private final CategoriaMapper categoriaMapper;
+    private final CalcadoProdutoMapper calcadoMapper;
+    private final OutrosProdutoMapper outrosMapper;
 
-    public ProdutoMapper(CategoriaMapper categoriaMapper) {
-        this.categoriaMapper = categoriaMapper;
-    }
+    public ProdutoResponse toItensVendaDTO(Produto produto) {
+        Object produtoReal = Hibernate.unproxy(produto);
 
-    public ItensVendaDTO toItensVendaDTO(Produto produto) {
-        if (produto == null) {
-            return null;
-        }
+        return switch (produtoReal) {
+            case null -> null;
+            case CalcadoProduto calcado -> calcadoMapper.toResponse(calcado);
+            case OutrosProduto outros -> outrosMapper.toResponse(outros);
 
-        ItensVendaDTO dto = new ItensVendaDTO();
-        dto.setId(produto.getId());
-        dto.setModelo(produto.getModelo());
-        dto.setMarca(produto.getMarca());
-        dto.setTamanho(produto.getTamanho());
-        dto.setCor(produto.getCor());
-
-        return dto;
-    }
-
-    public ProdutoResponseDTO toResponseDTO(Produto produto) {
-        if (produto == null) {
-            return null;
-        }
-
-        ProdutoResponseDTO dto = new ProdutoResponseDTO();
-        dto.setId(produto.getId());
-        dto.setModelo(produto.getModelo());
-        dto.setMarca(produto.getMarca());
-        dto.setPrecoVenda(produto.getPrecoVenda());
-
-        if (produto.getCategoria() != null) {
-            CategoriaResponseDto categoriaDto = categoriaMapper.toResponseDto(produto.getCategoria());
-            dto.setCategoria(categoriaDto);
-        }
-
-        return dto;
-    }
-
-    public List<ProdutoResponseDTO> produtoResponseDTOS(List<Produto> produtos) {
-        if (produtos == null) {
-            return null;
-        }
-
-        return produtos.stream()
-                .map(produto -> toResponseDTO(produto))
-                .collect(Collectors.toList());
-    }
-
-    public static Produto toEntity(ProdutoRequestDTO dto) {
-        if (dto == null) {
-            return null;
-        }
-
-        Produto produto = new Produto();
-
-        if (dto.getModelo() != null) {
-            produto.setModelo(dto.getModelo());
-        }
-        if (dto.getMarca() != null) {
-            produto.setMarca(dto.getMarca());
-        }
-        if (dto.getTamanho() != null) {
-            produto.setTamanho(dto.getTamanho());
-        }
-        if (dto.getCor() != null) {
-            produto.setCor(dto.getCor());
-        }
-
-        if (dto.getPrecoCusto() != null) {
-            produto.setPrecoCusto(dto.getPrecoCusto());
-        }
-        if (dto.getPrecoVenda() != null) {
-            produto.setPrecoVenda(dto.getPrecoVenda());
-        }
-
-        return produto;
+            default -> throw new IllegalArgumentException(
+                    "Tipo de produto desconhecido: " + produtoReal.getClass().getName()
+            );
+        };
     }
 }

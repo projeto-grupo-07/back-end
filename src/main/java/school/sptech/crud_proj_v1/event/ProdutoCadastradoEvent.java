@@ -1,6 +1,6 @@
 package school.sptech.crud_proj_v1.event;
 
-import school.sptech.crud_proj_v1.entity.Produto;
+import school.sptech.crud_proj_v1.entity.abstrato.Produto;
 
 public class ProdutoCadastradoEvent {
     private final Produto produto;

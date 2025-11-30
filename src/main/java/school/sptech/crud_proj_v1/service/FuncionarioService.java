@@ -13,7 +13,7 @@ import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioRequestDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioResponseDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioTokenDto;
 import school.sptech.crud_proj_v1.entity.Funcionario;
-import school.sptech.crud_proj_v1.entity.Produto;
+import school.sptech.crud_proj_v1.entity.abstrato.Produto;
 import school.sptech.crud_proj_v1.event.ProdutoCadastradoEvent;
 import school.sptech.crud_proj_v1.exception.EntidadeConflitoException;
 import school.sptech.crud_proj_v1.exception.EntidadeNotFoundException;
@@ -112,7 +112,7 @@ public class FuncionarioService {
 
     private void enviarNotificacao(List<Funcionario> funcionarios, Produto produto){
         for (Funcionario f : funcionarios) {
-            System.out.println("Enviando email para " + f.getEmail() + " sobre adição do produto: " + produto.getModelo());
+            System.out.println("Enviando email para " + f.getEmail() + " sobre adição do produto: " + produto.getId());
         }
     }
 }

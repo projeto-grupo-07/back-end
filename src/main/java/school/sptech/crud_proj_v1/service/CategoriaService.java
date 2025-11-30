@@ -1,20 +1,17 @@
 package school.sptech.crud_proj_v1.service;
 
-import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import school.sptech.crud_proj_v1.dto.Categoria.CategoriaRequestDto;
 import school.sptech.crud_proj_v1.dto.Categoria.CategoriaResponseDto;
 import school.sptech.crud_proj_v1.entity.Categoria;
-import school.sptech.crud_proj_v1.entity.Produto;
 import school.sptech.crud_proj_v1.mapper.CategoriaMapper;
 import school.sptech.crud_proj_v1.repository.CategoriaRepository;
 import school.sptech.crud_proj_v1.repository.ProdutoRepository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class CategoriaService {

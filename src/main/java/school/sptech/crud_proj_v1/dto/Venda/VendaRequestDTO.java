@@ -1,10 +1,9 @@
 package school.sptech.crud_proj_v1.dto.Venda;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import school.sptech.crud_proj_v1.dto.ItensVenda.ItensVendaRequestDTO;
+import school.sptech.crud_proj_v1.dto.VendaProduto.VendaProdutoRequestDTO;
 import school.sptech.crud_proj_v1.enumeration.FormaDePagamento;
 
 import java.util.List;
@@ -21,9 +20,9 @@ public class VendaRequestDTO {
 
     @NotNull()
     @NotEmpty()
-    private List<ItensVendaRequestDTO> itensVenda;
+    private List<VendaProdutoRequestDTO> itensVenda;
 
-    public VendaRequestDTO(Integer idVendedor, FormaDePagamento formaPagamento, List<ItensVendaRequestDTO> itensVenda) {
+    public VendaRequestDTO(Integer idVendedor, FormaDePagamento formaPagamento, List<VendaProdutoRequestDTO> itensVenda) {
         this.idVendedor = idVendedor;
         this.formaPagamento = formaPagamento;
         this.itensVenda = itensVenda;
@@ -47,11 +46,11 @@ public class VendaRequestDTO {
         this.formaPagamento = formaPagamento;
     }
 
-    public List<ItensVendaRequestDTO> getItensVenda() {
+    public List<VendaProdutoRequestDTO> getItensVenda() {
         return itensVenda;
     }
 
-    public void setItensVenda(List<ItensVendaRequestDTO> itensVenda) {
+    public void setItensVenda(List<VendaProdutoRequestDTO> itensVenda) {
         this.itensVenda = itensVenda;
     }
 }

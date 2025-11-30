@@ -1,28 +1,28 @@
 package school.sptech.crud_proj_v1.mapper;
 
 import org.springframework.stereotype.Component;
-import school.sptech.crud_proj_v1.dto.ItensVenda.ItensVendaResponseDTO;
-import school.sptech.crud_proj_v1.entity.ItensVenda;
+import school.sptech.crud_proj_v1.dto.VendaProduto.VendaProdutoResponseDTO;
+import school.sptech.crud_proj_v1.entity.VendaProduto;
 import java.util.List;
 
 @Component
-public class ItensVendaMapper {
+public class VendaProdutoMapper {
     private final ProdutoMapper produtoMapper;
 
-    public ItensVendaMapper(ProdutoMapper produtoMapper) {
+    public VendaProdutoMapper(ProdutoMapper produtoMapper) {
         this.produtoMapper = produtoMapper;
     }
 
-    public ItensVendaResponseDTO toProdutosVendaResponseDTO(ItensVenda itemVenda) {
+    public VendaProdutoResponseDTO toProdutosVendaResponseDTO(VendaProduto itemVenda) {
         if (itemVenda == null) {
             return null;
         }
 
-        ItensVendaResponseDTO dto = new ItensVendaResponseDTO();
+        VendaProdutoResponseDTO dto = new VendaProdutoResponseDTO();
 
         dto.setId(itemVenda.getId());
-        dto.setQuantidade(itemVenda.getQuantidade());
-        dto.setPrecoVenda(itemVenda.getPrecoVenda());
+        dto.setQuantidadeVendaProduto(itemVenda.getQuantidadeVendaProduto());
+        dto.setValorTotalVendaProduto(itemVenda.getValorTotalVendaProduto());
 
         if (itemVenda.getProduto() != null) {
             dto.setProduto(produtoMapper.toItensVendaDTO(itemVenda.getProduto()));
@@ -30,7 +30,7 @@ public class ItensVendaMapper {
         return dto;
     }
 
-    public List<ItensVendaResponseDTO> toProdutosVendaResponseDTO(List<ItensVenda> itens) {
+    public List<VendaProdutoResponseDTO> toProdutosVendaResponseDTO(List<VendaProduto> itens) {
         if (itens == null) {
             return List.of();
         }

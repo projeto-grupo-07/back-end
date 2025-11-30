@@ -1,100 +1,182 @@
 package school.sptech.crud_proj_v1.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import school.sptech.crud_proj_v1.dto.Produto.ProdutoResponseDTO;
-import school.sptech.crud_proj_v1.dto.Produto.ProdutoRequestDTO;
+import school.sptech.crud_proj_v1.dto.Produto.*;
+import school.sptech.crud_proj_v1.entity.CalcadoProduto;
 import school.sptech.crud_proj_v1.entity.Categoria;
-import school.sptech.crud_proj_v1.entity.Produto;
+import school.sptech.crud_proj_v1.entity.OutrosProduto;
+import school.sptech.crud_proj_v1.entity.abstrato.Produto;
 import school.sptech.crud_proj_v1.event.ProdutoCadastradoEvent;
 import school.sptech.crud_proj_v1.exception.EntidadeNotFoundException;
-import school.sptech.crud_proj_v1.mapper.ProdutoMapper;
+import school.sptech.crud_proj_v1.mapper.CalcadoProdutoMapper;
+import school.sptech.crud_proj_v1.mapper.OutrosProdutoMapper;
 import school.sptech.crud_proj_v1.repository.CategoriaRepository;
 import school.sptech.crud_proj_v1.repository.ProdutoRepository;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class ProdutoService {
     private final ProdutoRepository produtoRepository;
     private final CategoriaRepository categoriaRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private final ProdutoMapper produtoMapper;
     private final FuncionarioService funcionarioService;
+    private final CalcadoProdutoMapper calcadoMapper;
+    private final OutrosProdutoMapper outrosMapper;
 
-    public ProdutoService(ProdutoRepository produtoRepository, CategoriaRepository categoriaRepository, ApplicationEventPublisher eventPublisher, ProdutoMapper produtoMapper, FuncionarioService funcionarioService) {
-        this.produtoRepository = produtoRepository;
-        this.categoriaRepository = categoriaRepository;
-        this.eventPublisher = eventPublisher;
-        this.produtoMapper = produtoMapper;
-        this.funcionarioService = funcionarioService;
-    }
-
-
-    public List<ProdutoResponseDTO> listarTodos() {
-        List<Produto> produtos = produtoRepository.findAll();
-
-        return produtoMapper.produtoResponseDTOS(produtos);
-    }
-
-    public ProdutoResponseDTO criar(ProdutoRequestDTO novoProdutoDTO) {
-        Produto novoProduto = produtoMapper.toEntity(novoProdutoDTO);
-
-        if (novoProdutoDTO.getCategoriaId() != null) {
-            Categoria categoriaEncontrada = categoriaRepository
-                    .findById(novoProdutoDTO.getCategoriaId())
+    private void configurarCategoria(Produto produto, Integer categoriaId) {
+        if (categoriaId != null) {
+            Categoria categoriaEncontrada = categoriaRepository.findById(categoriaId)
                     .orElseThrow(() -> new ResponseStatusException(
-                            HttpStatus.NOT_FOUND, "Categoria com o ID informado não foi encontrada.")
-                    );
-            novoProduto.setCategoria(categoriaEncontrada);
-        }
+                            HttpStatus.NOT_FOUND, "Categoria não encontrada com ID: " + categoriaId));
 
-        var evento = new ProdutoCadastradoEvent(novoProduto);
+            produto.setCategoria(categoriaEncontrada);
+        }
+    }
+
+    public CalcadoProdutoResponse cadastrarCalcado(CalcadoProdutoRequest dto) {
+        CalcadoProduto novoCalcado = calcadoMapper.toEntity(dto);
+        configurarCategoria(novoCalcado, dto.getIdCategoria());
+
+        var evento = new ProdutoCadastradoEvent(novoCalcado);
         eventPublisher.publishEvent(evento);
         funcionarioService.handleProdutoCadastrado(evento);
 
-        Produto produtoSalvo = produtoRepository.save(novoProduto);
-        System.out.println("Produto " + produtoSalvo.getModelo() + " salvo!");
-        return produtoMapper.toResponseDTO(produtoSalvo);
+        CalcadoProduto salvo = produtoRepository.save(novoCalcado);
+
+        System.out.println("Calçado " + salvo.getModelo() + " salvo!");
+
+        return calcadoMapper.toResponse(salvo);
     }
 
-    public ProdutoResponseDTO atualizarPorId(Integer id, ProdutoRequestDTO dto) {
-        Produto produtoParaAtualizar = produtoRepository.findById(id)
+    public OutrosProdutoResponse cadastrarOutros(OutrosProdutoRequest dto) {
+        OutrosProduto novoOutros = outrosMapper.toEntity(dto);
+
+        configurarCategoria(novoOutros, dto.getIdCategoria());
+
+        var evento = new ProdutoCadastradoEvent(novoOutros);
+        eventPublisher.publishEvent(evento);
+        funcionarioService.handleProdutoCadastrado(evento);
+
+        OutrosProduto salvo = produtoRepository.save(novoOutros);
+        System.out.println("Produto Outros " + salvo.getNome() + " salvo!");
+
+        return outrosMapper.toResponse(salvo);
+    }
+
+    public List<ProdutoResponse> listarTodos() {
+        List<Produto> produtos = produtoRepository.findAll();
+
+        return produtos.stream()
+                .map(produto -> {
+                    if (produto instanceof CalcadoProduto) {
+                        return calcadoMapper.toResponse((CalcadoProduto) produto);
+                    } else if (produto instanceof OutrosProduto) {
+                        return outrosMapper.toResponse((OutrosProduto) produto);
+                    }
+                    return null;
+                })
+                .collect(Collectors.toList());
+    }
+
+
+    public List<CalcadoProdutoResponse> listarApenasCalcados() {
+        return calcadoMapper.toResponseList(produtoRepository.findAllCalcados());
+    }
+
+    public List<OutrosProdutoResponse> listarApenasOutros() {
+        return outrosMapper.toResponseList(produtoRepository.findAllOutros());
+    }
+
+    public List<ProdutoResponse> listarProdutosOrdenadoPorMaiorQuantidade() {
+        List<Produto> produtosOrdenados = produtoRepository.findAllByOrderByQuantidadeDesc();
+
+        return produtosOrdenados.stream()
+                .map(produto -> {
+                    if (produto instanceof CalcadoProduto calcado) {
+                        return calcadoMapper.toResponse(calcado);
+                    } else if (produto instanceof OutrosProduto outros) {
+                        return outrosMapper.toResponse(outros);
+                    }
+                    return null;
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<ProdutoResponse> listarProdutosOrdenadoPorMenorQuantidade() {
+        List<Produto> produtosOrdenados = produtoRepository.findAllByOrderByQuantidadeAsc();
+
+        return produtosOrdenados.stream()
+                .map(produto -> {
+                    if (produto instanceof CalcadoProduto calcado) {
+                        return calcadoMapper.toResponse(calcado);
+                    } else if (produto instanceof OutrosProduto outros) {
+                        return outrosMapper.toResponse(outros);
+                    }
+                    return null;
+                })
+                .collect(Collectors.toList());
+    }
+
+    public ProdutoResponse buscarProdutoPorId(Integer id){
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new EntidadeNotFoundException("Produto com id não encontrado: " + id));
+
+        if (produto instanceof CalcadoProduto calcado) {
+            return calcadoMapper.toResponse(calcado);
+        } else if (produto instanceof OutrosProduto outros) {
+            return outrosMapper.toResponse(outros);
+        }
+
+        throw new EntidadeNotFoundException("Tipo desconhecido.");
+    }
+
+    public CalcadoProdutoResponse atualizarCalcado(Integer id, CalcadoProdutoRequest dto) {
+
+        Produto produtoGenérico = produtoRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNotFoundException("Produto não encontrado pelo ID: " + id));
 
-        Categoria novaCategoria = categoriaRepository.findById(dto.getCategoriaId())
-                .orElseThrow(() -> new EntidadeNotFoundException("Categoria não encontrado pelo ID: " + dto.getCategoriaId()));
+        if (produtoGenérico instanceof CalcadoProduto calcado) {
+            calcadoMapper.toUpdate(dto, calcado);
 
-        produtoParaAtualizar.setModelo(dto.getModelo());
-        produtoParaAtualizar.setMarca(dto.getMarca());
-        produtoParaAtualizar.setTamanho(dto.getTamanho());
-        produtoParaAtualizar.setCor(dto.getCor());
-        produtoParaAtualizar.setPrecoCusto(dto.getPrecoCusto());
-        produtoParaAtualizar.setPrecoVenda(dto.getPrecoVenda());
+            if (dto.getIdCategoria() != null) {
+                configurarCategoria(calcado, dto.getIdCategoria());
+            }
 
-        produtoParaAtualizar.setCategoria(novaCategoria);
-
-        Produto produtoSalvo = produtoRepository.save(produtoParaAtualizar);
-
-        return produtoMapper.toResponseDTO(produtoSalvo);
+            CalcadoProduto salvo = produtoRepository.save(calcado);
+            return calcadoMapper.toResponse(salvo);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Este ID pertence a um produto do tipo 'Outros', use o endpoint correto.");
+        }
     }
 
-    public List<ProdutoResponseDTO> buscarProdutoPorModelo(String modelo){
-        return produtoMapper.produtoResponseDTOS(produtoRepository.findByModeloContainingIgnoreCase(modelo));
-    }
+    public OutrosProdutoResponse atualizarOutros(Integer id, OutrosProdutoRequest dto) {
+        Produto produtoGenérico = produtoRepository.findById(id)
+                .orElseThrow(() -> new EntidadeNotFoundException("Produto não encontrado pelo ID: " + id));
 
-    public List<ProdutoResponseDTO> buscarProdutoPorMarca(String marca){
-        return produtoMapper.produtoResponseDTOS(produtoRepository.findByMarcaContainingIgnoreCase(marca));
-    }
+        if (produtoGenérico instanceof OutrosProduto outros) {
 
-    public List<ProdutoResponseDTO> buscarProdutoPorCategoria(String categoria){
-        return produtoMapper.produtoResponseDTOS(produtoRepository.findByCategoriaDescricaoContainingIgnoreCase(categoria));
-    }
+            outrosMapper.toUpdate(dto, outros);
 
-    public List<ProdutoResponseDTO> buscarProdutoPorCategoriaOrdenadoPorPrecoDesc(String categoria) {
-        return produtoMapper.produtoResponseDTOS(produtoRepository.findByCategoriaDescricaoContainingIgnoreCaseOrderByPrecoVendaDesc(categoria));
+            if (dto.getIdCategoria() != null) {
+                configurarCategoria(outros, dto.getIdCategoria());
+            }
+
+            OutrosProduto salvo = produtoRepository.save(outros);
+            return outrosMapper.toResponse(salvo);
+
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Este ID pertence a um produto do tipo 'Calçado', use o endpoint correto.");
+        }
     }
 
     public void deletarPorId(Integer id) {
@@ -104,15 +186,62 @@ public class ProdutoService {
         produtoRepository.deleteById(id);
     }
 
-    public ProdutoResponseDTO atualizarPrecoVendaPorId(Integer id, ProdutoRequestDTO dto){
-        Produto produtoParaAtualizar = produtoRepository.findById(id)
-                .orElseThrow(() -> new EntidadeNotFoundException("Produto não encontrado pelo ID: " + id));
 
-        produtoParaAtualizar.setPrecoVenda(dto.getPrecoVenda());
+    public List<ProdutoResponse> buscarProdutoPorCategoria(String categoria) {
+        List<Produto> produtos = produtoRepository.findByCategoriaDescricaoContainingIgnoreCase(categoria);
 
-        Produto produtoSalvo = produtoRepository.save(produtoParaAtualizar);
+        return produtos.stream()
+                .map(produto -> {
+                    if (produto instanceof CalcadoProduto calcado) {
+                        return calcadoMapper.toResponse(calcado);
+                    }
+                    else if (produto instanceof OutrosProduto outros) {
+                        return outrosMapper.toResponse(outros);
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
 
-        return produtoMapper.toResponseDTO(produtoSalvo);
+    public List<ProdutoResponse> buscarProdutoPorCategoriaOrdenadoPorPrecoDesc(String categoria) {
+        List<Produto> produtos = produtoRepository.findByCategoriaDescricaoContainingIgnoreCaseOrderByValorUnitarioDesc(categoria);
+        return produtos.stream()
+                .map(produto -> {
+                    if (produto instanceof CalcadoProduto calcado) {
+                        return calcadoMapper.toResponse(calcado);
+                    }
+                    else if (produto instanceof OutrosProduto outros) {
+                        return outrosMapper.toResponse(outros);
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    public CalcadoProdutoResponse buscarCalcadoPorModelo(String modelo){
+        return calcadoMapper.toResponse(produtoRepository.findByModeloContainingIgnoreCase(modelo));
+    }
+
+    public List<CalcadoProdutoResponse> buscarCalcadoPorMarca(String marca){
+        return calcadoMapper.toResponseList(produtoRepository.findByMarcaContainingIgnoreCase(marca));
+    }
+
+    public List<CalcadoProdutoResponse> buscarCalcadoPorNumero(Integer numero){
+        return calcadoMapper.toResponseList(produtoRepository.findByNumero(numero));
+    }
+
+    public List<CalcadoProdutoResponse> buscarCalcadoPorCor(String cor){
+        return calcadoMapper.toResponseList(produtoRepository.findByCorContainingIgnoreCase(cor));
+    }
+
+    public OutrosProdutoResponse buscarOutrosPorNome(String nome) {
+        return outrosMapper.toResponse(produtoRepository.findByNomeContainingIgnoreCase(nome));
+    }
+
+    public List<OutrosProdutoResponse> buscarOutrosPorDescricao(String descricao) {
+        return outrosMapper.toResponseList(produtoRepository.findByDescricaoContainingIgnoreCase(descricao));
     }
 
     public void diminuirEstoque(Integer idProduto, Integer quantidadeVendida){

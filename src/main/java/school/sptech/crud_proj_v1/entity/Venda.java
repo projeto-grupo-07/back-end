@@ -25,7 +25,7 @@
         @Schema(example = "239.90", description = "Esse campo representa o valor final da venda a ser pago ")
         private Double totalVenda;
         @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL)
-        private List<ItensVenda> itens;
+        private List<VendaProduto> itens;
         private LocalDateTime dataHora;
         @OneToOne(mappedBy = "venda", cascade = CascadeType.ALL)
         private Comissao comissao;
@@ -47,11 +47,11 @@
             this.funcionario = funcionario;
         }
 
-        public List<ItensVenda> getItens() {
+        public List<VendaProduto> getItens() {
             return itens;
         }
 
-        public void setItens(List<ItensVenda> itens) {
+        public void setItens(List<VendaProduto> itens) {
             this.itens = itens;
         }
 

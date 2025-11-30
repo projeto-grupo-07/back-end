@@ -1,7 +1,7 @@
 package school.sptech.crud_proj_v1.mapper;
 
 import org.springframework.stereotype.Component;
-import school.sptech.crud_proj_v1.dto.ItensVenda.ItensVendaResponseDTO;
+import school.sptech.crud_proj_v1.dto.VendaProduto.VendaProdutoResponseDTO;
 import school.sptech.crud_proj_v1.dto.Venda.VendaRequestDTO;
 import school.sptech.crud_proj_v1.dto.Venda.VendaResponseDTO;
 import school.sptech.crud_proj_v1.entity.Venda;
@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 
 @Component
 public class VendaMapper {
-    private final ItensVendaMapper itensVendaMapper;
+    private final VendaProdutoMapper vendaProdutoMapper;
 
-    public VendaMapper(ItensVendaMapper itensVendaMapper) {
-        this.itensVendaMapper = itensVendaMapper;
+    public VendaMapper(VendaProdutoMapper vendaProdutoMapper) {
+        this.vendaProdutoMapper = vendaProdutoMapper;
     }
 
     public Venda toEntity(VendaRequestDTO dto) {
@@ -34,7 +34,7 @@ public class VendaMapper {
         VendaResponseDTO dto = new VendaResponseDTO();
 
         dto.setId(venda.getId());
-        dto.setValorTotal(venda.getTotalVenda());
+        dto.setValorTotalDaVenda(venda.getTotalVenda());
         dto.setFormaPagamento(venda.getFormaDePagamento());
         dto.setDataHora(venda.getDataHora());
 
@@ -43,8 +43,8 @@ public class VendaMapper {
         }
 
         if (venda.getItens() != null) {
-            List<ItensVendaResponseDTO> itensDto =
-                    itensVendaMapper.toProdutosVendaResponseDTO(venda.getItens());
+            List<VendaProdutoResponseDTO> itensDto =
+                    vendaProdutoMapper.toProdutosVendaResponseDTO(venda.getItens());
             dto.setItensDaVenda(itensDto);
         }
         return dto;

@@ -1,7 +1,7 @@
 package school.sptech.crud_proj_v1.dto.Venda;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import school.sptech.crud_proj_v1.dto.ItensVenda.ItensVendaResponseDTO;
+import school.sptech.crud_proj_v1.dto.VendaProduto.VendaProdutoResponseDTO;
 import school.sptech.crud_proj_v1.enumeration.FormaDePagamento;
 
 import java.time.LocalDateTime;
@@ -15,12 +15,12 @@ public class VendaResponseDTO {
     @Schema(example = "1", description = "Esse campo representa a chave estrangeira do funcionário que fez a venda")
     private Integer idVendedor;
     @Schema(example = "239.90", description = "Esse campo representa o valor final da venda a ser pago ")
-    private Double valorTotal;
+    private Double valorTotalDaVenda;
     @Schema(example = "PIX", description = "Esse campo representa qual foi a forma de pagamento da venda")
     private FormaDePagamento formaPagamento;
     private LocalDateTime dataHora;
 
-    private List<ItensVendaResponseDTO> itensDaVenda;
+    private List<VendaProdutoResponseDTO> itensDaVenda;
 
     public Integer getId() {
         return id;
@@ -38,12 +38,12 @@ public class VendaResponseDTO {
         this.idVendedor = idVendedor;
     }
 
-    public Double getValorTotal() {
-        return valorTotal;
+    public Double getValorTotalDaVenda() {
+        return valorTotalDaVenda;
     }
 
-    public void setValorTotal(Double valorTotal) {
-        this.valorTotal = valorTotal;
+    public void setValorTotalDaVenda(Double valorTotalDaVenda) {
+        this.valorTotalDaVenda = valorTotalDaVenda;
     }
 
     public FormaDePagamento getFormaPagamento() {
@@ -62,11 +62,11 @@ public class VendaResponseDTO {
         this.dataHora = dataHora;
     }
 
-    public List<ItensVendaResponseDTO> getItensDaVenda() {
+    public List<VendaProdutoResponseDTO> getItensDaVenda() {
         return itensDaVenda;
     }
 
-    public void setItensDaVenda(List<ItensVendaResponseDTO> itensDaVenda) {
+    public void setItensDaVenda(List<VendaProdutoResponseDTO> itensDaVenda) {
         this.itensDaVenda = itensDaVenda;
     }
 }
