@@ -248,7 +248,7 @@ public class ProdutoService {
         Produto produto = produtoRepository.findById(idProduto)
                 .orElseThrow(() -> new  EntidadeNotFoundException("Produto não encontrado pelo ID: " + idProduto));
 
-        produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - quantidadeVendida);
+        produto.setQuantidade(produto.getQuantidade() - quantidadeVendida);
         produtoRepository.save(produto);
     }
 }
