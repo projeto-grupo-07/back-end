@@ -26,5 +26,6 @@ public class VendaProduto {
     private Produto produto;
 
     private Integer quantidadeVendaProduto;
+
     private Double valorTotalVendaProduto;
 }

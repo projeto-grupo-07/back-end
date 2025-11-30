@@ -51,7 +51,6 @@ public class VendaService {
         if (itensDto == null || itensDto.isEmpty()) {
             throw new IllegalArgumentException("A venda deve ter pelo menos um item.");
         }
-
         Double valorTotal = 0.0;
         List<VendaProduto> novosItensDeVenda = new ArrayList<>();
 
@@ -143,6 +142,8 @@ public class VendaService {
         vendaParaAtualizar.setTotalVenda(valorTotal);
 
         Venda vendaSalva = vendaRepository.save(vendaParaAtualizar);
+
+        comissaoService.calcularComissao(vendaSalva);
 
         return vendaMapper.toVendaResponseDTO(vendaSalva);
     }

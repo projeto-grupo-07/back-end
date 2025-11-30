@@ -1,10 +1,12 @@
 package school.sptech.crud_proj_v1.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Data
 public class Comissao {
 
     @Id
@@ -23,45 +25,7 @@ public class Comissao {
     @JoinColumn(name = "fkFuncionario")
     private Funcionario funcionario;
 
-    public Integer getIdComissao() {
-        return idComissao;
-    }
 
-    public void setIdComissao(Integer idComissao) {
-        this.idComissao = idComissao;
-    }
-
-    public Double getValorComissao() {
-        return valorComissao;
-    }
-
-    public void setValorComissao(Double valorComissao) {
-        this.valorComissao = valorComissao;
-    }
-
-    public LocalDateTime getDataVenda() {
-        return dataVenda;
-    }
-
-    public void setDataVenda(LocalDateTime dataVenda) {
-        this.dataVenda = dataVenda;
-    }
-
-    public Venda getIdVenda() {
-        return venda;
-    }
-
-    public void setVenda(Venda venda) {
-        this.venda = venda;
-    }
-
-    public Funcionario getFuncionario() {
-        return funcionario;
-    }
-
-    public void setFuncionario(Funcionario idFuncionario) {
-        this.funcionario = idFuncionario;
-    }
 }
 
 
