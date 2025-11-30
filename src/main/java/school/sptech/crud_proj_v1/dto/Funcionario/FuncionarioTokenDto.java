@@ -5,6 +5,7 @@ public class FuncionarioTokenDto {
     private String email;
     private String nome;
     private String token;
+    private String perfil;
 
     public Integer getId() {
         return id;
@@ -36,5 +37,13 @@ public class FuncionarioTokenDto {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getPerfil() {
+        return perfil;
+    }
+
+    public void setPerfil(String perfil) {
+        this.perfil = perfil;
     }
 }

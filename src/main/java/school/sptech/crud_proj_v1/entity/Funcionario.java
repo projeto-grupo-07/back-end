@@ -1,15 +1,19 @@
 package school.sptech.crud_proj_v1.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import org.hibernate.validator.constraints.br.CPF;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import school.sptech.crud_proj_v1.enumeration.Perfil;
+
+import java.util.Collection;
+import java.util.List;
 
 @Entity
-public class Funcionario {
+public class Funcionario implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(example = "1", description = "Esse campo representa o identificador único dos funcionários. Ele se auto incrementa")
@@ -39,6 +43,49 @@ public class Funcionario {
 
     @Schema(description = "Esse campo representa a senha do funcionário")
     private String senha;
+
+    @Enumerated(EnumType.STRING)
+    private Perfil perfil;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (this.perfil == null) return List.of();
+
+        return List.of(new SimpleGrantedAuthority("ROLE_" + this.perfil.name()));
+    }
+
+    @Override
+    public String getPassword() {
+        return this.senha;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    public Perfil getPerfil() { return perfil; }
+    public void setPerfil(Perfil perfil) { this.perfil = perfil; }
 
     public Integer getId() {
         return id;

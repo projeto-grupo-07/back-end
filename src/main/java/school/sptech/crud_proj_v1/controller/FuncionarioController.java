@@ -3,14 +3,17 @@ package school.sptech.crud_proj_v1.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioLoginDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioRequestDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioResponseDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioTokenDto;
 import school.sptech.crud_proj_v1.entity.Funcionario;
 import school.sptech.crud_proj_v1.mapper.FuncionarioMapper;
+import school.sptech.crud_proj_v1.repository.FuncionarioRepository;
 import school.sptech.crud_proj_v1.service.FuncionarioService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -21,9 +24,11 @@ import java.util.List;
 @RequestMapping("/funcionarios")
 public class FuncionarioController {
     private final FuncionarioService service;
+    private final FuncionarioRepository funcionarioRepository;
 
-    public FuncionarioController(FuncionarioService service) {
+    public FuncionarioController(FuncionarioService service, FuncionarioRepository funcionarioRepository) {
         this.service = service;
+        this.funcionarioRepository = funcionarioRepository;
     }
 
     @GetMapping
@@ -48,7 +53,34 @@ public class FuncionarioController {
     public ResponseEntity<FuncionarioTokenDto> login(@RequestBody FuncionarioLoginDto funcionarioLoginDto) {
         final Funcionario funcionario = FuncionarioMapper.of(funcionarioLoginDto);
         FuncionarioTokenDto funcionarioTokenDto = this.service.autenticar(funcionario);
-        return ResponseEntity.status(200).body(funcionarioTokenDto);
+
+        String tokenJWT = funcionarioTokenDto.getToken();
+
+        ResponseCookie cookie = ResponseCookie.from("jwt", tokenJWT)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(3600)
+                .sameSite("Lax")
+                .build();
+
+        funcionarioTokenDto.setToken(null);
+
+        return ResponseEntity.status(200)
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(funcionarioTokenDto);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<FuncionarioTokenDto> getUsuarioLogado(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Funcionario funcionario = funcionarioRepository.findByEmail(authentication.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatusCode.valueOf(404), "Usuário não encontrado"));
+
+        return ResponseEntity.ok(FuncionarioMapper.of(funcionario, null));
     }
 
     @GetMapping("/{id}")

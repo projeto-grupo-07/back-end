@@ -19,8 +19,8 @@ INSERT INTO PRODUTO (modelo, marca, tamanho, cor, preco_custo, preco_venda, cate
 ---------------------------------------------------
 -- NOVO PASSO: Insere um Funcionário (Vendedor) --
 ---------------------------------------------------
-INSERT INTO FUNCIONARIO (nome, cpf, email, salario, comissao, senha)
-VALUES ('Ana Vendedora', '123.456.789-00', 'ana.vendas@empresa.com', 2000.00, 0.05, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi');
+INSERT INTO FUNCIONARIO (nome, cpf, email, salario, comissao, senha, perfil)
+VALUES ('VagaDev', '123.456.789-00', 'vaga.dev@brink.com', 2000.00, 0.05, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 'ADMIN');
 -- FUNCIONARIO ID: 1 (Usaremos este ID como fk_vendedor)
 
 --------------------------------------------------

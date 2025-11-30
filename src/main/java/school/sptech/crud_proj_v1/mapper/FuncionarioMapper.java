@@ -55,6 +55,10 @@ public class FuncionarioMapper {
         funcionarioTokenDto.setNome(funcionario.getNome());
         funcionarioTokenDto.setToken(token);
 
+        if (funcionario.getPerfil() != null) {
+            funcionarioTokenDto.setPerfil(funcionario.getPerfil().name());
+        }
+
         return funcionarioTokenDto;
     }
 
