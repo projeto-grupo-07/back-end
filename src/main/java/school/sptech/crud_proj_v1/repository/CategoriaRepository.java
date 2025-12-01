@@ -8,4 +8,10 @@ import java.util.List;
 
 public interface CategoriaRepository extends JpaRepository<Categoria, Integer> {
     List<Categoria> findByDescricaoContainingIgnoreCase(String descricao);
+
+    boolean existsByDescricao(String descricao);
+
+    List<Categoria> findByCategoriaPaiIsNull();
+
+    List<Categoria> findByCategoriaPaiIsNotNull();
 }
