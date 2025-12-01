@@ -3,9 +3,12 @@ package school.sptech.crud_proj_v1.service;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import school.sptech.crud_proj_v1.dto.Categoria.CategoriaPaiRequestDto;
+import school.sptech.crud_proj_v1.dto.Categoria.CategoriaPaiResponseDto;
 import school.sptech.crud_proj_v1.dto.Categoria.CategoriaRequestDto;
 import school.sptech.crud_proj_v1.dto.Categoria.CategoriaResponseDto;
 import school.sptech.crud_proj_v1.entity.Categoria;
+import school.sptech.crud_proj_v1.exception.EntidadeConflitoException;
 import school.sptech.crud_proj_v1.mapper.CategoriaMapper;
 import school.sptech.crud_proj_v1.repository.CategoriaRepository;
 import school.sptech.crud_proj_v1.repository.ProdutoRepository;
@@ -13,39 +16,80 @@ import school.sptech.crud_proj_v1.repository.ProdutoRepository;
 import java.util.List;
 import java.util.Optional;
 
+import static school.sptech.crud_proj_v1.mapper.CategoriaMapper.*;
+
 @Service
 public class CategoriaService {
     private final CategoriaRepository categoriaRepository;
-    private final CategoriaMapper categoriaMapper;
     private final ProdutoRepository produtoRepository;
 
-    public CategoriaService(CategoriaRepository categoriaRepository, CategoriaMapper categoriaMapper, ProdutoRepository produtoRepository) {
+    public CategoriaService(CategoriaRepository categoriaRepository, ProdutoRepository produtoRepository) {
         this.categoriaRepository = categoriaRepository;
-        this.categoriaMapper = categoriaMapper;
         this.produtoRepository = produtoRepository;
     }
 
-    public CategoriaResponseDto cadastrar(CategoriaRequestDto categoriaRequestDto) {
-
-        Categoria categoriaaSerCriada = categoriaMapper.toEntity(categoriaRequestDto);
-        categoriaRepository.save(categoriaaSerCriada);
-        return categoriaMapper.toResponseDto(categoriaaSerCriada);
+    public CategoriaPaiResponseDto cadastrarPai(CategoriaPaiRequestDto req) {
+        if (categoriaRepository.existsByDescricao(req.getDescricao())){
+            throw new EntidadeConflitoException("Categoria existente!");
+        }
+        Categoria entity = toEntity(req);
+        categoriaRepository.save(entity);
+        return toResponseDtoPai(entity);
     }
 
-    public List<CategoriaResponseDto> listarTodos() {
-        List<Categoria> categorias = categoriaRepository.findAll();
-        return categorias.stream().map(categoriaMapper::toResponseDto)
+    public CategoriaResponseDto cadastrarFilho(CategoriaRequestDto req){
+
+        if (categoriaRepository.existsByDescricao(req.getDescricao())){
+            throw new EntidadeConflitoException("Categoria existente!");
+        }
+
+        Categoria pai = categoriaRepository.findById(req.getCategoriaPaiId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Categoria pai não encontrada"
+                ));
+
+        Categoria filho = CategoriaMapper.toEntityFilho(req, pai);
+
+        pai.getSubcategorias().add(filho);
+
+        categoriaRepository.save(filho);
+
+        return CategoriaMapper.toResponseDto(filho);
+    }
+
+
+    public List<CategoriaPaiResponseDto> listarTodosPais() {
+        return CategoriaMapper.toResponseDtoPai(
+                categoriaRepository.findByCategoriaPaiIsNull()
+        );
+    }
+
+    public List<CategoriaResponseDto> listarTodosFilhos(){
+        return CategoriaMapper.toResponseDto(
+                categoriaRepository.findByCategoriaPaiIsNotNull()
+        );
+    }
+
+    public CategoriaResponseDto listarFilhoPorId(Integer id) {
+        Optional<Categoria> opCategoria = categoriaRepository.findById(id);
+        return opCategoria.map(CategoriaMapper::toResponseDto).orElse(null);
+    }
+
+    public CategoriaPaiResponseDto listarPaiPorId(Integer id) {
+        Optional<Categoria> opCategoria = categoriaRepository.findById(id);
+        return opCategoria.map(CategoriaMapper::toResponseDtoPai).orElse(null);
+    }
+
+    public List<CategoriaResponseDto> listarPorNomeFilho(String descricao) {
+        List<Categoria> categorias = categoriaRepository.findByDescricaoContainingIgnoreCase(descricao);
+        return categorias.stream().map(CategoriaMapper::toResponseDto)
                 .toList();
     }
 
-    public CategoriaResponseDto listarPorId(Integer id) {
-        Optional<Categoria> opCategoria = categoriaRepository.findById(id);
-        return opCategoria.map(categoriaMapper::toResponseDto).orElse(null);
-    }
-
-    public List<CategoriaResponseDto> listarPorNome(String descricao) {
+    public List<CategoriaPaiResponseDto> listarPorNomePai(String descricao){
         List<Categoria> categorias = categoriaRepository.findByDescricaoContainingIgnoreCase(descricao);
-        return categorias.stream().map(categoriaMapper::toResponseDto)
+        return categorias.stream().map(CategoriaMapper::toResponseDtoPai)
                 .toList();
     }
 
@@ -61,30 +105,50 @@ public class CategoriaService {
         categoriaRepository.deleteById(id);
     }
 
-    public CategoriaResponseDto atualizarTotal(Integer id, CategoriaRequestDto categoriaRequestDto) {
+    public CategoriaResponseDto atualizarTotalFilho(Integer id, CategoriaRequestDto req) {
         if (!categoriaRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Categoria não encontrada");
         }
-        Categoria categoriaParaAtualizar = categoriaMapper.toEntity(categoriaRequestDto);
 
-        categoriaParaAtualizar.setId(id);
+        Categoria pai = categoriaRepository.findById(req.getCategoriaPaiId())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Categoria pai não encontrada"
+                ));
 
-        Categoria categoriaSalva = categoriaRepository.save(categoriaParaAtualizar);
+        Categoria update = CategoriaMapper.toEntityFilho(req, pai);
 
-        return categoriaMapper.toResponseDto(categoriaSalva);
+        update.setId(id);
+
+        Categoria res = categoriaRepository.save(update);
+
+        return CategoriaMapper.toResponseDto(res);
     }
 
-    public CategoriaResponseDto atualizarParcial(Integer id, CategoriaRequestDto categoriaRequestDto) {
-        Categoria categoriaExistente = categoriaRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Categoria não encontrada"));
-
-        if (categoriaRequestDto.getDescricao() != null) {
-            categoriaExistente.setDescricao(categoriaRequestDto.getDescricao());
+    public CategoriaPaiResponseDto atualizarTotalPai(Integer id, CategoriaPaiRequestDto req) {
+        if (!categoriaRepository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Categoria não encontrada");
         }
+        Categoria update = CategoriaMapper.toEntity(req);
 
-        Categoria categoriaSalva = categoriaRepository.save(categoriaExistente);
+        update.setId(id);
 
-        return categoriaMapper.toResponseDto(categoriaSalva);
+        Categoria res = categoriaRepository.save(update);
+
+        return CategoriaMapper.toResponseDtoPai(res);
     }
+
+//    public CategoriaResponseDto atualizarParcial(Integer id, CategoriaRequestDto categoriaRequestDto) {
+//        Categoria categoriaExistente = categoriaRepository.findById(id)
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Categoria não encontrada"));
+//
+//        if (categoriaRequestDto.getDescricao() != null) {
+//            categoriaExistente.setDescricao(categoriaRequestDto.getDescricao());
+//        }
+//
+//        Categoria categoriaSalva = categoriaRepository.save(categoriaExistente);
+//
+//        return categoriaMapper.toResponseDto(categoriaSalva);
+//    }
 
 }
