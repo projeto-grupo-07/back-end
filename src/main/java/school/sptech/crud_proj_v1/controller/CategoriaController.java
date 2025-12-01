@@ -6,6 +6,8 @@ import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import school.sptech.crud_proj_v1.dto.Categoria.CategoriaPaiRequestDto;
+import school.sptech.crud_proj_v1.dto.Categoria.CategoriaPaiResponseDto;
 import school.sptech.crud_proj_v1.dto.Categoria.CategoriaRequestDto;
 import school.sptech.crud_proj_v1.dto.Categoria.CategoriaResponseDto;
 import school.sptech.crud_proj_v1.mapper.CategoriaMapper;
@@ -24,11 +26,22 @@ public class CategoriaController {
         this.categoriaService = categoriaService;
     }
 
-    @GetMapping
+    @GetMapping("/pais")
     @SecurityRequirement(name = "Bearer")
     @Tag(name = "Categoria")
-    public ResponseEntity<List<CategoriaResponseDto>> listarTodos(){
-        List<CategoriaResponseDto> categorias = categoriaService.listarTodos();
+    public ResponseEntity<List<CategoriaPaiResponseDto>> listarTodosPais(){
+        List<CategoriaPaiResponseDto> categorias = categoriaService.listarTodosPais();
+
+        return categorias.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(categorias);
+    }
+
+    @GetMapping("/filhos")
+    @SecurityRequirement(name = "Bearer")
+    @Tag(name = "Categoria")
+    public ResponseEntity<List<CategoriaResponseDto>> listarTodosFilho(){
+        List<CategoriaResponseDto> categorias = categoriaService.listarTodosFilhos();
 
         return categorias.isEmpty()
                 ? ResponseEntity.noContent().build()
@@ -36,31 +49,58 @@ public class CategoriaController {
     }
 
 
-
-    @GetMapping("/{id}")
+    @GetMapping("/pai/{id}")
     @SecurityRequirement(name = "Bearer")
     @Tag(name = "Categoria")
-    public ResponseEntity<CategoriaResponseDto> listarPorId(@PathVariable("id") Integer id) {
-        return categoriaService.listarPorId(id) == null ? ResponseEntity.notFound().build() : ResponseEntity.ok().body(categoriaService.listarPorId(id));
+    public ResponseEntity<CategoriaPaiResponseDto> listarPaiPorId(@PathVariable("id") Integer id) {
+        return categoriaService.listarPaiPorId(id) == null ? ResponseEntity.notFound().build() :
+                ResponseEntity.ok().body(categoriaService.listarPaiPorId(id));
     }
 
-    @GetMapping("/por-nome")
+    @GetMapping("/filho/{id}")
     @SecurityRequirement(name = "Bearer")
     @Tag(name = "Categoria")
-    public ResponseEntity<List<CategoriaResponseDto>> buscarPorNome(@RequestParam("nome") String descricao) {
+    public ResponseEntity<CategoriaResponseDto> listarFilhoPorId(@PathVariable("id") Integer id) {
+        return categoriaService.listarPaiPorId(id) == null ? ResponseEntity.notFound().build() :
+                ResponseEntity.ok().body(categoriaService.listarFilhoPorId(id));
+    }
 
-        List<CategoriaResponseDto> categorias = categoriaService.listarPorNome(descricao);
+    @GetMapping("/pai/por-nome")
+    @SecurityRequirement(name = "Bearer")
+    @Tag(name = "Categoria")
+    public ResponseEntity<List<CategoriaPaiResponseDto>> buscarPaiPorNome(@RequestParam("nome") String descricao) {
+
+        List<CategoriaPaiResponseDto> categorias = categoriaService.listarPorNomePai(descricao);
 
         return categorias.isEmpty()
                 ? ResponseEntity.noContent().build()
                 : ResponseEntity.ok(categorias);
     }
 
-    @PostMapping
+    @GetMapping("/filho/por-nome")
     @SecurityRequirement(name = "Bearer")
     @Tag(name = "Categoria")
-    public ResponseEntity<CategoriaResponseDto> cadastrar(@Valid @RequestBody CategoriaRequestDto categoriaRequestDto) {
-        return ResponseEntity.status(201).body(categoriaService.cadastrar(categoriaRequestDto));
+    public ResponseEntity<List<CategoriaResponseDto>> buscarFilhoPorNome(@RequestParam("nome") String descricao) {
+
+        List<CategoriaResponseDto> categorias = categoriaService.listarPorNomeFilho(descricao);
+
+        return categorias.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(categorias);
+    }
+
+    @PostMapping("/pai")
+    @SecurityRequirement(name = "Bearer")
+    @Tag(name = "Categoria")
+    public ResponseEntity<CategoriaPaiResponseDto> cadastrar(@Valid @RequestBody CategoriaPaiRequestDto req) {
+        return ResponseEntity.status(201).body(categoriaService.cadastrarPai(req));
+    }
+
+    @PostMapping("/filho")
+    @SecurityRequirement(name = "Bearer")
+    @Tag(name = "Categoria")
+    public ResponseEntity<CategoriaResponseDto> cadastrar(@Valid @RequestBody CategoriaRequestDto req, CategoriaPaiRequestDto pai) {
+        return ResponseEntity.status(201).body(categoriaService.cadastrarFilho(req));
     }
 
     @DeleteMapping("/{id}")
@@ -71,28 +111,36 @@ public class CategoriaController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/pai/{id}")
     @SecurityRequirement(name = "Bearer")
     @Tag(name = "Categoria")
-    public ResponseEntity<CategoriaResponseDto> atualizarTotal(
+    public ResponseEntity<CategoriaPaiResponseDto> atualizarTotalPai(
             @PathVariable Integer id,
-            @Valid @RequestBody CategoriaRequestDto categoriaRequestDto
+            @Valid @RequestBody CategoriaPaiRequestDto req
     ) {
-        CategoriaResponseDto dtoSalvo = categoriaService.atualizarTotal(id, categoriaRequestDto);
+        CategoriaPaiResponseDto dtoSalvo = categoriaService.atualizarTotalPai(id, req);
+        return ResponseEntity.ok(dtoSalvo);
+    }
+
+    @PutMapping("/filho/{id}")
+    @SecurityRequirement(name = "Bearer")
+    @Tag(name = "Categoria")
+    public ResponseEntity<CategoriaResponseDto> atualizarTotalFilho(@PathVariable Integer id, @Valid @RequestBody CategoriaRequestDto req) {
+        CategoriaResponseDto dtoSalvo = categoriaService.atualizarTotalFilho(id, req);
         return ResponseEntity.ok(dtoSalvo);
     }
 
 
-    @PatchMapping("/{id}")
-    @SecurityRequirement(name = "Bearer")
-    @Tag(name = "Categoria")
-    public ResponseEntity<CategoriaResponseDto> atualizarParcial(
-            @PathVariable Integer id,
-            @RequestBody CategoriaRequestDto categoriaRequestDto
-    ) {
-        CategoriaResponseDto dtoSalvo = categoriaService.atualizarParcial(id, categoriaRequestDto);
-        return ResponseEntity.ok(dtoSalvo);
-    }
+//    @PatchMapping("/{id}")
+//    @SecurityRequirement(name = "Bearer")
+//    @Tag(name = "Categoria")
+//    public ResponseEntity<CategoriaResponseDto> atualizarParcial(
+//            @PathVariable Integer id,
+//            @RequestBody CategoriaRequestDto categoriaRequestDto
+//    ) {
+//        CategoriaResponseDto dtoSalvo = categoriaService.atualizarParcial(id, categoriaRequestDto);
+//        return ResponseEntity.ok(dtoSalvo);
+//    }
 
 
 }
