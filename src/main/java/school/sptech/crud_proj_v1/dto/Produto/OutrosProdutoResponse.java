@@ -15,4 +15,7 @@ public class OutrosProdutoResponse implements ProdutoResponse{
 
     private String nome;
     private String descricao;
+
+    private String categoriaPai;
+    private String tipo;
 }

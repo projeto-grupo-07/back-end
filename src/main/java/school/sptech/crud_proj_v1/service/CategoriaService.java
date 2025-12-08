@@ -93,6 +93,14 @@ public class CategoriaService {
                 .toList();
     }
 
+    public List<CategoriaResponseDto> listarFilhosPorPai(Integer paiId) {
+        List<Categoria> filhos = categoriaRepository.findByCategoriaPaiId(paiId);
+
+        return filhos.stream()
+                .map(CategoriaMapper::toResponseDto)
+                .toList();
+    }
+
     public void deletarPorId(Integer id) {
         if (!categoriaRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Categoria não encontrada");

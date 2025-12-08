@@ -12,9 +12,11 @@ import school.sptech.crud_proj_v1.entity.OutrosProduto;
 import school.sptech.crud_proj_v1.entity.abstrato.Produto;
 import school.sptech.crud_proj_v1.event.ProdutoCadastradoEvent;
 import school.sptech.crud_proj_v1.exception.EntidadeNotFoundException;
+import school.sptech.crud_proj_v1.exception.ProdutoEmUsoException;
 import school.sptech.crud_proj_v1.mapper.CalcadoProdutoMapper;
 import school.sptech.crud_proj_v1.mapper.OutrosProdutoMapper;
 import school.sptech.crud_proj_v1.repository.CategoriaRepository;
+import school.sptech.crud_proj_v1.repository.ItensVendaRepository;
 import school.sptech.crud_proj_v1.repository.ProdutoRepository;
 
 import java.util.List;
@@ -30,6 +32,7 @@ public class ProdutoService {
     private final FuncionarioService funcionarioService;
     private final CalcadoProdutoMapper calcadoMapper;
     private final OutrosProdutoMapper outrosMapper;
+    private final ItensVendaRepository itensVendaRepository;
 
     private void configurarCategoria(Produto produto, Integer categoriaId) {
         if (categoriaId != null) {
@@ -183,6 +186,15 @@ public class ProdutoService {
         if (!produtoRepository.existsById(id)) {
             throw new EntidadeNotFoundException("Produto não encontrado pelo ID: " + id);
         }
+
+        Integer count = itensVendaRepository.countByProdutoId(id);
+
+        if (count > 0) {
+            throw new ProdutoEmUsoException(
+                    "Produto vinculado a uma ou mais vendas. Não é possível deletar."
+            );
+        }
+
         produtoRepository.deleteById(id);
     }
 

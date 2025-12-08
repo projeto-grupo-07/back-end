@@ -9,6 +9,8 @@ import java.util.List;
 public interface CategoriaRepository extends JpaRepository<Categoria, Integer> {
     List<Categoria> findByDescricaoContainingIgnoreCase(String descricao);
 
+    List<Categoria> findByCategoriaPaiId(Integer id);
+
     boolean existsByDescricao(String descricao);
 
     List<Categoria> findByCategoriaPaiIsNull();

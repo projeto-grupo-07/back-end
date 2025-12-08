@@ -45,8 +45,17 @@ public class CalcadoProdutoMapper {
 
         if (entidade.getCategoria() != null) {
             response.setIdCategoria(entidade.getCategoria().getId());
-        }
 
+            // NOVO: Categoria pai e tipo
+            if (entidade.getCategoria().getCategoriaPai() != null) {
+                response.setCategoriaPai(entidade.getCategoria().getCategoriaPai().getDescricao());
+                response.setTipo(entidade.getCategoria().getCategoriaPai().getDescricao()
+                        .equalsIgnoreCase("Calçados") ? "calcado" : "outros");
+            } else {
+                response.setCategoriaPai(entidade.getCategoria().getDescricao()); // fallback
+                response.setTipo("outros");
+            }
+        }
 
         response.setCor(entidade.getCor());
         response.setModelo(entidade.getModelo());

@@ -18,4 +18,7 @@ public class CalcadoProdutoResponse implements ProdutoResponse {
     private Integer numero;
     private String cor;
 
+    private String categoriaPai;
+    private String tipo;
+
 }

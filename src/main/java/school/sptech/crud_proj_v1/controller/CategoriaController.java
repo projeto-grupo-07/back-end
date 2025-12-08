@@ -77,6 +77,17 @@ public class CategoriaController {
                 : ResponseEntity.ok(categorias);
     }
 
+    @GetMapping("/filho/pai/{id}")
+    @SecurityRequirement(name = "Bearer")
+    @Tag(name = "Categoria")
+    public ResponseEntity<List<CategoriaResponseDto>> buscarFilhosPorPai(@PathVariable("id") Integer id) {
+        List<CategoriaResponseDto> filhos = categoriaService.listarFilhosPorPai(id);
+
+        return filhos.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(filhos);
+    }
+
     @GetMapping("/filho/por-nome")
     @SecurityRequirement(name = "Bearer")
     @Tag(name = "Categoria")

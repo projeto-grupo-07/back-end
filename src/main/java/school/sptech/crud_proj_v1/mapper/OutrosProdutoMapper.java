@@ -28,21 +28,24 @@ public class OutrosProdutoMapper {
 
 
     public OutrosProdutoResponse toResponse(OutrosProduto entidade) {
-        if (entidade == null) {
-            return null;
-        }
+        if (entidade == null) return null;
 
         OutrosProdutoResponse response = new OutrosProdutoResponse();
-
+        response.setId(entidade.getId());
+        response.setIdCategoria(entidade.getCategoria().getId());
         response.setQuantidade(entidade.getQuantidade());
         response.setValorUnitario(entidade.getValorUnitario());
-        if (entidade.getCategoria() != null) {
-            response.setIdCategoria(entidade.getCategoria().getId());
-        }
-
-        response.setId(entidade.getId());
-        response.setDescricao(entidade.getDescricao());
         response.setNome(entidade.getNome());
+        response.setDescricao(entidade.getDescricao());
+
+        // Adiciona categoriaPai e tipo
+        if (entidade.getCategoria().getCategoriaPai() != null) {
+            response.setCategoriaPai(entidade.getCategoria().getCategoriaPai().getDescricao());
+            response.setTipo(entidade.getCategoria().getCategoriaPai().getDescricao().equalsIgnoreCase("Calçados") ? "calcado" : "outros");
+        } else {
+            response.setCategoriaPai(entidade.getCategoria().getDescricao());
+            response.setTipo("outros");
+        }
 
         return response;
     }

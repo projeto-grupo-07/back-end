@@ -21,7 +21,7 @@ public class CategoriaMapper {
         }
 
         CategoriaResponseDto dto = new CategoriaResponseDto();
-//        dto.setId(entity.getId());
+       dto.setId(entity.getId());
         dto.setDescricao(entity.getDescricao());
 
         return dto;

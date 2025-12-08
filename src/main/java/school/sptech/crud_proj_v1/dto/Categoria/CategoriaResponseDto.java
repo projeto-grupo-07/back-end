@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 @Data
 public class CategoriaResponseDto {
-//    @Schema(example = "1")
-//    private Integer id;
+    @Schema(example = "1")
+    private Integer id;
 
     @Schema(example = "Calçados")
     private String descricao;
