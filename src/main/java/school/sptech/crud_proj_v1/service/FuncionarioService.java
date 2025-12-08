@@ -1,5 +1,6 @@
 package school.sptech.crud_proj_v1.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,22 +24,19 @@ import school.sptech.crud_proj_v1.repository.FuncionarioRepository;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class FuncionarioService {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private GerenciadorTokenJwt gerenciadorTokenJwt;
-    @Autowired
-    private AuthenticationManager authenticationManager;
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final GerenciadorTokenJwt gerenciadorTokenJwt;
+
+    private final AuthenticationManager authenticationManager;
 
     private final FuncionarioRepository funcionarioRepository;
     private final FuncionarioMapper funcionarioMapper;
 
-    public FuncionarioService(FuncionarioRepository repository, FuncionarioMapper funcionarioMapper) {
-        this.funcionarioRepository = repository;
-        this.funcionarioMapper = funcionarioMapper;
-    }
 
     public List<FuncionarioResponseDto> listar(){
         List<Funcionario> funcionariosEncontrados =  funcionarioRepository.findAll();
