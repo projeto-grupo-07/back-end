@@ -1,0 +1,30 @@
+package school.sptech.crud_proj_v1.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import school.sptech.crud_proj_v1.service.KpiService;
+
+@RestController
+@RequestMapping("/kpis")
+@RequiredArgsConstructor
+public class KpiController {
+    private final KpiService kpiService;
+
+    @GetMapping("/faturamentoDiario")
+    public ResponseEntity<Double> getFaturamentoDiario(){
+        return ResponseEntity.status(200).body(kpiService.buscarFaturamentoDia());
+    }
+
+    @GetMapping("/faturamentoSemanal")
+    public ResponseEntity<Double> getFaturamentoSemanal(){
+        return ResponseEntity.status(200).body(kpiService.buscarFaturamentoSemana());
+    }
+
+    @GetMapping("/faturamentoMensal")
+    public ResponseEntity<Double> getFaturamentoMensal(){
+        return ResponseEntity.status(200).body(kpiService.buscarFaturamentoMes());
+    }
+}
