@@ -13,18 +13,33 @@ import school.sptech.crud_proj_v1.service.KpiService;
 public class KpiController {
     private final KpiService kpiService;
 
-    @GetMapping("/faturamentoDiario")
+    @GetMapping("/faturamento-diario")
     public ResponseEntity<Double> getFaturamentoDiario(){
         return ResponseEntity.status(200).body(kpiService.buscarFaturamentoDia());
     }
 
-    @GetMapping("/faturamentoSemanal")
+    @GetMapping("/faturamento-semanal")
     public ResponseEntity<Double> getFaturamentoSemanal(){
         return ResponseEntity.status(200).body(kpiService.buscarFaturamentoSemana());
     }
 
-    @GetMapping("/faturamentoMensal")
+    @GetMapping("/faturamento-mensal")
     public ResponseEntity<Double> getFaturamentoMensal(){
         return ResponseEntity.status(200).body(kpiService.buscarFaturamentoMes());
+    }
+
+    @GetMapping("/total-vendas-diario")
+    public ResponseEntity<Integer> getTotalVendasDiario() {
+        return ResponseEntity.status(200).body(kpiService.buscarTotalVendasDiarias());
+    }
+
+    @GetMapping("/total-vendas-semanal")
+    public ResponseEntity<Integer> getTotalVendasSemanal() {
+        return ResponseEntity.status(200).body(kpiService.buscarTotalVendasSemanais());
+    }
+
+    @GetMapping("/total-vendas-mensal")
+    public ResponseEntity<Integer> getTotalVendasMensal() {
+        return ResponseEntity.status(200).body(kpiService.buscarTotalVendasMensais());
     }
 }

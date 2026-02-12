@@ -14,6 +14,8 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
     List<Venda> findByFormaDePagamento(FormaDePagamento formaDePagamento);
 
     //kpi da dashboard
+
+    //faturamento
     @Query(value = "SELECT * FROM faturamento_dia_atual", nativeQuery = true)
     Double buscarFaturamentoDia();
 
@@ -22,4 +24,14 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
 
     @Query(value = "SELECT * FROM faturamento_mes_atual", nativeQuery = true)
     Double buscarFaturamentoMes();
+
+    //total de vendas
+    @Query(value = "SELECT * FROM total_vendas_diarias", nativeQuery = true)
+    Integer contarVendasDiarias();
+
+    @Query(value = "SELECT * FROM total_vendas_semanais", nativeQuery = true)
+    Integer contarVendasSemanais();
+
+    @Query(value = "SELECT * FROM total_vendas_mensais", nativeQuery = true)
+    Integer contarVendasMensais();
 }

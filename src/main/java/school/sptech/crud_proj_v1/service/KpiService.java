@@ -20,4 +20,19 @@ public class KpiService {
     public Double buscarFaturamentoMes(){
         return vendaRepository.buscarFaturamentoMes();
     }
+
+    public Integer buscarTotalVendasDiarias() {
+        Integer qtd = vendaRepository.contarVendasDiarias();
+        return (qtd != null) ? qtd : 0;
+    }
+
+    public Integer buscarTotalVendasSemanais() {
+        Integer qtd = vendaRepository.contarVendasSemanais();
+        return (qtd != null) ? qtd : 0;
+    }
+
+    public Integer buscarTotalVendasMensais() {
+        Integer qtd = vendaRepository.contarVendasMensais();
+        return (qtd != null) ? qtd : 0;
+    }
 }
