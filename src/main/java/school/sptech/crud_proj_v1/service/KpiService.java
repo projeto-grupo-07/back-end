@@ -36,15 +36,15 @@ public class KpiService {
         return (qtd != null) ? qtd : 0;
     }
 
-    public Integer contarTicketMedioMensal(){
+    public Double contarTicketMedioMensal(){
         return vendaRepository.contarTicketMedioMensal();
     }
 
-    public Integer contarTicketMedioSemanal(){
+    public Double contarTicketMedioSemanal(){
         return vendaRepository.contarTicketMedioSemanal();
     }
 
-    public Integer contarTicketMedioDiario(){
+    public Double contarTicketMedioDiario(){
         return vendaRepository.contarTicketMedioDiario();
     }
 }

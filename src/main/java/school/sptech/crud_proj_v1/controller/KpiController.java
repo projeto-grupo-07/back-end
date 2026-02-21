@@ -44,17 +44,17 @@ public class KpiController {
     }
 
     @GetMapping("/ticket-medio-diario")
-    public ResponseEntity<Integer> getTicketMedioDiario(){
+    public ResponseEntity<Double> getTicketMedioDiario(){
         return ResponseEntity.status(200).body(kpiService.contarTicketMedioDiario());
     }
 
-    @GetMapping("/ticket-medio-mensal")
-    public ResponseEntity<Integer> getTicketMedioSemanal(){
+    @GetMapping("/ticket-medio-semanal")
+    public ResponseEntity<Double> getTicketMedioSemanal(){
         return ResponseEntity.status(200).body(kpiService.contarTicketMedioSemanal());
     }
 
-    @GetMapping("/ticket-medio-diario")
-    public ResponseEntity<Integer> getTicketMedioMensal(){
+    @GetMapping("/ticket-medio-mensal")
+    public ResponseEntity<Double> getTicketMedioMensal(){
         return ResponseEntity.status(200).body(kpiService.contarTicketMedioMensal());
     }
 }
