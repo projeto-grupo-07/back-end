@@ -34,4 +34,14 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
 
     @Query(value = "SELECT * FROM total_vendas_mensais", nativeQuery = true)
     Integer contarVendasMensais();
+
+    // ticket médio
+    @Query(value = "SELECT * FROM ticket_medio_diario", nativeQuery = true)
+    Integer contarTicketMedioDiario();
+
+    @Query(value = "SELECT * FROM ticket_medio_semanal", nativeQuery = true)
+    Integer contarTicketMedioSemanal();
+
+    @Query(value = "SELECT * FROM ticket_medio_mensal", nativeQuery = true)
+    Integer contarTicketMedioMensal();
 }
