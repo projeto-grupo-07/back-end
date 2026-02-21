@@ -42,4 +42,19 @@ public class KpiController {
     public ResponseEntity<Integer> getTotalVendasMensal() {
         return ResponseEntity.status(200).body(kpiService.buscarTotalVendasMensais());
     }
+
+    @GetMapping("/ticket-medio-diario")
+    public ResponseEntity<Integer> getTicketMedioDiario(){
+        return ResponseEntity.status(200).body(kpiService.contarTicketMedioDiario());
+    }
+
+    @GetMapping("/ticket-medio-mensal")
+    public ResponseEntity<Integer> getTicketMedioSemanal(){
+        return ResponseEntity.status(200).body(kpiService.contarTicketMedioSemanal());
+    }
+
+    @GetMapping("/ticket-medio-diario")
+    public ResponseEntity<Integer> getTicketMedioMensal(){
+        return ResponseEntity.status(200).body(kpiService.contarTicketMedioMensal());
+    }
 }
