@@ -1,5 +1,6 @@
 package school.sptech.crud_proj_v1.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,12 +15,14 @@ import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioRequestDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioResponseDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioTokenDto;
 import school.sptech.crud_proj_v1.entity.Funcionario;
+import school.sptech.crud_proj_v1.entity.Perfil;
 import school.sptech.crud_proj_v1.entity.abstrato.Produto;
 import school.sptech.crud_proj_v1.event.ProdutoCadastradoEvent;
 import school.sptech.crud_proj_v1.exception.EntidadeConflitoException;
 import school.sptech.crud_proj_v1.exception.EntidadeNotFoundException;
 import school.sptech.crud_proj_v1.mapper.FuncionarioMapper;
 import school.sptech.crud_proj_v1.repository.FuncionarioRepository;
+import school.sptech.crud_proj_v1.repository.PerfilRepository;
 
 import java.util.List;
 
@@ -36,10 +39,11 @@ public class FuncionarioService {
 
     private final FuncionarioRepository funcionarioRepository;
     private final FuncionarioMapper funcionarioMapper;
+    private final PerfilRepository perfilRepository;
 
 
     public List<FuncionarioResponseDto> listar(){
-        List<Funcionario> funcionariosEncontrados =  funcionarioRepository.findAll();
+        List<Funcionario> funcionariosEncontrados =  funcionarioRepository.findAllByAtivoTrue();
         return funcionariosEncontrados.stream().map(FuncionarioMapper::of).toList();
     }
 
@@ -76,30 +80,35 @@ public class FuncionarioService {
         return FuncionarioMapper.of(funcionarioFound);
     }
 
+    // No seu FuncionarioService.java
+
     public FuncionarioResponseDto atualizarPorId(Integer id, FuncionarioRequestDto dto) {
+        Funcionario funcionarioExistente = funcionarioRepository.findById(id)
+                .orElseThrow(() -> new EntidadeNotFoundException("Funcionário não encontrado"));
 
-        Funcionario funcionarioParaAtualizar = funcionarioRepository.findById(id)
-                .orElseThrow(() -> new EntidadeNotFoundException("Funcionário com id não encontrado: " + id));
+        // Busca o perfil enviado no DTO
+        Perfil perfil = perfilRepository.findById(dto.getIdPerfil())
+                .orElseThrow(() -> new EntidadeNotFoundException("Perfil não encontrado"));
 
-        funcionarioParaAtualizar.setNome(dto.getNome());
-        funcionarioParaAtualizar.setCpf(dto.getCpf());
-        funcionarioParaAtualizar.setEmail(dto.getEmail());
-        funcionarioParaAtualizar.setSalario(dto.getSalario());
-        funcionarioParaAtualizar.setComissao(dto.getComissao());
+        // Atualiza os campos
+        funcionarioExistente.setNome(dto.getNome());
+        funcionarioExistente.setEmail(dto.getEmail());
+        funcionarioExistente.setCpf(dto.getCpf()); // Agora o CPF virá no body do front
+        funcionarioExistente.setSalario(dto.getSalario());
+        funcionarioExistente.setComissao(dto.getComissao());
+        funcionarioExistente.setPerfil(perfil); // Seta o novo perfil
 
-        if (dto.getSenha() != null && !dto.getSenha().isBlank()) {
-            funcionarioParaAtualizar.setSenha(passwordEncoder.encode(dto.getSenha()));
-        }
-
-        return FuncionarioMapper.of(funcionarioRepository.save(funcionarioParaAtualizar));
+        return FuncionarioMapper.of(funcionarioRepository.save(funcionarioExistente));
     }
 
-    public void deletarPorId(Integer id){
-        if (funcionarioRepository.existsById(id)){
-            funcionarioRepository.deleteById(id);
-            return;
-        }
-        throw new EntidadeNotFoundException("funcionario nao encontrado/existente");
+    @Transactional
+    public void deletarPorId(Integer id) {
+        Funcionario funcionario = funcionarioRepository.findById(id)
+                .orElseThrow(() -> new EntidadeNotFoundException("Funcionário não encontrado/existente"));
+
+        funcionario.setAtivo(false);
+
+        funcionarioRepository.save(funcionario);
     }
 
     public void handleProdutoCadastrado(ProdutoCadastradoEvent event){

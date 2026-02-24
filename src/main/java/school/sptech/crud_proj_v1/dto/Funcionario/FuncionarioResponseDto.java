@@ -3,6 +3,7 @@ package school.sptech.crud_proj_v1.dto.Funcionario;
 
 import jakarta.validation.constraints.*;
 import org.hibernate.validator.constraints.br.CPF;
+import school.sptech.crud_proj_v1.dto.Perfil.PerfilResponseDto;
 
 public class FuncionarioResponseDto {
     private Integer id;
@@ -11,6 +12,7 @@ public class FuncionarioResponseDto {
     private Double salario;
     private String email;
     private Double comissao;
+    private PerfilResponseDto perfil;
 
     public Integer getId() {
         return id;
@@ -58,5 +60,13 @@ public class FuncionarioResponseDto {
 
     public void setComissao(Double comissao) {
         this.comissao = comissao;
+    }
+
+    public PerfilResponseDto getPerfil() {
+        return perfil;
+    }
+
+    public void setPerfil(PerfilResponseDto perfil) {
+        this.perfil = perfil;
     }
 }

@@ -5,6 +5,7 @@ import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioLoginDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioRequestDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioResponseDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioTokenDto;
+import school.sptech.crud_proj_v1.dto.Perfil.PerfilResponseDto;
 import school.sptech.crud_proj_v1.dto.Tela.TelaDto;
 import school.sptech.crud_proj_v1.entity.Funcionario;
 
@@ -82,15 +83,25 @@ public class FuncionarioMapper {
     }
 
     public static FuncionarioResponseDto of(Funcionario funcionario) {
-        FuncionarioResponseDto funcionarioResponseDto  = new FuncionarioResponseDto();
+        if (funcionario == null) return null;
 
-        funcionarioResponseDto.setId(funcionario.getId());
-        funcionarioResponseDto.setEmail(funcionario.getEmail());
-        funcionarioResponseDto.setNome(funcionario.getNome());
-        funcionarioResponseDto.setCpf(funcionario.getCpf());
-        funcionarioResponseDto.setSalario(funcionario.getSalario());
-        funcionarioResponseDto.setComissao(funcionario.getComissao());
+        FuncionarioResponseDto dto = new FuncionarioResponseDto();
 
-        return funcionarioResponseDto;
+        dto.setId(funcionario.getId());
+        dto.setEmail(funcionario.getEmail());
+        dto.setNome(funcionario.getNome());
+        dto.setCpf(funcionario.getCpf());
+        dto.setSalario(funcionario.getSalario());
+        dto.setComissao(funcionario.getComissao());
+
+        // MAPEAMENTO DO PERFIL ADICIONADO AQUI
+        if (funcionario.getPerfil() != null) {
+            PerfilResponseDto perfilDto = new PerfilResponseDto();
+            perfilDto.setId(funcionario.getPerfil().getId());
+            perfilDto.setNome(funcionario.getPerfil().getNome());
+            dto.setPerfil(perfilDto);
+        }
+
+        return dto;
     }
 }

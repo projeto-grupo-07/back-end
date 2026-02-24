@@ -105,44 +105,63 @@ public class VendaService {
     }
 
     public VendaResponseDTO atualizarPorId(Integer id, VendaRequestDTO dto) {
+        // 1. Busca a venda existente
         Venda vendaParaAtualizar = vendaRepository.findById(id)
                 .orElseThrow(() -> new EntidadeNotFoundException("Venda com ID não encontrada: " + id));
 
+        // 2. Valida o novo funcionário/vendedor
         Funcionario funcionario = funcionarioRepository.findById(dto.getIdVendedor())
                 .orElseThrow(() -> new EntidadeNotFoundException("Vendedor não encontrado"));
 
+        // 3. Atualiza os dados básicos
         vendaParaAtualizar.setFuncionario(funcionario);
         vendaParaAtualizar.setFormaDePagamento(dto.getFormaPagamento());
+
+        // Opcional: Remova a linha abaixo se quiser manter a data original da venda
         vendaParaAtualizar.setDataHora(LocalDateTime.now());
 
+        // 4. LIMPEZA DOS ITENS ANTIGOS
+        // Importante: Requer orphanRemoval = true na @OneToMany da entidade Venda
         vendaParaAtualizar.getItens().clear();
 
+        // 5. VALIDAÇÃO DE ITENS
         List<VendaProdutoRequestDTO> itensDto = dto.getItensVenda();
         if (itensDto == null || itensDto.isEmpty()) {
             throw new IllegalArgumentException("A venda deve ter pelo menos um item.");
         }
 
         Double valorTotal = 0.0;
-        List<VendaProduto> novosItensDeVenda = new ArrayList<>();
 
+        // 6. ADIÇÃO DOS NOVOS ITENS
         for (VendaProdutoRequestDTO itemDto : itensDto) {
             Produto produto = produtoRepository.findById(itemDto.getIdProduto())
-                    .orElseThrow(() -> new EntidadeNotFoundException("Produto do id não encontrado: " + itemDto.getIdProduto()));
+                    .orElseThrow(() -> new EntidadeNotFoundException("Produto ID não encontrado: " + itemDto.getIdProduto()));
 
             VendaProduto itemVenda = new VendaProduto();
             itemVenda.setProduto(produto);
             itemVenda.setQuantidadeVendaProduto(itemDto.getQuantidadeVendaProduto());
-            itemVenda.setValorTotalVendaProduto(produto.getValorUnitario() * itemDto.getQuantidadeVendaProduto());
+
+            // Calcula o valor total do item baseado no valor unitário ATUAL do produto
+            Double valorItem = produto.getValorUnitario() * itemDto.getQuantidadeVendaProduto();
+            itemVenda.setValorTotalVendaProduto(valorItem);
+
+            // Estabelece a relação bilateral (Muito importante para o JPA)
             itemVenda.setVenda(vendaParaAtualizar);
-            novosItensDeVenda.add(itemVenda);
-            valorTotal += itemVenda.getValorTotalVendaProduto();
+
+            // Adiciona na lista que o JPA já está monitorando
+            vendaParaAtualizar.getItens().add(itemVenda);
+
+            valorTotal += valorItem;
         }
 
-        vendaParaAtualizar.setItens(novosItensDeVenda);
+        // 7. Atualiza o valor total da venda consolidado
         vendaParaAtualizar.setTotalVenda(valorTotal);
 
+        // 8. PERSISTÊNCIA
+        // O save() aqui vai disparar os DELETEs dos órfãos e os INSERTs dos novos itens
         Venda vendaSalva = vendaRepository.save(vendaParaAtualizar);
 
+        // 9. Atualiza comissão
         comissaoService.calcularComissao(vendaSalva);
 
         return vendaMapper.toVendaResponseDTO(vendaSalva);

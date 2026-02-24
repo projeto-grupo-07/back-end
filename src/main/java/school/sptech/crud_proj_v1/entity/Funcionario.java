@@ -24,7 +24,6 @@ public class Funcionario implements UserDetails {
     private String nome;
 
     @CPF
-    @NotBlank
     private String cpf;
 
     @Positive
@@ -42,6 +41,8 @@ public class Funcionario implements UserDetails {
     @ManyToOne
     @JoinColumn(name = "perfil_id") // Cria a FK no banco
     private Perfil perfil;
+
+    private Boolean ativo = true;
 
 
     @Override
@@ -67,6 +68,14 @@ public class Funcionario implements UserDetails {
 
     public Perfil getPerfil() { return perfil; }
     public void setPerfil(Perfil perfil) { this.perfil = perfil; }
+
+    public Boolean getAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(Boolean ativo) {
+        this.ativo = ativo;
+    }
 
     @Override public String getPassword() { return this.senha; }
     @Override public String getUsername() { return this.email; }
