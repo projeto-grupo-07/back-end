@@ -2,7 +2,9 @@ package school.sptech.crud_proj_v1.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,6 +16,7 @@ import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioRequestDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioResponseDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioTokenDto;
 import school.sptech.crud_proj_v1.entity.Funcionario;
+import school.sptech.crud_proj_v1.entity.TentativaLogin;
 import school.sptech.crud_proj_v1.entity.abstrato.Produto;
 import school.sptech.crud_proj_v1.event.ProdutoCadastradoEvent;
 import school.sptech.crud_proj_v1.exception.EntidadeConflitoException;
@@ -36,6 +39,7 @@ public class FuncionarioService {
 
     private final FuncionarioRepository funcionarioRepository;
     private final FuncionarioMapper funcionarioMapper;
+    private final TentativaLoginService tentativaLoginService;
 
 
     public List<FuncionarioResponseDto> listar(){
@@ -56,19 +60,34 @@ public class FuncionarioService {
     }
 
     public FuncionarioTokenDto autenticar(Funcionario funcionario) {
-        final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(funcionario.getEmail(), funcionario.getSenha());
+        TentativaLogin tentativa = tentativaLoginService.getByEmail(funcionario.getEmail());
 
-        final Authentication authentication = this.authenticationManager.authenticate(credentials);
+        if (tentativa.isBloqueado()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Usuário temporariamente bloqueado até " + tentativa.getDesbloqueio());
+        }
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(funcionario.getEmail(), funcionario.getSenha())
+            );
+            // Resetar tentativas em caso de sucesso
+            tentativaLoginService.resetar(funcionario.getEmail());
 
-        Funcionario funcionarioAutenticado = funcionarioRepository.findByEmail(funcionario.getEmail())
-                .orElseThrow(
-                () -> new ResponseStatusException(404, "Email do usuário não cadastrado", null)
-                );
+            Funcionario funcionarioAutenticado = funcionarioRepository.findByEmail(funcionario.getEmail())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Email não cadastrado"));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        final String token = gerenciadorTokenJwt.generateToken(authentication);
-        return FuncionarioMapper.of(funcionarioAutenticado, token);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String token = gerenciadorTokenJwt.generateToken(authentication);
+
+            return FuncionarioMapper.of(funcionarioAutenticado, token);
+
+        } catch (BadCredentialsException e) {
+            // Registrar falha
+            tentativaLoginService.registrarFalha(funcionario.getEmail());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Credenciais inválidas");
+        }
     }
+
 
     public FuncionarioResponseDto buscarPorId(Integer id){
         Funcionario funcionarioFound = funcionarioRepository.findById(id)
