@@ -26,6 +26,9 @@ public class FuncionarioRequestDto {
     @NotNull
     private Double comissao;
 
+    @NotNull
+    private Integer idPerfil;
+
     public String getNome() {
         return nome;
     }
@@ -72,5 +75,13 @@ public class FuncionarioRequestDto {
 
     public void setComissao(Double comissao) {
         this.comissao = comissao;
+    }
+
+    public Integer getIdPerfil() {
+        return idPerfil;
+    }
+
+    public void setIdPerfil(Integer idPerfil) {
+        this.idPerfil = idPerfil;
     }
 }

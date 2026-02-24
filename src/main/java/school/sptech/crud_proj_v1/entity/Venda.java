@@ -30,7 +30,7 @@
         @Schema(example = "239.90", description = "Esse campo representa o valor final da venda a ser pago ")
         private Double totalVenda;
 
-        @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL)
+        @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, orphanRemoval = true)
         private List<VendaProduto> itens;
 
         private LocalDateTime dataHora;
