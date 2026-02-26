@@ -3,6 +3,7 @@ package school.sptech.crud_proj_v1.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ import java.util.List;
 @Tag(name = "Funcionário")
 @RestController
 @RequestMapping("/funcionarios")
+@Slf4j
 public class FuncionarioController {
     private final FuncionarioService service;
     private final FuncionarioRepository funcionarioRepository;
@@ -35,10 +37,13 @@ public class FuncionarioController {
     @SecurityRequirement(name = "Bearer")
     @Tag(name = "Funcionário")
     public ResponseEntity<List<FuncionarioResponseDto>> listarFuncionarios(){
+        log.info("Requisição para listar todos os funcionários recebida.");
         List<FuncionarioResponseDto> all = service.listar();
         if (all.isEmpty()){
+            log.warn("Nenhum funcionário encontrado na base de dados.");
             return ResponseEntity.status(204).build();
         }
+        log.info("Listagem finalizada. Total de registros: {}", all.size());
         return ResponseEntity.status(200).body(all);
     }
 
@@ -46,11 +51,15 @@ public class FuncionarioController {
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método cadastra um novo funcionário")
     public ResponseEntity<FuncionarioResponseDto> cadastrarFuncionario(@Valid @RequestBody FuncionarioRequestDto func){
-        return ResponseEntity.status(201).body(service.cadastrarFuncionario(func));
+        log.info("Iniciando cadastro de novo funcionário: {}", func.getNome());
+        FuncionarioResponseDto criado = service.cadastrarFuncionario(func);
+        log.info("Funcionário cadastrado com sucesso. ID gerado: {}", criado.getId());
+        return ResponseEntity.status(201).body(criado);
     }
 
     @PostMapping("/login")
     public ResponseEntity<FuncionarioTokenDto> login(@RequestBody FuncionarioLoginDto funcionarioLoginDto) {
+        log.info("Tentativa de login para o usuário: {}", funcionarioLoginDto.getEmail());
         final Funcionario funcionario = FuncionarioMapper.of(funcionarioLoginDto);
         FuncionarioTokenDto funcionarioTokenDto = this.service.autenticar(funcionario);
 
@@ -66,6 +75,7 @@ public class FuncionarioController {
 
         funcionarioTokenDto.setToken(null);
 
+        log.info("Login bem-sucedido para o usuário: {}", funcionarioLoginDto.getEmail());
         return ResponseEntity.status(200)
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(funcionarioTokenDto);
@@ -73,6 +83,7 @@ public class FuncionarioController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
+        log.info("Processando solicitação de logout.");
         ResponseCookie cookie = ResponseCookie.from("jwt", "")
                 .httpOnly(true)
                 .secure(false)
@@ -80,6 +91,7 @@ public class FuncionarioController {
                 .maxAge(0)
                 .build();
 
+        log.info("Logout realizado. Cookie JWT invalidado.");
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .build();
@@ -88,11 +100,16 @@ public class FuncionarioController {
     @GetMapping("/me")
     public ResponseEntity<FuncionarioTokenDto> getUsuarioLogado(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
+            log.warn("Tentativa de acesso a '/me' sem autenticação válida.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        log.info("Buscando dados do usuário logado: {}", authentication.getName());
         Funcionario funcionario = funcionarioRepository.findByEmail(authentication.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatusCode.valueOf(404), "Usuário não encontrado"));
+                .orElseThrow(() -> {
+                    log.error("Usuário autenticado '{}' não encontrado no banco de dados.", authentication.getName());
+                    return new ResponseStatusException(HttpStatusCode.valueOf(404), "Usuário não encontrado");
+                });
 
         return ResponseEntity.ok(FuncionarioMapper.of(funcionario, null));
     }
@@ -101,21 +118,29 @@ public class FuncionarioController {
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método busca um funcionário por seu id")
     public ResponseEntity<FuncionarioResponseDto> buscarFuncPorId(@PathVariable int id){
-        return ResponseEntity.status(200).body(service.buscarPorId(id));
+        log.info("Buscando funcionário por ID: {}", id);
+        FuncionarioResponseDto dto = service.buscarPorId(id);
+        log.info("Funcionário encontrado: {}", dto.getNome());
+        return ResponseEntity.status(200).body(dto);
     }
 
     @PutMapping("/{id}")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método atualiza algum campo do funcionário pelo id")
     public ResponseEntity<FuncionarioResponseDto> atualizarFuncionarioPorId(@Valid @PathVariable Integer id, @RequestBody FuncionarioRequestDto func){
-        return ResponseEntity.status(200).body(service.atualizarPorId(id, func));
+        log.info("Iniciando atualização do funcionário ID: {}", id);
+        FuncionarioResponseDto atualizado = service.atualizarPorId(id, func);
+        log.info("Funcionário ID: {} atualizado com sucesso.", id);
+        return ResponseEntity.status(200).body(atualizado);
     }
 
     @DeleteMapping("/{id}")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método deleta um funcionário pelo id")
     public ResponseEntity<Void> deletarFuncionarioPorId(@PathVariable Integer id){
+        log.info("Solicitação para deletar funcionário ID: {}", id);
         service.deletarPorId(id);
+        log.info("Funcionário ID: {} removido com sucesso.", id);
         return ResponseEntity.status(204).build();
     }
 }
