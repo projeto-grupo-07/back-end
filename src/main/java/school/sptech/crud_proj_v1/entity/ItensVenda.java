@@ -28,4 +28,5 @@ public class ItensVenda {
     private Integer quantidadeVendaProduto;
 
     private Double valorTotalVendaProduto;
+    //teste
 }
