@@ -1,8 +1,8 @@
 package school.sptech.crud_proj_v1.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import school.sptech.crud_proj_v1.entity.VendaProduto;
+import school.sptech.crud_proj_v1.entity.ItensVenda;
 
-public interface ItensVendaRepository extends JpaRepository<VendaProduto, Integer> {
+public interface ItensVendaRepository extends JpaRepository<ItensVenda, Integer> {
     Integer countByProdutoId(Integer produtoId);
 }

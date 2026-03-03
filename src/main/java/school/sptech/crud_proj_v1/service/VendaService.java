@@ -10,7 +10,7 @@ import school.sptech.crud_proj_v1.dto.Venda.VendaResponseDTO;
 
 import school.sptech.crud_proj_v1.entity.Funcionario;
 import school.sptech.crud_proj_v1.entity.abstrato.Produto;
-import school.sptech.crud_proj_v1.entity.VendaProduto;
+import school.sptech.crud_proj_v1.entity.ItensVenda;
 import school.sptech.crud_proj_v1.entity.Venda;
 
 import school.sptech.crud_proj_v1.enumeration.FormaDePagamento;
@@ -52,13 +52,13 @@ public class VendaService {
             throw new IllegalArgumentException("A venda deve ter pelo menos um item.");
         }
         Double valorTotal = 0.0;
-        List<VendaProduto> novosItensDeVenda = new ArrayList<>();
+        List<ItensVenda> novosItensDeVenda = new ArrayList<>();
 
         for (VendaProdutoRequestDTO itemDto : itensDto) {
             Produto produto = produtoRepository.findById(itemDto.getIdProduto())
                     .orElseThrow(() -> new EntidadeNotFoundException("Produto do id " + itemDto.getIdProduto() + " não encontrado"));
 
-            VendaProduto itemVenda = new VendaProduto();
+            ItensVenda itemVenda = new ItensVenda();
             itemVenda.setProduto(produto);
             itemVenda.setQuantidadeVendaProduto(itemDto.getQuantidadeVendaProduto());
             itemVenda.setValorTotalVendaProduto(produto.getValorUnitario() * itemDto.getQuantidadeVendaProduto());
@@ -74,7 +74,7 @@ public class VendaService {
 
         Venda vendaSalva = vendaRepository.save(novaVenda);
 
-        for (VendaProduto item : vendaSalva.getItens()) {
+        for (ItensVenda item : vendaSalva.getItens()) {
             produtoService.diminuirEstoque(item.getProduto().getId(), item.getQuantidadeVendaProduto());
         }
 
@@ -137,7 +137,7 @@ public class VendaService {
             Produto produto = produtoRepository.findById(itemDto.getIdProduto())
                     .orElseThrow(() -> new EntidadeNotFoundException("Produto ID não encontrado: " + itemDto.getIdProduto()));
 
-            VendaProduto itemVenda = new VendaProduto();
+            ItensVenda itemVenda = new ItensVenda();
             itemVenda.setProduto(produto);
             itemVenda.setQuantidadeVendaProduto(itemDto.getQuantidadeVendaProduto());
 

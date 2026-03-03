@@ -11,7 +11,7 @@ import school.sptech.crud_proj_v1.entity.abstrato.Produto;
 @Entity
 @Table(name = "ITENS_VENDA")
 @NoArgsConstructor
-public class VendaProduto {
+public class ItensVenda {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
