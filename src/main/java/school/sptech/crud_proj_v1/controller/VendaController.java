@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.sptech.crud_proj_v1.dto.Venda.VendaRequestDTO;
@@ -19,6 +20,7 @@ import java.util.List;
 @Tag(name = "Venda")
 @RestController
 @RequestMapping("/vendas")
+@Slf4j
 public class VendaController {
     private final VendaService service;
 
@@ -38,10 +40,13 @@ public class VendaController {
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método lista todas as vendas cadastrados")
     public ResponseEntity<List<VendaResponseDTO>> listarVendas(){
+        log.info("Requisição para listar todas as vendas recebida");
         List<VendaResponseDTO> all = service.listar();
         if (all.isEmpty()){
+            log.warn("Nenhuma venda encontrada na base de dados");
             return ResponseEntity.status(204).build();
         }
+        log.info("Listagem finalizada. Total de registros: {}", all.size());
         return ResponseEntity.status(200).body(all);
     }
 
@@ -49,10 +54,13 @@ public class VendaController {
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método lista todas as vendas de um determinado vendedor através do seu nome")
     public ResponseEntity<List<VendaResponseDTO>> buscarVendasPorNomeDoVendedor(@PathVariable String nome){
+        log.info("Requisição para buscar vendas por nome do vendedor recebida");
         List<VendaResponseDTO> vendasByNome = service.buscarPorNomeVendedor(nome);
         if (vendasByNome.isEmpty()){
+            log.warn("Nenhuma venda encontrada em nome do vendedor na base de dados");
             return ResponseEntity.status(204).build();
         }
+        log.info("Busca de vendas por nome finalizada: {}", vendasByNome.size());
         return ResponseEntity.status(200).body(vendasByNome);
     }
 
@@ -61,11 +69,14 @@ public class VendaController {
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método lista todas as vendas através de uma determinada forma de papgamento")
     public ResponseEntity<List<VendaResponseDTO>> buscarPorFormaDePagamento(@PathVariable String formaDePagamento){
+        log.info("Requisição para buscar vendas por forma de pagamento recebida");
         FormaDePagamento forma = FormaDePagamento.valueOf(formaDePagamento.toUpperCase());
         List<VendaResponseDTO> vendasByFormaPagto = service.buscarPorFormaPagamento(forma);
         if (vendasByFormaPagto.isEmpty()){
+            log.warn("Nenhuma venda encontrada com a forma de pagamento solicitada na base de dados");
             return ResponseEntity.status(204).build();
         }
+        log.info("Buscar de vendas por forma de pagamento finalizada: {}", vendasByFormaPagto.size());
         return ResponseEntity.status(200).body(vendasByFormaPagto);
     }
 
@@ -75,11 +86,13 @@ public class VendaController {
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método retorna o valor total de todas as vendas cadastradas")
     public ResponseEntity<Double> calcularTotalVendas() {
+        log.info("Requisição para calcular total de vendas recebida");
         Double total = service.calcularTotal();
-
         if(total == null || total == 0){
+            log.warn("Nenhuma venda encontrada no momento");
             return ResponseEntity.status(204).build();
         }
+        log.info("Total de venda calculado com sucesso: {}", total);
         return ResponseEntity.status(200).body(total);
     }
 
@@ -87,7 +100,6 @@ public class VendaController {
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método cadastra uma venda")
     public ResponseEntity<VendaResponseDTO> cadastrarVenda(@RequestBody VendaRequestDTO venda){
-
        VendaResponseDTO vendaCriada = service.cadastrar(venda);
         return ResponseEntity.status(201).body(vendaCriada);
     }
