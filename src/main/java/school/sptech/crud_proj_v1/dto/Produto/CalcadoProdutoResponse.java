@@ -12,7 +12,7 @@ public class CalcadoProdutoResponse implements ProdutoResponse {
     private Integer idCategoria;
     private Integer quantidade;
     private Double valorUnitario;
-
+    private Double precoCusto;
     private String marca;
     private String modelo;
     private Integer numero;

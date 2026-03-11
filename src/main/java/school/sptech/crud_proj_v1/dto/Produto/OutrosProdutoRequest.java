@@ -11,7 +11,7 @@ public class OutrosProdutoRequest {
     private Integer idCategoria;
     private Integer quantidade;
     private Double valorUnitario;
-
+    private Double precoCustoProduto;
     private String nome;
     private String descricao;
 

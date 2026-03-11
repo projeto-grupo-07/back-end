@@ -43,6 +43,7 @@ public class FuncionarioMapper {
         funcionario.setSenha(funcionarioRequestDto.getSenha());
         funcionario.setCpf(funcionarioRequestDto.getCpf());
 
+
         return funcionario;
     }
 

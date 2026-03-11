@@ -11,7 +11,7 @@ import school.sptech.crud_proj_v1.entity.abstrato.Produto;
 @Entity
 @Table(name = "ITENS_VENDA")
 @NoArgsConstructor
-public class ItensVenda {
+public class VendaProduto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -27,6 +27,9 @@ public class ItensVenda {
 
     private Integer quantidadeVendaProduto;
 
+    @Column(name = "valor_desconto")
+    private Double desconto;
+
     private Double valorTotalVendaProduto;
-    //teste
+
 }

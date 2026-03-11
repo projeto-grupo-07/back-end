@@ -16,6 +16,7 @@ import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioRequestDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioResponseDto;
 import school.sptech.crud_proj_v1.dto.Funcionario.FuncionarioTokenDto;
 import school.sptech.crud_proj_v1.entity.Funcionario;
+import school.sptech.crud_proj_v1.entity.Perfil;
 import school.sptech.crud_proj_v1.entity.TentativaLogin;
 import school.sptech.crud_proj_v1.entity.abstrato.Produto;
 import school.sptech.crud_proj_v1.event.ProdutoCadastradoEvent;
@@ -23,6 +24,7 @@ import school.sptech.crud_proj_v1.exception.EntidadeConflitoException;
 import school.sptech.crud_proj_v1.exception.EntidadeNotFoundException;
 import school.sptech.crud_proj_v1.mapper.FuncionarioMapper;
 import school.sptech.crud_proj_v1.repository.FuncionarioRepository;
+import school.sptech.crud_proj_v1.repository.PerfilRepository;
 
 import java.util.List;
 
@@ -38,6 +40,7 @@ public class FuncionarioService {
     private final AuthenticationManager authenticationManager;
 
     private final FuncionarioRepository funcionarioRepository;
+    private final PerfilRepository perfilRepository;
     private final FuncionarioMapper funcionarioMapper;
     private final TentativaLoginService tentativaLoginService;
 
@@ -54,6 +57,10 @@ public class FuncionarioService {
             String senhaCriptograda = passwordEncoder.encode(func.getSenha());
             Funcionario funcionarioSalvo = FuncionarioMapper.toEntity(func);
             funcionarioSalvo.setSenha(senhaCriptograda);
+            Perfil perfil = perfilRepository.findById(func.getIdPerfil())
+                    .orElseThrow(() -> new EntidadeNotFoundException("Perfil não encontrado"));
+
+            funcionarioSalvo.setPerfil(perfil);
             funcionarioRepository.save(funcionarioSalvo);
             return FuncionarioMapper.of(funcionarioSalvo);
         }

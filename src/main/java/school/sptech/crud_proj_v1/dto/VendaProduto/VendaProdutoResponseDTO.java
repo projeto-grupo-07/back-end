@@ -10,5 +10,6 @@ public class VendaProdutoResponseDTO {
     private Integer id;
     private Integer quantidadeVendaProduto;
     private Double valorTotalVendaProduto;
+    private Double precoCustoProduto;
     private ProdutoResponse produto;
 }

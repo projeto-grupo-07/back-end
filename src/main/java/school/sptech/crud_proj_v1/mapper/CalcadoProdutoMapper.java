@@ -27,6 +27,7 @@ public class CalcadoProdutoMapper {
         entidade.setModelo(dto.getModelo());
         entidade.setMarca(dto.getMarca());
         entidade.setNumero(dto.getNumero());
+        entidade.setPrecoCusto(dto.getPrecoCustoProduto());
 
         return entidade;
     }
@@ -42,6 +43,7 @@ public class CalcadoProdutoMapper {
         response.setId(entidade.getId());
         response.setQuantidade(entidade.getQuantidade());
         response.setValorUnitario(entidade.getValorUnitario());
+        response.setPrecoCusto(entidade.getPrecoCusto());
 
         if (entidade.getCategoria() != null) {
             response.setIdCategoria(entidade.getCategoria().getId());

@@ -16,7 +16,7 @@ import school.sptech.crud_proj_v1.exception.ProdutoEmUsoException;
 import school.sptech.crud_proj_v1.mapper.CalcadoProdutoMapper;
 import school.sptech.crud_proj_v1.mapper.OutrosProdutoMapper;
 import school.sptech.crud_proj_v1.repository.CategoriaRepository;
-import school.sptech.crud_proj_v1.repository.ItensVendaRepository;
+import school.sptech.crud_proj_v1.repository.VendaProdutoRepository;
 import school.sptech.crud_proj_v1.repository.ProdutoRepository;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class ProdutoService {
     private final FuncionarioService funcionarioService;
     private final CalcadoProdutoMapper calcadoMapper;
     private final OutrosProdutoMapper outrosMapper;
-    private final ItensVendaRepository itensVendaRepository;
+    private final VendaProdutoRepository itensVendaRepository;
 
     private void configurarCategoria(Produto produto, Integer categoriaId) {
         if (categoriaId != null) {

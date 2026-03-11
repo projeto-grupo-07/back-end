@@ -31,7 +31,7 @@
         private Double totalVenda;
 
         @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, orphanRemoval = true)
-        private List<ItensVenda> itens;
+        private List<VendaProduto> itens;
 
         private LocalDateTime dataHora;
         @OneToOne(mappedBy = "venda", cascade = CascadeType.ALL)

@@ -8,14 +8,11 @@ import school.sptech.crud_proj_v1.enumeration.FormaDePagamento;
 import java.util.List;
 
 public interface VendaRepository extends JpaRepository<Venda, Integer> {
-    // aqui vai conter as queries personalizadas
 
     List<Venda> findByFuncionarioNomeContainingIgnoreCase(String valor);
     List<Venda> findByFormaDePagamento(FormaDePagamento formaDePagamento);
 
-    //kpi da dashboard
-
-    //faturamento
+    // --- KPI de Faturamento Geral (Views Nativas) ---
     @Query(value = "SELECT * FROM faturamento_dia_atual", nativeQuery = true)
     Double buscarFaturamentoDia();
 
@@ -25,7 +22,7 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
     @Query(value = "SELECT * FROM faturamento_mes_atual", nativeQuery = true)
     Double buscarFaturamentoMes();
 
-    //total de vendas
+    // --- KPI de Volume de Vendas ---
     @Query(value = "SELECT * FROM total_vendas_diarias", nativeQuery = true)
     Integer contarVendasDiarias();
 
@@ -35,7 +32,7 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
     @Query(value = "SELECT * FROM total_vendas_mensais", nativeQuery = true)
     Integer contarVendasMensais();
 
-    // ticket médio
+    // --- KPI de Ticket Médio ---
     @Query(value = "SELECT * FROM ticket_medio_diario", nativeQuery = true)
     Double contarTicketMedioDiario();
 
@@ -44,4 +41,20 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
 
     @Query(value = "SELECT * FROM ticket_medio_mensal", nativeQuery = true)
     Double contarTicketMedioMensal();
+
+    // --- MÉTODOS POR VENDEDOR (AJUSTADOS COM 'totalVenda') ---
+
+    @Query("SELECT SUM(v.totalVenda) FROM Venda v WHERE v.funcionario.id = :idFuncionario")
+    Double buscarFaturamentoTotalPorVendedor(Integer idFuncionario);
+
+    @Query("SELECT SUM(v.totalVenda * f.comissao) FROM Venda v JOIN v.funcionario f WHERE f.id = :idFuncionario")
+    Double buscarComissaoTotalPorVendedor(Integer idFuncionario);
+
+    @Query(value = "SELECT SUM(valor_total) FROM venda WHERE fk_vendedor = :idFuncionario " +
+            "AND YEAR(data_hora) = YEAR(CURDATE()) " +
+            "AND MONTH(data_hora) = MONTH(CURDATE())", nativeQuery = true)
+    Double buscarFaturamentoMensalPorVendedor(Integer idFuncionario);
+
+    @Query("SELECT COUNT(v) FROM Venda v WHERE v.funcionario.id = :idFuncionario")
+    Integer contarQtdVendasPorVendedor(Integer idFuncionario);
 }

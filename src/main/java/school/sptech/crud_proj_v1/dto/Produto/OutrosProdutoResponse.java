@@ -12,6 +12,7 @@ public class OutrosProdutoResponse implements ProdutoResponse{
     private Integer idCategoria;
     private Integer quantidade;
     private Double valorUnitario;
+    private Double precoCusto;
 
     private String nome;
     private String descricao;

@@ -21,4 +21,7 @@ public class VendaProdutoRequestDTO {
     @NotNull()
     @Min(value = 1)
     private Double valorTotalVendaProduto;
+
+    @Min(value = 0, message = "O valor do desconto não pode ser negativo")
+    private Double desconto;
 }

@@ -33,6 +33,7 @@ public abstract class Produto {
     private Integer id;
     private Integer quantidade;
     private Double valorUnitario;
+    private Double precoCusto;
     @ManyToOne
     @JoinColumn(name = "fk_categoria")
     private Categoria categoria;

@@ -2,7 +2,7 @@ package school.sptech.crud_proj_v1.mapper;
 
 import org.springframework.stereotype.Component;
 import school.sptech.crud_proj_v1.dto.VendaProduto.VendaProdutoResponseDTO;
-import school.sptech.crud_proj_v1.entity.ItensVenda;
+import school.sptech.crud_proj_v1.entity.VendaProduto;
 import java.util.List;
 
 @Component
@@ -13,7 +13,7 @@ public class VendaProdutoMapper {
         this.produtoMapper = produtoMapper;
     }
 
-    public VendaProdutoResponseDTO toProdutosVendaResponseDTO(ItensVenda itemVenda) {
+    public VendaProdutoResponseDTO toProdutosVendaResponseDTO(VendaProduto itemVenda) {
         if (itemVenda == null) {
             return null;
         }
@@ -30,7 +30,7 @@ public class VendaProdutoMapper {
         return dto;
     }
 
-    public List<VendaProdutoResponseDTO> toProdutosVendaResponseDTO(List<ItensVenda> itens) {
+    public List<VendaProdutoResponseDTO> toProdutosVendaResponseDTO(List<VendaProduto> itens) {
         if (itens == null) {
             return List.of();
         }

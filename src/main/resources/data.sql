@@ -63,10 +63,10 @@ INSERT INTO perfil_tela (perfil_id, tela_id) VALUES
 
 -- No H2, não usamos @PWD. Inserimos a string diretamente ou repetimos.
 INSERT INTO FUNCIONARIO (nome, cpf, email, salario, comissao, senha, perfil_id) VALUES
-('Maria Admin', '123.456.789-02', 'maria.admin@empresa.com', 8000.00, 0.00, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 1),
-('Agenor Gerente', '111.111.111-11', 'agenor.gerente@empresa.com', 5000.00, 0.10, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 2),
-('Rosangela Gerente', '222.222.222-22', 'rosangela.gerente@empresa.com', 5200.00, 0.10, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 2),
-('Ana Vendedora', '123.456.789-00', 'ana.vendas@empresa.com', 2000, 0.05, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 3);
+('Maria Admin', '116.580.380-10', 'maria.admin@empresa.com', 8000.00, 0.00, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 1),
+('Agenor Gerente', '188.116.470-53', 'agenor.gerente@empresa.com', 5000.00, 0.10, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 2),
+('Rosangela Gerente', '502.111.650-93', 'rosangela.gerente@empresa.com', 5200.00, 0.10, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 2),
+('Ana Vendedora', '864.793.360-54', 'ana.vendas@empresa.com', 2000, 0.05, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 3);
 
 -- ==================================================================
 -- 3. CATEGORIAS
@@ -83,9 +83,9 @@ INSERT INTO CATEGORIA (id, descricao, fk_pai) VALUES
 -- 4. PRODUTOS (Ajustado para os campos corretos)
 -- ==================================================================
 
-INSERT INTO PRODUTO (modelo, marca, numero, cor, valor_unitario, quantidade, fk_categoria) VALUES
-('Havaianas Top', 'Havaianas', 38, 'Azul', 29.90, 100, 5),
-('Nike Revolution', 'Nike', 42, 'Preto', 399.90, 50, 4);
+INSERT INTO PRODUTO (modelo, marca, numero, cor, preco_custo, valor_unitario, quantidade, fk_categoria) VALUES
+('Havaianas Top', 'Havaianas', 38, 'Azul', 14.50, 29.90, 100, 5),
+('Nike Revolution', 'Nike', 42, 'Preto', 195.00, 399.90, 50, 4);
 
 -- ==================================================================
 -- 5. VENDAS
@@ -103,5 +103,4 @@ INSERT INTO venda (data_hora, valor_total, forma_pagamento, fk_vendedor) VALUES
 
 INSERT INTO itens_venda (fk_produto, fk_venda, quantidade_venda_produto, valor_total_venda_produto) VALUES
 (1, 1, 2, 59.80),
-
 (2, 1, 1, 399.90);

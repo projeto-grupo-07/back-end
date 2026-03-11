@@ -22,6 +22,7 @@ public class OutrosProdutoMapper {
 
         entidade.setDescricao(dto.getDescricao());
         entidade.setNome(dto.getNome());
+        entidade.setPrecoCusto(dto.getPrecoCustoProduto());
 
         return entidade;
     }
@@ -37,6 +38,7 @@ public class OutrosProdutoMapper {
         response.setValorUnitario(entidade.getValorUnitario());
         response.setNome(entidade.getNome());
         response.setDescricao(entidade.getDescricao());
+        response.setPrecoCusto(entidade.getPrecoCusto());
 
         // Adiciona categoriaPai e tipo
         if (entidade.getCategoria().getCategoriaPai() != null) {

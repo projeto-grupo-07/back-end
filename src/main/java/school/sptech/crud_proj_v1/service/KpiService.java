@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.sptech.crud_proj_v1.repository.VendaRepository;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class KpiService {
@@ -47,4 +49,21 @@ public class KpiService {
     public Double contarTicketMedioDiario(){
         return vendaRepository.contarTicketMedioDiario();
     }
+
+    public Double buscarFaturamentoTotalPorVendedor(Integer idFuncionario) {
+        Double faturamento = vendaRepository.buscarFaturamentoTotalPorVendedor(idFuncionario);
+        return Optional.ofNullable(faturamento).orElse(0.0);
+    }
+
+
+    public Double buscarComissaoTotalPorVendedor(Integer idFuncionario) {
+        Double comissao = vendaRepository.buscarComissaoTotalPorVendedor(idFuncionario);
+        return Optional.ofNullable(comissao).orElse(0.0);
+    }
+
+    public Integer buscarQtdVendasPorVendedor(Integer id) {
+        Integer qtd = vendaRepository.contarQtdVendasPorVendedor(id);
+        return (qtd != null) ? qtd : 0;
+    }
+    
 }

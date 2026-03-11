@@ -12,6 +12,7 @@ public class CalcadoProdutoRequest {
     private Integer idCategoria;
     private Integer quantidade;
     private Double valorUnitario;
+    private Double precoCustoProduto;
 
     private String marca;
     private String modelo;

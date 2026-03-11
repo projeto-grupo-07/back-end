@@ -10,7 +10,7 @@ import school.sptech.crud_proj_v1.dto.Venda.VendaResponseDTO;
 
 import school.sptech.crud_proj_v1.entity.Funcionario;
 import school.sptech.crud_proj_v1.entity.abstrato.Produto;
-import school.sptech.crud_proj_v1.entity.ItensVenda;
+import school.sptech.crud_proj_v1.entity.VendaProduto;
 import school.sptech.crud_proj_v1.entity.Venda;
 
 import school.sptech.crud_proj_v1.enumeration.FormaDePagamento;
@@ -18,6 +18,7 @@ import school.sptech.crud_proj_v1.exception.EntidadeNotFoundException;
 import school.sptech.crud_proj_v1.mapper.VendaMapper;
 import school.sptech.crud_proj_v1.repository.FuncionarioRepository;
 import school.sptech.crud_proj_v1.repository.ProdutoRepository;
+import school.sptech.crud_proj_v1.repository.VendaProdutoRepository;
 import school.sptech.crud_proj_v1.repository.VendaRepository;
 
 import java.math.BigDecimal;
@@ -52,20 +53,38 @@ public class VendaService {
             throw new IllegalArgumentException("A venda deve ter pelo menos um item.");
         }
         Double valorTotal = 0.0;
-        List<ItensVenda> novosItensDeVenda = new ArrayList<>();
+        List<VendaProduto> novosItensDeVenda = new ArrayList<>();
 
         for (VendaProdutoRequestDTO itemDto : itensDto) {
             Produto produto = produtoRepository.findById(itemDto.getIdProduto())
                     .orElseThrow(() -> new EntidadeNotFoundException("Produto do id " + itemDto.getIdProduto() + " não encontrado"));
 
-            ItensVenda itemVenda = new ItensVenda();
+            VendaProduto itemVenda = new VendaProduto();
             itemVenda.setProduto(produto);
             itemVenda.setQuantidadeVendaProduto(itemDto.getQuantidadeVendaProduto());
-            itemVenda.setValorTotalVendaProduto(produto.getValorUnitario() * itemDto.getQuantidadeVendaProduto());
             itemVenda.setVenda(novaVenda);
+
+            // 1. Extrai o desconto (Se vier nulo, assume 0.0)
+            Double descontoAplicado = itemDto.getDesconto() != null ? itemDto.getDesconto() : 0.0;
+
+            // 2. Calcula o subtotal bruto
+            Double subtotalBruto = produto.getValorUnitario() * itemDto.getQuantidadeVendaProduto();
+
+            // 3. Valida se o desconto faz sentido
+            if (descontoAplicado > subtotalBruto) {
+                throw new IllegalArgumentException("O desconto de R$ " + descontoAplicado + " excede o valor do item.");
+            }
+
+            // 4. Aplica o desconto no valor final
+            Double valorFinalItem = subtotalBruto - descontoAplicado;
+
+            // 5. INJETA NA ENTIDADE PARA O HIBERNATE SALVAR
+            itemVenda.setDesconto(descontoAplicado);
+            itemVenda.setValorTotalVendaProduto(valorFinalItem);
 
             novosItensDeVenda.add(itemVenda);
 
+            // Soma no total da venda geral
             valorTotal += itemVenda.getValorTotalVendaProduto();
         }
 
@@ -74,7 +93,7 @@ public class VendaService {
 
         Venda vendaSalva = vendaRepository.save(novaVenda);
 
-        for (ItensVenda item : vendaSalva.getItens()) {
+        for (VendaProduto item : vendaSalva.getItens()) {
             produtoService.diminuirEstoque(item.getProduto().getId(), item.getQuantidadeVendaProduto());
         }
 
@@ -137,7 +156,7 @@ public class VendaService {
             Produto produto = produtoRepository.findById(itemDto.getIdProduto())
                     .orElseThrow(() -> new EntidadeNotFoundException("Produto ID não encontrado: " + itemDto.getIdProduto()));
 
-            ItensVenda itemVenda = new ItensVenda();
+            VendaProduto itemVenda = new VendaProduto();
             itemVenda.setProduto(produto);
             itemVenda.setQuantidadeVendaProduto(itemDto.getQuantidadeVendaProduto());
 
