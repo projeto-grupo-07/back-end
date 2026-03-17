@@ -2,19 +2,19 @@ package school.sptech.crud_proj_v1.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import school.sptech.crud_proj_v1.entity.Comissao;
 import school.sptech.crud_proj_v1.entity.Venda;
-import school.sptech.crud_proj_v1.repository.ComissaoRepository;
+import school.sptech.crud_proj_v1.repository.VendaRepository; // <-- IMPORT NECESSÁRIO
+// import school.sptech.crud_proj_v1.repository.ComissaoRepository; // Pode apagar se não usar mais
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-
 
 @Service
 @RequiredArgsConstructor
 public class ComissaoService {
 
-private final ComissaoRepository comissaoRepository;
+    // private final ComissaoRepository comissaoRepository; // Pode apagar se não for usar a tabela separada
+    private final VendaRepository vendaRepository; // <-- ADICIONADO PARA O SAVE FUNCIONAR
 
     private Double arredondar(Double valor) {
         if (valor == null) return 0.0;
@@ -23,27 +23,22 @@ private final ComissaoRepository comissaoRepository;
                 .doubleValue();
     }
 
-    public Comissao calcularComissao(Venda venda){
+    public void calcularComissao(Venda venda) {
+        // 1. Puxa a porcentagem que foi "congelada" na venda
+        Double porcentagem = venda.getPercentualComissaoAplicado();
 
-        Comissao comissaoExistente = comissaoRepository.findByVendaId(venda.getId()).orElse(null);
-
-        Double novoValor = arredondar(venda.getTotalVenda() * venda.getFuncionario().getComissao());
-
-        if (comissaoExistente != null) {
-
-            comissaoExistente.setValorComissao(novoValor);
-            return comissaoRepository.save(comissaoExistente);
+        // Segurança extra: se vier nulo por algum motivo, assume 0
+        if (porcentagem == null) {
+            porcentagem = 0.0;
         }
 
+        // 2. Calcula o valor em R$ com base no total da venda
+        Double valorEmReais = venda.getTotalVenda() * porcentagem;
 
+        // 3. Salva o valor final na própria venda USANDO O SEU MÉTODO DE ARREDONDAR!
+        venda.setValorComissao(arredondar(valorEmReais));
 
-        Comissao vendaComissao = new Comissao();
-        vendaComissao.setVenda(venda);
-        vendaComissao.setFuncionario(venda.getFuncionario());
-        vendaComissao.setDataVenda(venda.getDataHora());
-        vendaComissao.setValorComissao(arredondar(venda.getTotalVenda() * venda.getFuncionario().getComissao()));
-
-        return comissaoRepository.save(vendaComissao);
+        // 4. Atualiza a venda no banco
+        vendaRepository.save(venda);
     }
-
 }

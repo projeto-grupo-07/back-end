@@ -24,6 +24,10 @@ public class VendaProdutoMapper {
         dto.setQuantidadeVendaProduto(itemVenda.getQuantidadeVendaProduto());
         dto.setValorTotalVendaProduto(itemVenda.getValorTotalVendaProduto());
 
+        // NOVO: Mapeando o desconto para o Frontend receber
+        // Usamos um ternário rápido caso alguma venda antiga esteja com o campo nulo no banco
+        dto.setDesconto(itemVenda.getDesconto() != null ? itemVenda.getDesconto() : 0.0);
+
         if (itemVenda.getProduto() != null) {
             dto.setProduto(produtoMapper.toItensVendaDTO(itemVenda.getProduto()));
         }

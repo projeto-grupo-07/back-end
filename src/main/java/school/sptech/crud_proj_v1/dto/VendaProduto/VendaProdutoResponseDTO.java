@@ -12,4 +12,5 @@ public class VendaProdutoResponseDTO {
     private Double valorTotalVendaProduto;
     private Double precoCustoProduto;
     private ProdutoResponse produto;
+    private Double desconto;
 }

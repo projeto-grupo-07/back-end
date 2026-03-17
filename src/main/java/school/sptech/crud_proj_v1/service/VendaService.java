@@ -47,6 +47,7 @@ public class VendaService {
         novaVenda.setFuncionario(funcionario);
 
         novaVenda.setDataHora(LocalDateTime.now());
+        novaVenda.setPercentualComissaoAplicado(funcionario.getComissao());
 
         List<VendaProdutoRequestDTO> itensDto = dto.getItensVenda();
         if (itensDto == null || itensDto.isEmpty()) {
@@ -136,6 +137,7 @@ public class VendaService {
         vendaParaAtualizar.setFuncionario(funcionario);
         vendaParaAtualizar.setFormaDePagamento(dto.getFormaPagamento());
 
+        vendaParaAtualizar.setPercentualComissaoAplicado(funcionario.getComissao());
         // Opcional: Remova a linha abaixo se quiser manter a data original da venda
         vendaParaAtualizar.setDataHora(LocalDateTime.now());
 
@@ -160,9 +162,20 @@ public class VendaService {
             itemVenda.setProduto(produto);
             itemVenda.setQuantidadeVendaProduto(itemDto.getQuantidadeVendaProduto());
 
-            // Calcula o valor total do item baseado no valor unitário ATUAL do produto
-            Double valorItem = produto.getValorUnitario() * itemDto.getQuantidadeVendaProduto();
-            itemVenda.setValorTotalVendaProduto(valorItem);
+            // --- INÍCIO DA LÓGICA DE DESCONTO ---
+            Double descontoAplicado = itemDto.getDesconto() != null ? itemDto.getDesconto() : 0.0;
+            Double subtotalBruto = produto.getValorUnitario() * itemDto.getQuantidadeVendaProduto();
+
+            // Valida se o desconto não é abusivo/errado
+            if (descontoAplicado > subtotalBruto) {
+                throw new IllegalArgumentException("O desconto de R$ " + descontoAplicado + " excede o valor do item.");
+            }
+
+            Double valorFinalItem = subtotalBruto - descontoAplicado;
+
+            itemVenda.setDesconto(descontoAplicado);
+            itemVenda.setValorTotalVendaProduto(valorFinalItem);
+            // --- FIM DA LÓGICA DE DESCONTO ---
 
             // Estabelece a relação bilateral (Muito importante para o JPA)
             itemVenda.setVenda(vendaParaAtualizar);
@@ -170,7 +183,7 @@ public class VendaService {
             // Adiciona na lista que o JPA já está monitorando
             vendaParaAtualizar.getItens().add(itemVenda);
 
-            valorTotal += valorItem;
+            valorTotal += valorFinalItem;
         }
 
         // 7. Atualiza o valor total da venda consolidado

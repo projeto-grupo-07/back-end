@@ -38,6 +38,10 @@ public class VendaMapper {
         dto.setFormaPagamento(venda.getFormaDePagamento());
         dto.setDataHora(venda.getDataHora());
 
+        // NOVO: Mapeando os dados do snapshot de comissão
+        dto.setPercentualComissaoAplicado(venda.getPercentualComissaoAplicado());
+        dto.setValorComissao(venda.getValorComissao());
+
         if (venda.getFuncionario() != null) {
             dto.setIdVendedor(venda.getFuncionario().getId());
         }

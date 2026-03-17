@@ -10,7 +10,6 @@ public class FuncionarioRequestDto {
     private String nome;
 
     @CPF
-    @NotBlank
     private String cpf;
 
     @Positive

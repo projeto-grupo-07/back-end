@@ -37,6 +37,9 @@
         @OneToOne(mappedBy = "venda", cascade = CascadeType.ALL)
         private Comissao comissao;
 
-
+        @Column(name = "percentual_comissao_aplicado")
+        private Double percentualComissaoAplicado;
+        @Column(name = "valor_comissao")
+        private Double valorComissao;
 
     }

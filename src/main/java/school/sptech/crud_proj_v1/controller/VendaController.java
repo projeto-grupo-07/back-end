@@ -121,6 +121,13 @@ public class VendaController {
     }
 
 
+    @SecurityRequirement(name = "Bearer")
+    @GetMapping("/formas-pagamento")
+    public ResponseEntity<FormaDePagamento[]> listarFormasDePagamento() {
+        return ResponseEntity.ok(FormaDePagamento.values());
+    }
+
+
 
 
 }

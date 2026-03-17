@@ -7,21 +7,33 @@ import school.sptech.crud_proj_v1.enumeration.FormaDePagamento;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Schema(description = "DTO utilizado para cadastro e atualização de vendas")
+@Schema(description = "DTO utilizado para retorno de dados das vendas")
 public class VendaResponseDTO {
 
-    @Schema(example = "1", description = "Esse campo representa o identificador único dos vendas")
+    @Schema(example = "1", description = "Esse campo representa o identificador único da venda")
     private Integer id;
+
     @Schema(example = "1", description = "Esse campo representa a chave estrangeira do funcionário que fez a venda")
     private Integer idVendedor;
-    @Schema(example = "239.90", description = "Esse campo representa o valor final da venda a ser pago ")
+
+    @Schema(example = "239.90", description = "Esse campo representa o valor final da venda a ser pago")
     private Double valorTotalDaVenda;
+
     @Schema(example = "PIX", description = "Esse campo representa qual foi a forma de pagamento da venda")
     private FormaDePagamento formaPagamento;
+
     private LocalDateTime dataHora;
+
+    // NOVOS CAMPOS DE COMISSÃO
+    @Schema(example = "0.10", description = "Percentual de comissão que o vendedor tinha no momento exato desta venda")
+    private Double percentualComissaoAplicado;
+
+    @Schema(example = "23.99", description = "Valor em reais (R$) que o vendedor ganhou de comissão nesta venda")
+    private Double valorComissao;
 
     private List<VendaProdutoResponseDTO> itensDaVenda;
 
+    // GETTERS E SETTERS
     public Integer getId() {
         return id;
     }
@@ -60,6 +72,22 @@ public class VendaResponseDTO {
 
     public void setDataHora(LocalDateTime dataHora) {
         this.dataHora = dataHora;
+    }
+
+    public Double getPercentualComissaoAplicado() {
+        return percentualComissaoAplicado;
+    }
+
+    public void setPercentualComissaoAplicado(Double percentualComissaoAplicado) {
+        this.percentualComissaoAplicado = percentualComissaoAplicado;
+    }
+
+    public Double getValorComissao() {
+        return valorComissao;
+    }
+
+    public void setValorComissao(Double valorComissao) {
+        this.valorComissao = valorComissao;
     }
 
     public List<VendaProdutoResponseDTO> getItensDaVenda() {
