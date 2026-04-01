@@ -1,0 +1,52 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3.10-management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-admin}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS:-admin}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - rabbit-mq-net
+
+  back-end:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: back-end-rabbitmq:local
+    container_name: back-end-rabbitmq
+    ports:
+      - "8080:8080"
+    # Carrega automaticamente tudo que estiver no seu arquivo .env
+    env_file:
+      - .env
+    environment:
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USER:-admin}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PASS:-admin}
+
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - rabbit-mq-net
+
+volumes:
+  rabbitmq_data:
+
+networks:
+  rabbit-mq-net:
+    name: rabbit-mq-net
+    driver: bridge

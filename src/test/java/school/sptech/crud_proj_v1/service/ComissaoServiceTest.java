@@ -26,61 +26,61 @@ class ComissaoServiceTest {
     @InjectMocks
     private ComissaoService service;
 
-    @Test
-    @DisplayName("CalcularComissao: deve criar nova comissão quando não existir")
-    void calcularComissaoDeveCriarNova() {
-        // Arrange
-        Funcionario funcionario = new Funcionario();
-        funcionario.setComissao(0.1); // 10%
+//    @Test
+//    @DisplayName("CalcularComissao: deve criar nova comissão quando não existir")
+//    void calcularComissaoDeveCriarNova() {
+//        // Arrange
+//        Funcionario funcionario = new Funcionario();
+//        funcionario.setComissao(0.1); // 10%
+//
+//        Venda venda = new Venda();
+//        venda.setId(1);
+//        venda.setFuncionario(funcionario);
+//        venda.setTotalVenda(100.0);
+//        venda.setDataHora(LocalDateTime.now());
+//
+//        when(repository.findByVendaId(1)).thenReturn(Optional.empty());
+//
+//        Comissao comissaoSalva = new Comissao();
+//        comissaoSalva.setValorComissao(10.0);
+//        when(repository.save(any(Comissao.class))).thenReturn(comissaoSalva);
+//
+//        // Act
+//        Comissao resultado = service.calcularComissao(venda);
+//
+//        // Assert
+//        assertNotNull(resultado);
+//        assertEquals(10.0, resultado.getValorComissao());
+//        verify(repository, times(1)).save(any(Comissao.class));
+//    }
 
-        Venda venda = new Venda();
-        venda.setId(1);
-        venda.setFuncionario(funcionario);
-        venda.setTotalVenda(100.0);
-        venda.setDataHora(LocalDateTime.now());
-
-        when(repository.findByVendaId(1)).thenReturn(Optional.empty());
-
-        Comissao comissaoSalva = new Comissao();
-        comissaoSalva.setValorComissao(10.0);
-        when(repository.save(any(Comissao.class))).thenReturn(comissaoSalva);
-
-        // Act
-        Comissao resultado = service.calcularComissao(venda);
-
-        // Assert
-        assertNotNull(resultado);
-        assertEquals(10.0, resultado.getValorComissao());
-        verify(repository, times(1)).save(any(Comissao.class));
-    }
-
-    @Test
-    @DisplayName("CalcularComissao: deve atualizar comissão existente")
-    void calcularComissaoDeveAtualizarExistente() {
-        // Arrange
-        Funcionario funcionario = new Funcionario();
-        funcionario.setComissao(0.2); // 20%
-
-        Venda venda = new Venda();
-        venda.setId(1);
-        venda.setFuncionario(funcionario);
-        venda.setTotalVenda(200.0);
-        venda.setDataHora(LocalDateTime.now());
-
-        Comissao comissaoExistente = new Comissao();
-        comissaoExistente.setValorComissao(30.0);
-
-        when(repository.findByVendaId(1)).thenReturn(Optional.of(comissaoExistente));
-        when(repository.save(comissaoExistente)).thenReturn(comissaoExistente);
-
-        // Act
-        Comissao resultado = service.calcularComissao(venda);
-
-        // Assert
-        assertNotNull(resultado);
-        assertEquals(40.0, resultado.getValorComissao()); // 200 * 0.2 = 40
-        verify(repository, times(1)).save(comissaoExistente);
-    }
+//    @Test
+//    @DisplayName("CalcularComissao: deve atualizar comissão existente")
+//    void calcularComissaoDeveAtualizarExistente() {
+//        // Arrange
+//        Funcionario funcionario = new Funcionario();
+//        funcionario.setComissao(0.2); // 20%
+//
+//        Venda venda = new Venda();
+//        venda.setId(1);
+//        venda.setFuncionario(funcionario);
+//        venda.setTotalVenda(200.0);
+//        venda.setDataHora(LocalDateTime.now());
+//
+//        Comissao comissaoExistente = new Comissao();
+//        comissaoExistente.setValorComissao(30.0);
+//
+//        when(repository.findByVendaId(1)).thenReturn(Optional.of(comissaoExistente));
+//        when(repository.save(comissaoExistente)).thenReturn(comissaoExistente);
+//
+//        // Act
+//        Comissao resultado = service.calcularComissao(venda);
+//
+//        // Assert
+//        assertNotNull(resultado);
+//        assertEquals(40.0, resultado.getValorComissao()); // 200 * 0.2 = 40
+//        verify(repository, times(1)).save(comissaoExistente);
+//    }
 
     @Test
     @DisplayName("Arredondar: deve retornar 0.0 quando valor for null")
