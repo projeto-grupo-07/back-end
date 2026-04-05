@@ -260,7 +260,20 @@ public class ProdutoService {
         Produto produto = produtoRepository.findById(idProduto)
                 .orElseThrow(() -> new  EntidadeNotFoundException("Produto não encontrado pelo ID: " + idProduto));
 
+        if (produto.getQuantidade() < quantidadeVendida) {
+            throw new IllegalArgumentException("Estoque insuficiente para o produto ID: " + idProduto);
+        }
+
         produto.setQuantidade(produto.getQuantidade() - quantidadeVendida);
+        produtoRepository.save(produto);
+    }
+
+    public void aumentarEstoque(Integer idProduto, Integer quantidade) {
+        Produto produto = produtoRepository.findById(idProduto)
+                .orElseThrow(() -> new EntidadeNotFoundException(
+                        "Produto não encontrado pelo ID: " + idProduto));
+
+        produto.setQuantidade(produto.getQuantidade() + quantidade);
         produtoRepository.save(produto);
     }
 }

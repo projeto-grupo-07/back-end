@@ -61,8 +61,12 @@ public class CategoriaController {
     @SecurityRequirement(name = "Bearer")
     @Tag(name = "Categoria")
     public ResponseEntity<CategoriaResponseDto> listarFilhoPorId(@PathVariable("id") Integer id) {
-        return categoriaService.listarPaiPorId(id) == null ? ResponseEntity.notFound().build() :
-                ResponseEntity.ok().body(categoriaService.listarFilhoPorId(id));
+
+        CategoriaResponseDto dto = categoriaService.listarFilhoPorId(id);
+
+        return dto == null
+                ? ResponseEntity.notFound().build()
+                : ResponseEntity.ok(dto);
     }
 
     @GetMapping("/pai/por-nome")
@@ -110,7 +114,7 @@ public class CategoriaController {
     @PostMapping("/filho")
     @SecurityRequirement(name = "Bearer")
     @Tag(name = "Categoria")
-    public ResponseEntity<CategoriaResponseDto> cadastrar(@Valid @RequestBody CategoriaRequestDto req, CategoriaPaiRequestDto pai) {
+    public ResponseEntity<CategoriaResponseDto> cadastrar(@Valid @RequestBody CategoriaRequestDto req) {
         return ResponseEntity.status(201).body(categoriaService.cadastrarFilho(req));
     }
 

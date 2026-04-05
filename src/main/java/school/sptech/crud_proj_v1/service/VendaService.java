@@ -60,6 +60,12 @@ public class VendaService {
             Produto produto = produtoRepository.findById(itemDto.getIdProduto())
                     .orElseThrow(() -> new EntidadeNotFoundException("Produto do id " + itemDto.getIdProduto() + " não encontrado"));
 
+            if (produto.getQuantidade() < itemDto.getQuantidadeVendaProduto()) {
+                throw new IllegalArgumentException(
+                        "Estoque insuficiente para o produto ID: " + produto.getId()
+                );
+            }
+
             VendaProduto itemVenda = new VendaProduto();
             itemVenda.setProduto(produto);
             itemVenda.setQuantidadeVendaProduto(itemDto.getQuantidadeVendaProduto());
@@ -141,6 +147,13 @@ public class VendaService {
         // Opcional: Remova a linha abaixo se quiser manter a data original da venda
         vendaParaAtualizar.setDataHora(LocalDateTime.now());
 
+        for (VendaProduto item : vendaParaAtualizar.getItens()) {
+            produtoService.aumentarEstoque(
+                    item.getProduto().getId(),
+                    item.getQuantidadeVendaProduto()
+            );
+        }
+
         // 4. LIMPEZA DOS ITENS ANTIGOS
         // Importante: Requer orphanRemoval = true na @OneToMany da entidade Venda
         vendaParaAtualizar.getItens().clear();
@@ -157,6 +170,12 @@ public class VendaService {
         for (VendaProdutoRequestDTO itemDto : itensDto) {
             Produto produto = produtoRepository.findById(itemDto.getIdProduto())
                     .orElseThrow(() -> new EntidadeNotFoundException("Produto ID não encontrado: " + itemDto.getIdProduto()));
+
+            if (produto.getQuantidade() < itemDto.getQuantidadeVendaProduto()) {
+                throw new IllegalArgumentException(
+                        "Estoque insuficiente para o produto ID: " + produto.getId()
+                );
+            }
 
             VendaProduto itemVenda = new VendaProduto();
             itemVenda.setProduto(produto);
@@ -192,6 +211,13 @@ public class VendaService {
         // 8. PERSISTÊNCIA
         // O save() aqui vai disparar os DELETEs dos órfãos e os INSERTs dos novos itens
         Venda vendaSalva = vendaRepository.save(vendaParaAtualizar);
+
+        for (VendaProduto item : vendaSalva.getItens()) {
+            produtoService.diminuirEstoque(
+                    item.getProduto().getId(),
+                    item.getQuantidadeVendaProduto()
+            );
+        }
 
         // 9. Atualiza comissão
         comissaoService.calcularComissao(vendaSalva);

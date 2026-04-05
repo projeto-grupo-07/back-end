@@ -37,7 +37,7 @@ public class GerenciadorTokenJwt {
         return Jwts.builder().setSubject(authentication.getName())
                 .claim("roles", authorities)
                 .signWith(parseSecret()).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtTokenValidity * 1_000)).compact();
+                .setExpiration(new Date(System.currentTimeMillis() + jwtTokenValidity)).compact();
     }
 
 

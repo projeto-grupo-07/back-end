@@ -181,7 +181,7 @@ public class ProdutoController {
     @GetMapping("/por-categoria-ordenado-preco-desc/{categoria}")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método lista todos os produtos de uma determinada categoria ordenados pelo preço de forma decrescente")
-    public ResponseEntity<List<ProdutoResponse>> listarProdutosOrdenadoPorMaiorQuantidade(@RequestParam String categoria) {
+    public ResponseEntity<List<ProdutoResponse>> listarProdutosOrdenadoPorMaiorQuantidade(@PathVariable String categoria) {
         log.info("Requisição para listar todos os produtos ordenado por maior quantidade por categoria");
         List<ProdutoResponse> produtos = service.buscarProdutoPorCategoriaOrdenadoPorPrecoDesc(categoria);
         if (produtos.isEmpty()) {

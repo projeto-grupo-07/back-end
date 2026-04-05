@@ -2,9 +2,12 @@ package school.sptech.crud_proj_v1.dto.Funcionario;
 
 
 import jakarta.validation.constraints.*;
+import lombok.Data;
+import lombok.Getter;
 import org.hibernate.validator.constraints.br.CPF;
 import school.sptech.crud_proj_v1.dto.Perfil.PerfilResponseDto;
 
+@Data
 public class FuncionarioResponseDto {
     private Integer id;
     private String nome;
@@ -12,6 +15,7 @@ public class FuncionarioResponseDto {
     private Double salario;
     private String email;
     private Double comissao;
+    private Boolean ativo;
     private PerfilResponseDto perfil;
 
     public Integer getId() {

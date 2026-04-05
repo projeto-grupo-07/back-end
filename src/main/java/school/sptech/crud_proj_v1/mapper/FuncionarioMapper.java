@@ -94,6 +94,7 @@ public class FuncionarioMapper {
         dto.setCpf(funcionario.getCpf());
         dto.setSalario(funcionario.getSalario());
         dto.setComissao(funcionario.getComissao());
+        dto.setAtivo(funcionario.getAtivo());
 
         // MAPEAMENTO DO PERFIL ADICIONADO AQUI
         if (funcionario.getPerfil() != null) {
