@@ -69,6 +69,7 @@ public class VendaService {
             VendaProduto itemVenda = new VendaProduto();
             itemVenda.setProduto(produto);
             itemVenda.setQuantidadeVendaProduto(itemDto.getQuantidadeVendaProduto());
+            itemVenda.setPrecoUnitarioNaVenda(produto.getValorUnitario());
             itemVenda.setVenda(novaVenda);
 
             // 1. Extrai o desconto (Se vier nulo, assume 0.0)
@@ -178,6 +179,7 @@ public class VendaService {
             VendaProduto itemVenda = new VendaProduto();
             itemVenda.setProduto(produto);
             itemVenda.setQuantidadeVendaProduto(itemDto.getQuantidadeVendaProduto());
+            itemVenda.setPrecoUnitarioNaVenda(produto.getValorUnitario());
 
             // --- INÍCIO DA LÓGICA DE DESCONTO ---
             Double descontoAplicado = itemDto.getDesconto() != null ? itemDto.getDesconto() : 0.0;

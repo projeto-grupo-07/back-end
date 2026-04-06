@@ -22,7 +22,9 @@ public class VendaProdutoMapper {
 
         dto.setId(itemVenda.getId());
         dto.setQuantidadeVendaProduto(itemVenda.getQuantidadeVendaProduto());
+        dto.setPrecoUnitarioNaVenda(itemVenda.getPrecoUnitarioNaVenda());
         dto.setValorTotalVendaProduto(itemVenda.getValorTotalVendaProduto());
+
 
         // NOVO: Mapeando o desconto para o Frontend receber
         // Usamos um ternário rápido caso alguma venda antiga esteja com o campo nulo no banco

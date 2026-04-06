@@ -30,6 +30,9 @@ public class VendaProduto {
     @Column(name = "valor_desconto")
     private Double desconto;
 
+    @Column(name = "preco_unitario_na_venda")
+    private Double precoUnitarioNaVenda;  // snapshot do preço no momento da venda
+
     private Double valorTotalVendaProduto;
 
 }
