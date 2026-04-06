@@ -70,7 +70,13 @@ public class VendaController {
     @Operation(summary = "Esse método lista todas as vendas através de uma determinada forma de papgamento")
     public ResponseEntity<List<VendaResponseDTO>> buscarPorFormaDePagamento(@PathVariable String formaDePagamento){
         log.info("Requisição para buscar vendas por forma de pagamento recebida");
-        FormaDePagamento forma = FormaDePagamento.valueOf(formaDePagamento.toUpperCase());
+        FormaDePagamento forma;
+        try {
+            forma = FormaDePagamento.valueOf(formaDePagamento.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            log.warn("Forma de pagamento inválida: {}", formaDePagamento);
+            return ResponseEntity.status(400).body(null);
+        }
         List<VendaResponseDTO> vendasByFormaPagto = service.buscarPorFormaPagamento(forma);
         if (vendasByFormaPagto.isEmpty()){
             log.warn("Nenhuma venda encontrada com a forma de pagamento solicitada na base de dados");

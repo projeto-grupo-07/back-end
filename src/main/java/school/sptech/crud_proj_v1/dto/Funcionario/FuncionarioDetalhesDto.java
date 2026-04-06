@@ -11,11 +11,13 @@ public class FuncionarioDetalhesDto implements UserDetails {
     private final String nome;
     private final String email;
     private final String senha;
+    private final Funcionario funcionario;
 
     public FuncionarioDetalhesDto(Funcionario funcionario) {
         this.nome = funcionario.getNome();
         this.email = funcionario.getEmail();
         this.senha = funcionario.getSenha();
+        this.funcionario = funcionario;
     }
 
     public String getNome() {
@@ -30,11 +32,11 @@ public class FuncionarioDetalhesDto implements UserDetails {
         return senha;
     }
 
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return funcionario.getAuthorities();
     }
-
     @Override
     public String getPassword() {
         return this.senha;
@@ -62,6 +64,6 @@ public class FuncionarioDetalhesDto implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return this.ativo;
+        return funcionario.isEnabled();
     }
 }

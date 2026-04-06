@@ -86,6 +86,7 @@ public class ProdutoService {
                     }
                     return null;
                 })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
@@ -125,6 +126,7 @@ public class ProdutoService {
                     }
                     return null;
                 })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 

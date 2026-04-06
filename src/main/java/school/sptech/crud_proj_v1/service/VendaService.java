@@ -3,7 +3,9 @@ package school.sptech.crud_proj_v1.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import school.sptech.crud_proj_v1.dto.VendaProduto.VendaProdutoRequestDTO;
 import school.sptech.crud_proj_v1.dto.Venda.VendaRequestDTO;
 import school.sptech.crud_proj_v1.dto.Venda.VendaResponseDTO;
@@ -51,7 +53,7 @@ public class VendaService {
 
         List<VendaProdutoRequestDTO> itensDto = dto.getItensVenda();
         if (itensDto == null || itensDto.isEmpty()) {
-            throw new IllegalArgumentException("A venda deve ter pelo menos um item.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A venda deve ter pelo menos um item.");
         }
         Double valorTotal = 0.0;
         List<VendaProduto> novosItensDeVenda = new ArrayList<>();
@@ -61,9 +63,7 @@ public class VendaService {
                     .orElseThrow(() -> new EntidadeNotFoundException("Produto do id " + itemDto.getIdProduto() + " não encontrado"));
 
             if (produto.getQuantidade() < itemDto.getQuantidadeVendaProduto()) {
-                throw new IllegalArgumentException(
-                        "Estoque insuficiente para o produto ID: " + produto.getId()
-                );
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Estoque insuficiente para o produto ID: " + produto.getId());
             }
 
             VendaProduto itemVenda = new VendaProduto();
@@ -79,7 +79,7 @@ public class VendaService {
 
             // 3. Valida se o desconto faz sentido
             if (descontoAplicado > subtotalBruto) {
-                throw new IllegalArgumentException("O desconto de R$ " + descontoAplicado + " excede o valor do item.");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O desconto de R$ " + descontoAplicado + " excede o valor do item.");
             }
 
             // 4. Aplica o desconto no valor final
@@ -161,7 +161,7 @@ public class VendaService {
         // 5. VALIDAÇÃO DE ITENS
         List<VendaProdutoRequestDTO> itensDto = dto.getItensVenda();
         if (itensDto == null || itensDto.isEmpty()) {
-            throw new IllegalArgumentException("A venda deve ter pelo menos um item.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A venda deve ter pelo menos um item.");
         }
 
         Double valorTotal = 0.0;
@@ -172,9 +172,7 @@ public class VendaService {
                     .orElseThrow(() -> new EntidadeNotFoundException("Produto ID não encontrado: " + itemDto.getIdProduto()));
 
             if (produto.getQuantidade() < itemDto.getQuantidadeVendaProduto()) {
-                throw new IllegalArgumentException(
-                        "Estoque insuficiente para o produto ID: " + produto.getId()
-                );
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Estoque insuficiente para o produto ID: " + produto.getId());
             }
 
             VendaProduto itemVenda = new VendaProduto();
@@ -187,7 +185,7 @@ public class VendaService {
 
             // Valida se o desconto não é abusivo/errado
             if (descontoAplicado > subtotalBruto) {
-                throw new IllegalArgumentException("O desconto de R$ " + descontoAplicado + " excede o valor do item.");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O desconto de R$ " + descontoAplicado + " excede o valor do item.");
             }
 
             Double valorFinalItem = subtotalBruto - descontoAplicado;

@@ -46,24 +46,26 @@ public class FuncionarioService {
 
 
     public List<FuncionarioResponseDto> listar(){
-        List<Funcionario> funcionariosEncontrados =  funcionarioRepository.findAll();
+        List<Funcionario> funcionariosEncontrados = funcionarioRepository.findAllByAtivoTrue();
         return funcionariosEncontrados.stream().map(FuncionarioMapper::of).toList();
     }
 
-    public FuncionarioResponseDto cadastrarFuncionario(FuncionarioRequestDto func){
-        if (funcionarioRepository.existsByCpf(func.getCpf())){
-            throw new EntidadeConflitoException("Conflito no cpf");
-        } else {
-            String senhaCriptograda = passwordEncoder.encode(func.getSenha());
-            Funcionario funcionarioSalvo = FuncionarioMapper.toEntity(func);
-            funcionarioSalvo.setSenha(senhaCriptograda);
-            Perfil perfil = perfilRepository.findById(func.getIdPerfil())
-                    .orElseThrow(() -> new EntidadeNotFoundException("Perfil não encontrado"));
-
-            funcionarioSalvo.setPerfil(perfil);
-            funcionarioRepository.save(funcionarioSalvo);
-            return FuncionarioMapper.of(funcionarioSalvo);
+    public FuncionarioResponseDto cadastrarFuncionario(FuncionarioRequestDto func) {
+        if (funcionarioRepository.existsByCpf(func.getCpf())) {
+            throw new EntidadeConflitoException("Já existe um funcionário com este CPF.");
         }
+        if (funcionarioRepository.existsByEmail(func.getEmail())) {
+            throw new EntidadeConflitoException("Já existe um funcionário com este e-mail.");
+        }
+
+        String senhaCriptografada = passwordEncoder.encode(func.getSenha());
+        Funcionario funcionarioSalvo = FuncionarioMapper.toEntity(func);
+        funcionarioSalvo.setSenha(senhaCriptografada);
+        Perfil perfil = perfilRepository.findById(func.getIdPerfil())
+                .orElseThrow(() -> new EntidadeNotFoundException("Perfil não encontrado"));
+        funcionarioSalvo.setPerfil(perfil);
+        funcionarioRepository.save(funcionarioSalvo);
+        return FuncionarioMapper.of(funcionarioSalvo);
     }
 
     public FuncionarioTokenDto autenticar(Funcionario funcionario) {
@@ -120,17 +122,17 @@ public class FuncionarioService {
         return FuncionarioMapper.of(funcionarioRepository.save(funcionarioParaAtualizar));
     }
 
-    public void deletarPorId(Integer id){
-        if (funcionarioRepository.existsById(id)){
-            funcionarioRepository.deleteById(id);
-            return;
-        }
-        throw new EntidadeNotFoundException("funcionario nao encontrado/existente");
+    public void deletarPorId(Integer id) {
+        Funcionario funcionario = funcionarioRepository.findById(id)
+                .orElseThrow(() -> new EntidadeNotFoundException("Funcionário não encontrado: " + id));
+
+        funcionario.setAtivo(false);
+        funcionarioRepository.save(funcionario);
     }
 
     public void handleProdutoCadastrado(ProdutoCadastradoEvent event){
         Produto produto = event.getProduto();
-        List<Funcionario> funcionarios = funcionarioRepository.findAll();
+        List<Funcionario> funcionarios = funcionarioRepository.findAllByAtivoTrue();
         enviarNotificacao(funcionarios, produto);
     }
 
