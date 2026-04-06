@@ -1,6 +1,7 @@
 package school.sptech.crud_proj_v1.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
+@Slf4j
 @Service
 public class ProdutoService {
     private final ProdutoRepository produtoRepository;
@@ -54,7 +56,7 @@ public class ProdutoService {
 
         CalcadoProduto salvo = produtoRepository.save(novoCalcado);
 
-        System.out.println("Calçado " + salvo.getModelo() + " salvo!");
+        log.info("Calçado {} salvo com sucesso.", salvo.getModelo());
 
         return calcadoMapper.toResponse(salvo);
     }
@@ -69,7 +71,7 @@ public class ProdutoService {
         funcionarioService.handleProdutoCadastrado(evento);
 
         OutrosProduto salvo = produtoRepository.save(novoOutros);
-        System.out.println("Produto Outros " + salvo.getNome() + " salvo!");
+        log.info("Produto Outros {} salvo com sucesso.", salvo.getNome());
 
         return outrosMapper.toResponse(salvo);
     }

@@ -231,11 +231,7 @@ public class VendaService {
     }
 
     public Double calcularTotal() {
-        List<Venda> vendas = vendaRepository.findAll();
-
-        return vendas.stream()
-                .mapToDouble(Venda::getTotalVenda)
-                .sum();
+        return vendaRepository.calcularTotalGeral();
     }
 
     private Double arredondar(Double valor) {

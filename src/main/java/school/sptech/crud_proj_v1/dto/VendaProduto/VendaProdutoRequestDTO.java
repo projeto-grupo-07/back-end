@@ -18,6 +18,9 @@ public class VendaProdutoRequestDTO {
     @Min(value = 1)
     private Integer quantidadeVendaProduto;
 
+    // ATENÇÃO: este campo é enviado pelo cliente mas ignorado pelo service.
+    // O valor total é sempre recalculado no backend com base no valorUnitario do produto.
+    // Pode ser removido futuramente ao alinhar com o front-end.
     @NotNull()
     @Min(value = 1)
     private Double valorTotalVendaProduto;

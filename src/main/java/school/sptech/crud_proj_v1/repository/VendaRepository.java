@@ -26,6 +26,8 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
     @Query(value = "SELECT COALESCE(SUM(valor_total), 0.0) FROM venda WHERE EXTRACT(YEAR FROM data_hora) = EXTRACT(YEAR FROM CURRENT_DATE) AND EXTRACT(MONTH FROM data_hora) = EXTRACT(MONTH FROM CURRENT_DATE)", nativeQuery = true)
     Double buscarFaturamentoMes();
 
+    @Query(value = "SELECT COALESCE(SUM(valor_total), 0.0) FROM venda", nativeQuery = true)
+    Double calcularTotalGeral();
     // ========================================================================
     // --- KPI de Volume de Vendas ---
     // ========================================================================
