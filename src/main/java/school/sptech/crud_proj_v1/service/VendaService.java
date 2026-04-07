@@ -3,9 +3,7 @@ package school.sptech.crud_proj_v1.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import school.sptech.crud_proj_v1.dto.VendaProduto.VendaProdutoRequestDTO;
 import school.sptech.crud_proj_v1.dto.Venda.VendaRequestDTO;
 import school.sptech.crud_proj_v1.dto.Venda.VendaResponseDTO;
@@ -18,13 +16,12 @@ import school.sptech.crud_proj_v1.entity.Venda;
 import school.sptech.crud_proj_v1.enumeration.FormaDePagamento;
 import school.sptech.crud_proj_v1.exception.EntidadeNotFoundException;
 import school.sptech.crud_proj_v1.mapper.VendaMapper;
+import school.sptech.crud_proj_v1.projection.*;
 import school.sptech.crud_proj_v1.repository.FuncionarioRepository;
 import school.sptech.crud_proj_v1.repository.ProdutoRepository;
-import school.sptech.crud_proj_v1.repository.VendaProdutoRepository;
 import school.sptech.crud_proj_v1.repository.VendaRepository;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +37,8 @@ public class VendaService {
     private final ComissaoService comissaoService;
     private final ProdutoService produtoService;
 
+
+
     @Transactional
     public VendaResponseDTO cadastrar(VendaRequestDTO dto) {
         Venda novaVenda = vendaMapper.toEntity(dto);
@@ -53,7 +52,7 @@ public class VendaService {
 
         List<VendaProdutoRequestDTO> itensDto = dto.getItensVenda();
         if (itensDto == null || itensDto.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A venda deve ter pelo menos um item.");
+            throw new IllegalArgumentException("A venda deve ter pelo menos um item.");
         }
         Double valorTotal = 0.0;
         List<VendaProduto> novosItensDeVenda = new ArrayList<>();
@@ -62,14 +61,9 @@ public class VendaService {
             Produto produto = produtoRepository.findById(itemDto.getIdProduto())
                     .orElseThrow(() -> new EntidadeNotFoundException("Produto do id " + itemDto.getIdProduto() + " não encontrado"));
 
-            if (produto.getQuantidade() < itemDto.getQuantidadeVendaProduto()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Estoque insuficiente para o produto ID: " + produto.getId());
-            }
-
             VendaProduto itemVenda = new VendaProduto();
             itemVenda.setProduto(produto);
             itemVenda.setQuantidadeVendaProduto(itemDto.getQuantidadeVendaProduto());
-            itemVenda.setPrecoUnitarioNaVenda(produto.getValorUnitario());
             itemVenda.setVenda(novaVenda);
 
             // 1. Extrai o desconto (Se vier nulo, assume 0.0)
@@ -80,7 +74,7 @@ public class VendaService {
 
             // 3. Valida se o desconto faz sentido
             if (descontoAplicado > subtotalBruto) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O desconto de R$ " + descontoAplicado + " excede o valor do item.");
+                throw new IllegalArgumentException("O desconto de R$ " + descontoAplicado + " excede o valor do item.");
             }
 
             // 4. Aplica o desconto no valor final
@@ -148,13 +142,6 @@ public class VendaService {
         // Opcional: Remova a linha abaixo se quiser manter a data original da venda
         vendaParaAtualizar.setDataHora(LocalDateTime.now());
 
-        for (VendaProduto item : vendaParaAtualizar.getItens()) {
-            produtoService.aumentarEstoque(
-                    item.getProduto().getId(),
-                    item.getQuantidadeVendaProduto()
-            );
-        }
-
         // 4. LIMPEZA DOS ITENS ANTIGOS
         // Importante: Requer orphanRemoval = true na @OneToMany da entidade Venda
         vendaParaAtualizar.getItens().clear();
@@ -162,7 +149,7 @@ public class VendaService {
         // 5. VALIDAÇÃO DE ITENS
         List<VendaProdutoRequestDTO> itensDto = dto.getItensVenda();
         if (itensDto == null || itensDto.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A venda deve ter pelo menos um item.");
+            throw new IllegalArgumentException("A venda deve ter pelo menos um item.");
         }
 
         Double valorTotal = 0.0;
@@ -172,14 +159,9 @@ public class VendaService {
             Produto produto = produtoRepository.findById(itemDto.getIdProduto())
                     .orElseThrow(() -> new EntidadeNotFoundException("Produto ID não encontrado: " + itemDto.getIdProduto()));
 
-            if (produto.getQuantidade() < itemDto.getQuantidadeVendaProduto()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Estoque insuficiente para o produto ID: " + produto.getId());
-            }
-
             VendaProduto itemVenda = new VendaProduto();
             itemVenda.setProduto(produto);
             itemVenda.setQuantidadeVendaProduto(itemDto.getQuantidadeVendaProduto());
-            itemVenda.setPrecoUnitarioNaVenda(produto.getValorUnitario());
 
             // --- INÍCIO DA LÓGICA DE DESCONTO ---
             Double descontoAplicado = itemDto.getDesconto() != null ? itemDto.getDesconto() : 0.0;
@@ -187,7 +169,7 @@ public class VendaService {
 
             // Valida se o desconto não é abusivo/errado
             if (descontoAplicado > subtotalBruto) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O desconto de R$ " + descontoAplicado + " excede o valor do item.");
+                throw new IllegalArgumentException("O desconto de R$ " + descontoAplicado + " excede o valor do item.");
             }
 
             Double valorFinalItem = subtotalBruto - descontoAplicado;
@@ -212,13 +194,6 @@ public class VendaService {
         // O save() aqui vai disparar os DELETEs dos órfãos e os INSERTs dos novos itens
         Venda vendaSalva = vendaRepository.save(vendaParaAtualizar);
 
-        for (VendaProduto item : vendaSalva.getItens()) {
-            produtoService.diminuirEstoque(
-                    item.getProduto().getId(),
-                    item.getQuantidadeVendaProduto()
-            );
-        }
-
         // 9. Atualiza comissão
         comissaoService.calcularComissao(vendaSalva);
 
@@ -233,13 +208,29 @@ public class VendaService {
     }
 
     public Double calcularTotal() {
-        return vendaRepository.calcularTotalGeral();
+        List<Venda> vendas = vendaRepository.findAll();
+
+        return vendas.stream()
+                .mapToDouble(Venda::getTotalVenda)
+                .sum();
     }
 
-    private Double arredondar(Double valor) {
-        if (valor == null) return 0.0;
-        return BigDecimal.valueOf(valor)
-                .setScale(2, RoundingMode.HALF_EVEN)
-                .doubleValue();
+    public List<MetodoPagamentoProjection> buscarDesempenhoPagamentos(LocalDateTime inicio, LocalDateTime fim) {
+        return vendaRepository.buscarDesempenhoPagamentosDinamico(inicio, fim);
     }
+
+    public List<ProdutoRentavelProjection> buscarProdutosRentaveis(LocalDateTime inicio, LocalDateTime fim) {
+        return vendaRepository.buscarProdutosMaisRentaveisDinamico(inicio, fim);
+    }
+
+    public List<MargemCategoriaProjection> buscarMargemCategoria(LocalDateTime inicio, LocalDateTime fim) {
+        return vendaRepository.buscarMargemPorCategoriaDinamico(inicio, fim);
+    }
+
+    private double arredondar(Double valor) {
+        if (valor == null) return 0.0;
+        return Double.valueOf(valor);
+
+    }
+
 }

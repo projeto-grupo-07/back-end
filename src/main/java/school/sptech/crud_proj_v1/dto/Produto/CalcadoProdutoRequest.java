@@ -28,16 +28,11 @@ public class CalcadoProdutoRequest {
     @Positive(message = "O preço de custo deve ser maior que zero.")
     private Double precoCustoProduto;
 
-    @NotBlank(message = "A marca é obrigatória.")
     private String marca;
 
-    @NotBlank(message = "O modelo é obrigatório.")
     private String modelo;
 
-    @NotNull(message = "O número é obrigatório.")
-    @Positive(message = "O número deve ser maior que zero.")
     private Integer numero;
 
-    @NotBlank(message = "A cor é obrigatória.")
     private String cor;
 }

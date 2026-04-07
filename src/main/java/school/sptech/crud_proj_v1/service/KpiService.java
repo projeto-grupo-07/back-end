@@ -1,11 +1,13 @@
 package school.sptech.crud_proj_v1.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import school.sptech.crud_proj_v1.repository.VendaRepository;
 import school.sptech.crud_proj_v1.projection.*; // Importante para as listas
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,7 +104,7 @@ public class KpiService {
     }
 
     // ========================================================================
-    // --- NOVOS MÉTODOS: GRÁFICOS E TABELAS (LISTAS) ---
+    // --- DADOS ESTÁTICOS (MANTIDOS POR SEGURANÇA) ---
     // ========================================================================
 
     public List<GraficoTempoProjection> buscarFaturamentoTempoMensal() {
@@ -131,5 +133,83 @@ public class KpiService {
 
     public List<DesempenhoFuncionarioProjection> buscarDesempenhoFuncionarioSemana() {
         return vendaRepository.buscarDesempenhoFuncionarioSemana();
+    }
+
+    // ========================================================================
+    // --- LÓGICA DINÂMICA (DASHBOARD) ---
+    // ========================================================================
+
+    // Helper para converter o texto do React em datas reais
+    private LocalDateTime[] calcularPeriodo(String tipo, LocalDateTime inicio, LocalDateTime fim) {
+        LocalDateTime dataInicio;
+        LocalDateTime dataFim = LocalDateTime.now(); // default
+
+        if (tipo == null) tipo = "Este Mês";
+
+        switch (tipo) {
+            case "Hoje":
+                dataInicio = LocalDate.now().atStartOfDay();
+                dataFim = LocalDate.now().atTime(LocalTime.MAX);
+                break;
+            case "Esta Semana":
+                dataInicio = LocalDate.now().with(java.time.DayOfWeek.MONDAY).atStartOfDay();
+                dataFim = LocalDate.now().with(java.time.DayOfWeek.SUNDAY).atTime(LocalTime.MAX);
+                break;
+            case "Este Mês":
+                dataInicio = LocalDate.now().withDayOfMonth(1).atStartOfDay();
+                dataFim = LocalDate.now().with(java.time.temporal.TemporalAdjusters.lastDayOfMonth()).atTime(LocalTime.MAX);
+                break;
+            case "Este Semestre":
+                dataInicio = LocalDate.now().minusMonths(6).withDayOfMonth(1).atStartOfDay();
+                break;
+            case "Personalizado":
+                dataInicio = inicio != null ? inicio.toLocalDate().atStartOfDay() : LocalDate.now().withDayOfMonth(1).atStartOfDay();
+                dataFim = fim != null ? fim.toLocalDate().atTime(LocalTime.MAX) : LocalDate.now().atTime(LocalTime.MAX);
+                break;
+            default:
+                dataInicio = LocalDate.now().withDayOfMonth(1).atStartOfDay();
+        }
+        return new LocalDateTime[]{dataInicio, dataFim};
+    }
+
+    // --- Gráficos Dinâmicos ---
+    public List<FaturamentoTempoProjection> buscarGraficoFaturamentoDinamico(String tipo, LocalDateTime inicio, LocalDateTime fim) {
+        LocalDateTime[] datas = calcularPeriodo(tipo, inicio, fim);
+        long dias = java.time.temporal.ChronoUnit.DAYS.between(datas[0], datas[1]);
+
+        // MÁGICA: Se o filtro for mais de 2 meses, agrupa por Mês. Senão, mostra dia a dia.
+        if (dias > 60) {
+            return vendaRepository.buscarGraficoFaturamentoMensalDinamico(datas[0], datas[1]);
+        } else {
+            return vendaRepository.buscarGraficoFaturamentoDiarioDinamico(datas[0], datas[1]);
+        }
+    }
+
+    public List<PicoDiaProjection> buscarGraficoPicoDiaDinamico(String tipo, LocalDateTime inicio, LocalDateTime fim) {
+        LocalDateTime[] datas = calcularPeriodo(tipo, inicio, fim);
+        return vendaRepository.buscarGraficoPicoDiaDinamico(datas[0], datas[1]);
+    }
+
+    // --- Tabelas Dinâmicas (MÉTODOS QUE ESTAVAM FALTANDO) ---
+    public List<RankingVendasProjection> buscarRankingProdutosDinamico(String tipo, LocalDateTime LocalDateInicio, LocalDateTime LocalDateFim) {
+        LocalDateTime[] datas = calcularPeriodo(tipo, LocalDateInicio, LocalDateFim);
+        return vendaRepository.buscarRankingProdutosDinamico(datas[0], datas[1]);
+    }
+
+    public List<RankingVendasProjection> buscarRankingMarcasDinamico(String tipo, LocalDateTime LocalDateInicio, LocalDateTime LocalDateFim) {
+        LocalDateTime[] datas = calcularPeriodo(tipo, LocalDateInicio, LocalDateFim);
+        return vendaRepository.buscarRankingMarcasDinamico(datas[0], datas[1]);
+    }
+
+    public List<DesempenhoFuncionarioProjection> buscarDesempenhoEquipeDinamico(String tipo, LocalDateTime LocalDateInicio, LocalDateTime LocalDateFim) {
+        LocalDateTime[] datas = calcularPeriodo(tipo, LocalDateInicio, LocalDateFim);
+        return vendaRepository.buscarDesempenhoEquipeDinamico(datas[0], datas[1]);
+    }
+
+    public List<SazonalidadeProjection> buscarMapaSazonalidade(Integer ano) {
+        if (ano == null) {
+            ano = java.time.LocalDate.now().getYear();
+        }
+        return vendaRepository.buscarMapaSazonalidade(ano);
     }
 }

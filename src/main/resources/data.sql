@@ -60,7 +60,6 @@ INSERT INTO FUNCIONARIO (nome, cpf, email, salario, comissao, senha, perfil_id, 
 ('Ana Vendedora', '864.793.360-54', 'ana.vendas@brinks.com', 2000.00, 0.05, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 3, TRUE),
 ('Roberto Vendas', '234.567.890-12', 'roberto.vendas@brinks.com', 2000.00, 0.05, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 3, TRUE),
 ('Juliana Caixa', '987.654.321-00', 'juliana.vendas@brinks.com', 2000.00, 0.05, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 3, TRUE);
-
 -- ==================================================================
 -- 4. CATEGORIAS
 -- ==================================================================
@@ -113,29 +112,71 @@ INSERT INTO PRODUTO (id, nome, descricao, modelo, marca, numero, cor, preco_cust
 ALTER TABLE PRODUTO ALTER COLUMN id RESTART WITH 20;
 
 -- ==================================================================
--- 6. VENDAS (Datas distribuídas para gerar gráficos)
+-- 6. VENDAS (HISTÓRICO DENSO - OUT/2025 ATÉ MAR/2026)
 -- ==================================================================
 
+-- [OUTUBRO 2025] - Início moderado
 INSERT INTO venda (id, data_hora, valor_total, forma_pagamento, fk_vendedor, percentual_comissao_aplicado, valor_comissao) VALUES
-(1, '2026-02-15 10:30:00', 399.90, 'PIX', 3, 0.05, 19.99),     -- Vendedora Ana
-(2, '2026-02-20 14:15:00', 459.80, 'CREDITO', 4, 0.05, 22.99), -- Vendedor Roberto
-(3, '2026-02-28 09:00:00', 799.90, 'DEBITO', 5, 0.05, 39.99),  -- Vendedora Juliana
-(4, '2026-03-02 11:20:00', 80.00, 'DINHEIRO', 3, 0.05, 4.00),  -- Vendedora Ana
-(5, '2026-03-05 16:45:00', 229.80, 'PIX', 4, 0.05, 11.49),     -- Vendedor Roberto
-(6, '2026-03-08 13:10:00', 729.80, 'CREDITO', 5, 0.05, 36.49), -- Vendedora Juliana
-(7, '2026-03-10 10:05:00', 379.90, 'PIX', 3, 0.05, 18.99),     -- Vendedora Ana
-(8, '2026-03-11 15:30:00', 219.90, 'DEBITO', 4, 0.05, 10.99),  -- Vendedor Roberto
-(9, '2026-03-12 12:40:00', 149.90, 'PIX', 5, 0.05, 7.49),      -- Vendedora Juliana (Ontem)
-(10, '2026-03-13 09:15:00', 509.80, 'CREDITO', 3, 0.05, 25.49),-- Vendedora Ana (HOJE!)
-(11, '2026-03-13 14:20:00', 349.90, 'PIX', 4, 0.05, 17.49);    -- Vendedor Roberto (HOJE!)
+(1, '2025-10-05 10:00:00', 1250.00, 'CREDITO', 3, 0.05, 62.50),
+(2, '2025-10-12 15:30:00', 890.00, 'PIX', 4, 0.05, 44.50),
+(3, '2025-10-15 11:20:00', 350.00, 'DEBITO', 5, 0.05, 17.50),
+(4, '2025-10-28 17:45:00', 2100.00, 'CREDITO', 3, 0.05, 105.00);
 
-ALTER TABLE venda ALTER COLUMN id RESTART WITH 20;
--- ==================================================================
--- 7. ITENS DE VENDA (Com descontos aplicados)
--- ==================================================================
--- Lembre-se: valor_total_venda_produto = (preco * qtd) - desconto
+-- [NOVEMBRO 2025] - Esquenta Black Friday
+INSERT INTO venda (id, data_hora, valor_total, forma_pagamento, fk_vendedor, percentual_comissao_aplicado, valor_comissao) VALUES
+(5, '2025-11-02 14:00:00', 1800.00, 'PIX', 4, 0.05, 90.00),
+(6, '2025-11-15 09:30:00', 2450.00, 'CREDITO', 5, 0.05, 122.50),
+(7, '2025-11-28 10:00:00', 4200.00, 'CREDITO', 3, 0.05, 210.00), -- Pico BF
+(8, '2025-11-28 16:20:00', 3150.00, 'PIX', 4, 0.05, 157.50),    -- Pico BF
+(9, '2025-11-29 11:00:00', 1200.00, 'DEBITO', 5, 0.05, 60.00);
 
- -- Venda 1: 1x Revolution 6 (R$ 399.90 cada)
+-- [DEZEMBRO 2025] - Explosão de Natal
+INSERT INTO venda (id, data_hora, valor_total, forma_pagamento, fk_vendedor, percentual_comissao_aplicado, valor_comissao) VALUES
+(10, '2025-12-05 14:00:00', 3200.00, 'CREDITO', 3, 0.05, 160.00),
+(11, '2025-12-10 10:00:00', 2800.00, 'PIX', 4, 0.05, 140.00),
+(12, '2025-12-15 18:30:00', 5400.00, 'CREDITO', 5, 0.05, 270.00),
+(13, '2025-12-20 12:00:00', 7100.00, 'CREDITO', 3, 0.05, 355.00),
+(14, '2025-12-23 15:00:00', 8900.00, 'PIX', 4, 0.05, 445.00),   -- Recorde do ano
+(15, '2025-12-24 10:00:00', 4500.00, 'DINHEIRO', 5, 0.05, 225.00);
+
+-- [JANEIRO 2026] - Baixa temporada
+INSERT INTO venda (id, data_hora, valor_total, forma_pagamento, fk_vendedor, percentual_comissao_aplicado, valor_comissao) VALUES
+(16, '2026-01-05 11:00:00', 900.00, 'DEBITO', 3, 0.05, 45.00),
+(17, '2026-01-15 14:30:00', 1200.00, 'PIX', 4, 0.05, 60.00),
+(18, '2026-01-25 16:00:00', 850.00, 'CREDITO', 5, 0.05, 42.50);
+
+-- [FEVEREIRO 2026] - Recuperação (Volta às aulas)
+INSERT INTO venda (id, data_hora, valor_total, forma_pagamento, fk_vendedor, percentual_comissao_aplicado, valor_comissao) VALUES
+(19, '2026-02-02 09:00:00', 2200.00, 'CREDITO', 3, 0.05, 110.00),
+(20, '2026-02-10 13:00:00', 3100.00, 'PIX', 4, 0.05, 155.00),
+(21, '2026-02-18 15:00:00', 1800.00, 'DEBITO', 5, 0.05, 90.00),
+(22, '2026-02-25 17:00:00', 2500.00, 'CREDITO', 3, 0.05, 125.00);
+
+-- [MARÇO 2026] - Semana Passada (Simulando variação diária)
+INSERT INTO venda (id, data_hora, valor_total, forma_pagamento, fk_vendedor, percentual_comissao_aplicado, valor_comissao) VALUES
+(23, '2026-03-09 10:00:00', 450.00, 'PIX', 4, 0.05, 22.50),   -- Seg
+(24, '2026-03-10 14:00:00', 890.00, 'CREDITO', 5, 0.05, 44.50), -- Ter
+(25, '2026-03-11 11:00:00', 1200.00, 'DEBITO', 3, 0.05, 60.00), -- Qua
+(26, '2026-03-12 16:00:00', 2100.00, 'PIX', 4, 0.05, 105.00),  -- Qui
+(27, '2026-03-13 18:00:00', 4500.00, 'CREDITO', 5, 0.05, 225.00), -- Sex (Pico)
+(28, '2026-03-14 10:00:00', 5200.00, 'CREDITO', 3, 0.05, 260.00), -- Sab (Pico)
+(29, '2026-03-15 14:00:00', 1100.00, 'PIX', 4, 0.05, 55.00);    -- Dom
+
+-- [MARÇO 2026] - HOJE (Terça-feira, 17/03/2026)
+INSERT INTO venda (id, data_hora, valor_total, forma_pagamento, fk_vendedor, percentual_comissao_aplicado, valor_comissao) VALUES
+(30, '2026-03-17 08:30:00', 450.00, 'PIX', 3, 0.05, 22.50),
+(31, '2026-03-17 10:15:00', 1200.00, 'CREDITO', 4, 0.05, 60.00),
+(32, '2026-03-17 13:00:00', 800.00, 'DEBITO', 5, 0.05, 40.00),
+(33, '2026-03-17 15:45:00', 2300.00, 'PIX', 3, 0.05, 115.00),
+(34, '2026-03-17 17:20:00', 150.00, 'DINHEIRO', 4, 0.05, 7.50),
+(35, '2026-03-17 18:00:00', 650.00, 'CREDITO', 5, 0.05, 32.50);
+
+ALTER TABLE venda ALTER COLUMN id RESTART WITH 50;
+
+-- ==================================================================
+-- 7. ITENS DE VENDA (DETALHAMENTO PARA RANKINGS)
+-- ==================================================================
+
   INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto,
   preco_unitario_na_venda) VALUES
   (2, 0.0, 1, 1, 399.90, 399.90);

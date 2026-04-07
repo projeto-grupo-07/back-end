@@ -22,15 +22,11 @@ public class OutrosProdutoRequest {
     @NotNull(message = "O valor unitário é obrigatório.")
     @Positive(message = "O valor unitário deve ser maior que zero.")
     private Double valorUnitario;
-
-    @NotNull(message = "O preço de custo é obrigatório.")
-    @Positive(message = "O preço de custo deve ser maior que zero.")
+    
     private Double precoCustoProduto;
 
-    @NotBlank(message = "O nome é obrigatório.")
     private String nome;
 
-    @NotBlank(message = "A descrição é obrigatória.")
     private String descricao;
 
 }

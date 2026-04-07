@@ -1,14 +1,15 @@
 package school.sptech.crud_proj_v1.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import school.sptech.crud_proj_v1.repository.VendaRepository;
 import school.sptech.crud_proj_v1.service.KpiService;
 import school.sptech.crud_proj_v1.projection.*; // Traz as interfaces para o Controller
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -17,6 +18,7 @@ import java.util.List;
 public class KpiController {
 
     private final KpiService kpiService;
+    private final VendaRepository vendaRepository;
 
     // ========================================================================
     // --- KPIs EXISTENTES (Faturamento, Vendas, Ticket e Vendedor Único) ---
@@ -158,4 +160,56 @@ public class KpiController {
     public ResponseEntity<List<DesempenhoFuncionarioProjection>> getDesempenhoEquipeSemana() {
         return ResponseEntity.status(200).body(kpiService.buscarDesempenhoFuncionarioSemana());
     }
+
+
+
+    @GetMapping("/graficos/faturamento-dinamico")
+    public ResponseEntity<List<FaturamentoTempoProjection>> getGraficoFaturamentoDinamico(
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim
+    ) {
+        return ResponseEntity.ok(kpiService.buscarGraficoFaturamentoDinamico(tipo, inicio, fim));
+    }
+
+    @GetMapping("/graficos/pico-dia-dinamico")
+    public ResponseEntity<List<PicoDiaProjection>> getGraficoPicoDiaDinamico(
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) LocalDateTime inicio,
+            @RequestParam(required = false) LocalDateTime fim
+    ) {
+        return ResponseEntity.ok(kpiService.buscarGraficoPicoDiaDinamico(tipo, inicio, fim));
+    }
+
+    @GetMapping("/tabelas/ranking-produtos-dinamico")
+    public ResponseEntity<List<school.sptech.crud_proj_v1.projection.RankingVendasProjection>> getRankingProdutosDinamico(
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) java.time.LocalDateTime inicio,
+            @RequestParam(required = false) java.time.LocalDateTime fim) {
+        return ResponseEntity.ok(kpiService.buscarRankingProdutosDinamico(tipo, inicio, fim));
+    }
+
+    @GetMapping("/tabelas/ranking-marcas-dinamico")
+    public ResponseEntity<List<school.sptech.crud_proj_v1.projection.RankingVendasProjection>> getRankingMarcasDinamico(
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) java.time.LocalDateTime inicio,
+            @RequestParam(required = false) java.time.LocalDateTime fim) {
+        return ResponseEntity.ok(kpiService.buscarRankingMarcasDinamico(tipo, inicio, fim));
+    }
+
+    @GetMapping("/tabelas/desempenho-equipe-dinamico")
+    public ResponseEntity<List<school.sptech.crud_proj_v1.projection.DesempenhoFuncionarioProjection>> getDesempenhoEquipeDinamico(
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) java.time.LocalDateTime inicio,
+            @RequestParam(required = false) java.time.LocalDateTime fim) {
+        return ResponseEntity.ok(kpiService.buscarDesempenhoEquipeDinamico(tipo, inicio, fim));
+    }
+
+    @GetMapping("/graficos/sazonalidade")
+    public ResponseEntity<List<school.sptech.crud_proj_v1.projection.SazonalidadeProjection>> getMapaSazonalidade(
+            @RequestParam(required = false) Integer ano) {
+
+        return ResponseEntity.ok(kpiService.buscarMapaSazonalidade(ano));
+    }
+
 }
