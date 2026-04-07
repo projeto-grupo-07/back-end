@@ -54,12 +54,12 @@ INSERT INTO perfil_tela (perfil_id, tela_id) VALUES
 -- 3. FUNCIONÁRIOS
 -- ==================================================================
 
-INSERT INTO FUNCIONARIO (nome, cpf, email, salario, comissao, senha, perfil_id) VALUES
-('Maria Admin', '116.580.380-10', 'maria.admin@brinks.com', 8000.00, 0.00, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 1),
-('Agenor Gerente', '188.116.470-53', 'agenor.gerente@brinks.com', 5000.00, 0.10, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 2),
-('Ana Vendedora', '864.793.360-54', 'ana.vendas@brinks.com', 2000.00, 0.05, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 3),
-('Roberto Vendas', '234.567.890-12', 'roberto.vendas@brinks.com', 2000.00, 0.05, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 3),
-('Juliana Caixa', '987.654.321-00', 'juliana.vendas@brinks.com', 2000.00, 0.05, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 3);
+INSERT INTO FUNCIONARIO (nome, cpf, email, salario, comissao, senha, perfil_id, ativo   ) VALUES
+('Maria Admin', '116.580.380-10', 'maria.admin@brinks.com', 8000.00, 0.00, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 1, TRUE),
+('Agenor Gerente', '188.116.470-53', 'agenor.gerente@brinks.com', 5000.00, 0.10, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 2,TRUE),
+('Ana Vendedora', '864.793.360-54', 'ana.vendas@brinks.com', 2000.00, 0.05, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 3, TRUE),
+('Roberto Vendas', '234.567.890-12', 'roberto.vendas@brinks.com', 2000.00, 0.05, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 3, TRUE),
+('Juliana Caixa', '987.654.321-00', 'juliana.vendas@brinks.com', 2000.00, 0.05, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 3, TRUE);
 
 -- ==================================================================
 -- 4. CATEGORIAS
@@ -135,50 +135,61 @@ ALTER TABLE venda ALTER COLUMN id RESTART WITH 20;
 -- ==================================================================
 -- Lembre-se: valor_total_venda_produto = (preco * qtd) - desconto
 
--- Venda 1: 1x Revolution 6
-INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto) VALUES
-(2, 0.0, 1, 1, 399.90);
+ -- Venda 1: 1x Revolution 6 (R$ 399.90 cada)
+  INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto,
+  preco_unitario_na_venda) VALUES
+  (2, 0.0, 1, 1, 399.90, 399.90);
 
--- Venda 2: 2x Chuck Taylor
-INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto) VALUES
-(9, 0.0, 2, 2, 459.80);
+  -- Venda 2: 2x Chuck Taylor (R$ 229.90 cada)
+  INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto,
+  preco_unitario_na_venda) VALUES
+  (9, 0.0, 2, 2, 459.80, 229.90);
 
--- Venda 3: 1x Ultraboost + 1x Meia (Meia saiu de graça com R$ 39.90 de desconto)
-INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto) VALUES
-(3, 0.0, 3, 1, 799.90),
-(11, 39.90, 3, 1, 0.00);
+  -- Venda 3: 1x Ultraboost (R$ 799.90) + 1x Meia (R$ 39.90, saiu de graça com desconto)
+  INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto,
+  preco_unitario_na_venda) VALUES
+  (3, 0.0, 3, 1, 799.90, 799.90),
+  (11, 39.90, 3, 1, 0.00, 39.90);
 
--- Venda 4: 3x Havaianas (Valor original 89.70 - Desconto 9.70 = 80.00)
-INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto) VALUES
-(1, 9.70, 4, 3, 80.00);
+  -- Venda 4: 3x Havaianas (R$ 29.90 cada, valor original 89.70 - Desconto 9.70 = 80.00)
+  INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto,
+  preco_unitario_na_venda) VALUES
+  (1, 9.70, 4, 3, 80.00, 29.90);
 
--- Venda 5: 1x Vizzano + 1x Cinto
-INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto) VALUES
-(4, 0.0, 5, 1, 149.90),
-(12, 0.0, 5, 1, 79.90);
+  -- Venda 5: 1x Vizzano (R$ 149.90) + 1x Cinto (R$ 79.90)
+  INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto,
+  preco_unitario_na_venda) VALUES
+  (4, 0.0, 5, 1, 149.90, 149.90),
+  (12, 0.0, 5, 1, 79.90, 79.90);
 
--- Venda 6: 1x Wave Titan + 1x Social Pegada
-INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto) VALUES
-(7, 0.0, 6, 1, 499.90),
-(6, 0.0, 6, 1, 229.90);
+  -- Venda 6: 1x Wave Titan (R$ 499.90) + 1x Social Pegada (R$ 229.90)
+  INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto,
+  preco_unitario_na_venda) VALUES
+  (7, 0.0, 6, 1, 499.90, 499.90),
+  (6, 0.0, 6, 1, 229.90, 229.90);
 
--- Venda 7: 1x Vans Old Skool
-INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto) VALUES
-(10, 0.0, 7, 1, 379.90);
+  -- Venda 7: 1x Vans Old Skool (R$ 379.90)
+  INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto,
+  preco_unitario_na_venda) VALUES
+  (10, 0.0, 7, 1, 379.90, 379.90);
 
--- Venda 8: 1x Chuck Taylor (Valor original 229.90 - Desconto 10.00 = 219.90)
-INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto) VALUES
-(9, 10.00, 8, 1, 219.90);
+  -- Venda 8: 1x Chuck Taylor (R$ 229.90, com desconto de R$ 10.00 = 219.90)
+  INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto,
+  preco_unitario_na_venda) VALUES
+  (9, 10.00, 8, 1, 219.90, 229.90);
 
--- Venda 9: 1x Vizzano
-INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto) VALUES
-(4, 0.0, 9, 1, 149.90);
+  -- Venda 9: 1x Vizzano (R$ 149.90)
+  INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto,
+  preco_unitario_na_venda) VALUES
+  (4, 0.0, 9, 1, 149.90, 149.90);
 
--- Venda 10: 1x Chelsea Democrata + 1x Mochila Nike
-INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto) VALUES
-(15, 0.0, 10, 1, 329.90),
-(13, 0.0, 10, 1, 179.90);
+  -- Venda 10: 1x Chelsea Democrata (R$ 329.90) + 1x Mochila Nike (R$ 179.90)
+  INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto,
+  preco_unitario_na_venda) VALUES
+  (15, 0.0, 10, 1, 329.90, 329.90),
+  (13, 0.0, 10, 1, 179.90, 179.90);
 
--- Venda 11: 1x Puma Future
-INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto) VALUES
-(8, 0.0, 11, 1, 349.90);
+  -- Venda 11: 1x Puma Future (R$ 349.90)
+  INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto,
+  preco_unitario_na_venda) VALUES
+  (8, 0.0, 11, 1, 349.90, 349.90);
