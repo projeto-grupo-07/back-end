@@ -125,11 +125,10 @@ public class VendaService {
         return vendaMapper.toVendaResponseDTO(vendas);
     }
 
+    @Transactional
     public VendaResponseDTO atualizarPorId(Integer id, VendaRequestDTO dto) {
         // 1. Busca a venda existente
-        Venda vendaParaAtualizar = vendaRepository.findById(id)
-                .orElseThrow(() -> new EntidadeNotFoundException("Venda com ID não encontrada: " + id));
-
+        Venda vendaParaAtualizar = vendaRepository.findById(id)                                                                         .orElseThrow(() -> new EntidadeNotFoundException("Venda com ID não encontrada: " + id));
         // 2. Valida o novo funcionário/vendedor
         Funcionario funcionario = funcionarioRepository.findById(dto.getIdVendedor())
                 .orElseThrow(() -> new EntidadeNotFoundException("Vendedor não encontrado"));
@@ -137,64 +136,100 @@ public class VendaService {
         // 3. Atualiza os dados básicos
         vendaParaAtualizar.setFuncionario(funcionario);
         vendaParaAtualizar.setFormaDePagamento(dto.getFormaPagamento());
-
         vendaParaAtualizar.setPercentualComissaoAplicado(funcionario.getComissao());
-        // Opcional: Remova a linha abaixo se quiser manter a data original da venda
         vendaParaAtualizar.setDataHora(LocalDateTime.now());
 
-        // 4. LIMPEZA DOS ITENS ANTIGOS
-        // Importante: Requer orphanRemoval = true na @OneToMany da entidade Venda
+        // 4. MAPEIA QUANTIDADES ANTIGAS POR PRODUTO (ANTES DE LIMPAR)
+        java.util.Map<Integer, Integer> qtdAntigaPorProduto = new java.util.HashMap<>();
+        for (VendaProduto itemAntigo : vendaParaAtualizar.getItens()) {
+            qtdAntigaPorProduto.merge(itemAntigo.getProduto().getId(), itemAntigo.getQuantidadeVendaProduto(),
+                    Integer::sum);
+        }
+
+        // 5. LIMPEZA DOS ITENS ANTIGOS
         vendaParaAtualizar.getItens().clear();
 
-        // 5. VALIDAÇÃO DE ITENS
+        // 6. VALIDAÇÃO DE ITENS NOVOS
         List<VendaProdutoRequestDTO> itensDto = dto.getItensVenda();
         if (itensDto == null || itensDto.isEmpty()) {
             throw new IllegalArgumentException("A venda deve ter pelo menos um item.");
         }
 
+        // 7. MAPEIA QUANTIDADES NOVAS POR PRODUTO E VALIDA DESCONTOS
+        java.util.Map<Integer, Integer> qtdNovaPorProduto = new java.util.HashMap<>();
         Double valorTotal = 0.0;
 
-        // 6. ADIÇÃO DOS NOVOS ITENS
         for (VendaProdutoRequestDTO itemDto : itensDto) {
             Produto produto = produtoRepository.findById(itemDto.getIdProduto())
-                    .orElseThrow(() -> new EntidadeNotFoundException("Produto ID não encontrado: " + itemDto.getIdProduto()));
+                    .orElseThrow(() -> new EntidadeNotFoundException("Produto ID não encontrado: " +
+                            itemDto.getIdProduto()));
 
-            VendaProduto itemVenda = new VendaProduto();
-            itemVenda.setProduto(produto);
-            itemVenda.setQuantidadeVendaProduto(itemDto.getQuantidadeVendaProduto());
+            int qtd = itemDto.getQuantidadeVendaProduto();
+            qtdNovaPorProduto.merge(itemDto.getIdProduto(), qtd, Integer::sum);
 
-            // --- INÍCIO DA LÓGICA DE DESCONTO ---
             Double descontoAplicado = itemDto.getDesconto() != null ? itemDto.getDesconto() : 0.0;
             Double subtotalBruto = produto.getValorUnitario() * itemDto.getQuantidadeVendaProduto();
 
-            // Valida se o desconto não é abusivo/errado
             if (descontoAplicado > subtotalBruto) {
                 throw new IllegalArgumentException("O desconto de R$ " + descontoAplicado + " excede o valor do item.");
             }
 
             Double valorFinalItem = subtotalBruto - descontoAplicado;
-
-            itemVenda.setDesconto(descontoAplicado);
-            itemVenda.setValorTotalVendaProduto(valorFinalItem);
-            // --- FIM DA LÓGICA DE DESCONTO ---
-
-            // Estabelece a relação bilateral (Muito importante para o JPA)
-            itemVenda.setVenda(vendaParaAtualizar);
-
-            // Adiciona na lista que o JPA já está monitorando
-            vendaParaAtualizar.getItens().add(itemVenda);
-
             valorTotal += valorFinalItem;
         }
 
-        // 7. Atualiza o valor total da venda consolidado
+        // 8. AJUSTE DE ESTOQUE (o que saiu ou reduziu volta, o que aumentou sai)
+        for (java.util.Map.Entry<Integer, Integer> entry : qtdAntigaPorProduto.entrySet()) {
+            int idProduto = entry.getKey();
+            int qtdAntiga = entry.getValue();
+            int qtdNova = qtdNovaPorProduto.getOrDefault(idProduto, 0);
+            int diferenca = qtdAntiga - qtdNova;
+
+            if (diferenca > 0) {
+                produtoRepository.findById(idProduto).ifPresent(p -> {
+                    p.setQuantidade(p.getQuantidade() + diferenca);
+                    produtoRepository.save(p);
+                });
+            } else if (diferenca < 0) {
+                produtoRepository.findById(idProduto).ifPresent(p -> {
+                    int falta = Math.abs(diferenca);
+                    if (p.getQuantidade() < falta) {
+                        throw new IllegalArgumentException("Estoque insuficiente para o produto ID: " + idProduto);
+                    }
+                    p.setQuantidade(p.getQuantidade() - falta);
+                    produtoRepository.save(p);
+                });
+            }
+        }
+
+        // 9. CRIAÇÃO DOS NOVOS ITENS
+        for (VendaProdutoRequestDTO itemDto : itensDto) {
+            Produto produto = produtoRepository.findById(itemDto.getIdProduto())
+                    .orElseThrow(() -> new EntidadeNotFoundException("Produto ID não encontrado: " +
+                            itemDto.getIdProduto()));
+
+            VendaProduto itemVenda = new VendaProduto();
+            itemVenda.setProduto(produto);
+            itemVenda.setQuantidadeVendaProduto(itemDto.getQuantidadeVendaProduto());
+
+            Double descontoAplicado = itemDto.getDesconto() != null ? itemDto.getDesconto() : 0.0;
+            Double subtotalBruto = produto.getValorUnitario() * itemDto.getQuantidadeVendaProduto();
+            Double valorFinalItem = subtotalBruto - descontoAplicado;
+
+            itemVenda.setDesconto(descontoAplicado);
+            itemVenda.setValorTotalVendaProduto(valorFinalItem);
+            itemVenda.setVenda(vendaParaAtualizar);
+
+            vendaParaAtualizar.getItens().add(itemVenda);
+        }
+
+        // 10. Atualiza o total
         vendaParaAtualizar.setTotalVenda(valorTotal);
 
-        // 8. PERSISTÊNCIA
-        // O save() aqui vai disparar os DELETEs dos órfãos e os INSERTs dos novos itens
+        // 11. Persiste
         Venda vendaSalva = vendaRepository.save(vendaParaAtualizar);
 
-        // 9. Atualiza comissão
+        // 12. Atualiza comissão
         comissaoService.calcularComissao(vendaSalva);
 
         return vendaMapper.toVendaResponseDTO(vendaSalva);
