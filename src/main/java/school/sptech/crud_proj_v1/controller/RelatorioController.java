@@ -19,11 +19,17 @@ public class RelatorioController {
         this.producer = producer;
     }
 
-    @PostMapping("/{fileKey}")
+    @PostMapping("/{*fileKey}")
     public ResponseEntity<JobResponse> emitirRelatorio(@PathVariable String fileKey) {
-        log.info("Recebendo pedido para enfileirar arquivo: {}", fileKey);
-        String jobId = producer.publish(fileKey);
-        log.info("Job enfileirado: jobId={}, fileKey={}", jobId, fileKey);
-        return ResponseEntity.accepted().body(new JobResponse(jobId));
+        String normalizedKey = fileKey.startsWith("/") ? fileKey.substring(1) : fileKey;
+        log.info("Recebendo requisição de importação. FileKey: {}", normalizedKey);
+        try {
+            String jobId = producer.publish(normalizedKey);
+            log.info("Importação enfileirada com sucesso. JobId: {}, FileKey: {}", jobId, normalizedKey);
+            return ResponseEntity.accepted().body(new JobResponse(jobId));
+        } catch (Exception e) {
+            log.error("Erro ao enfileirar importação para FileKey: {}", normalizedKey, e);
+            throw e;
+        }
     }
 }

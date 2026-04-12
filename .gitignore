@@ -38,3 +38,4 @@ src/main/resources/application.properties
 ### env ###
 .env
 
+src/main/resources/.data-local.sql
