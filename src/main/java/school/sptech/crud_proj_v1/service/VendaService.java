@@ -82,6 +82,7 @@ public class VendaService {
 
             // 5. INJETA NA ENTIDADE PARA O HIBERNATE SALVAR
             itemVenda.setDesconto(descontoAplicado);
+            itemVenda.setPrecoUnitarioNaVenda(produto.getValorUnitario());
             itemVenda.setValorTotalVendaProduto(valorFinalItem);
 
             novosItensDeVenda.add(itemVenda);
@@ -202,6 +203,21 @@ public class VendaService {
             }
         }
 
+        // 8.1 DESCONTAR ESTOQUE DOS PRODUTOS NOVOS (que não existiam na venda anterior)
+        for (java.util.Map.Entry<Integer, Integer> entry : qtdNovaPorProduto.entrySet()) {
+            int idProduto = entry.getKey();
+            if (!qtdAntigaPorProduto.containsKey(idProduto)) {
+                int qtdNova = entry.getValue();
+                produtoRepository.findById(idProduto).ifPresent(p -> {
+                    if (p.getQuantidade() < qtdNova) {
+                        throw new IllegalArgumentException("Estoque insuficiente para o produto ID: " + idProduto);
+                    }
+                    p.setQuantidade(p.getQuantidade() - qtdNova);
+                    produtoRepository.save(p);
+                });
+            }
+        }
+
         // 9. CRIAÇÃO DOS NOVOS ITENS
         for (VendaProdutoRequestDTO itemDto : itensDto) {
             Produto produto = produtoRepository.findById(itemDto.getIdProduto())
@@ -217,6 +233,7 @@ public class VendaService {
             Double valorFinalItem = subtotalBruto - descontoAplicado;
 
             itemVenda.setDesconto(descontoAplicado);
+            itemVenda.setPrecoUnitarioNaVenda(produto.getValorUnitario());
             itemVenda.setValorTotalVendaProduto(valorFinalItem);
             itemVenda.setVenda(vendaParaAtualizar);
 

@@ -1,5 +1,6 @@
 package school.sptech.crud_proj_v1.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -77,7 +78,7 @@ public class ProdutoService {
     }
 
     public List<ProdutoResponse> listarTodos() {
-        List<Produto> produtos = produtoRepository.findAll();
+        List<Produto> produtos = produtoRepository.findAllByAtivoTrue();
 
         return produtos.stream()
                 .map(produto -> {
@@ -102,7 +103,7 @@ public class ProdutoService {
     }
 
     public List<ProdutoResponse> listarProdutosOrdenadoPorMaiorQuantidade() {
-        List<Produto> produtosOrdenados = produtoRepository.findAllByOrderByQuantidadeDesc();
+        List<Produto> produtosOrdenados = produtoRepository.findAllByAtivoTrueOrderByQuantidadeDesc();
 
         return produtosOrdenados.stream()
                 .map(produto -> {
@@ -117,7 +118,7 @@ public class ProdutoService {
     }
 
     public List<ProdutoResponse> listarProdutosOrdenadoPorMenorQuantidade() {
-        List<Produto> produtosOrdenados = produtoRepository.findAllByOrderByQuantidadeAsc();
+        List<Produto> produtosOrdenados = produtoRepository.findAllByAtivoTrueOrderByQuantidadeAsc();
 
         return produtosOrdenados.stream()
                 .map(produto -> {
@@ -133,7 +134,7 @@ public class ProdutoService {
     }
 
     public ProdutoResponse buscarProdutoPorId(Integer id){
-        Produto produto = produtoRepository.findById(id)
+        Produto produto = produtoRepository.findByIdAndAtivoTrue(id)
                 .orElseThrow(() -> new EntidadeNotFoundException("Produto com id não encontrado: " + id));
 
         if (produto instanceof CalcadoProduto calcado) {
@@ -147,7 +148,7 @@ public class ProdutoService {
 
     public CalcadoProdutoResponse atualizarCalcado(Integer id, CalcadoProdutoRequest dto) {
 
-        Produto produtoGenerico = produtoRepository.findById(id)
+        Produto produtoGenerico = produtoRepository.findByIdAndAtivoTrue(id)
                 .orElseThrow(() -> new EntidadeNotFoundException("Produto não encontrado pelo ID: " + id));
 
         if (produtoGenerico instanceof CalcadoProduto calcado) {
@@ -166,7 +167,7 @@ public class ProdutoService {
     }
 
     public OutrosProdutoResponse atualizarOutros(Integer id, OutrosProdutoRequest dto) {
-        Produto produtoGenérico = produtoRepository.findById(id)
+        Produto produtoGenérico = produtoRepository.findByIdAndAtivoTrue(id)
                 .orElseThrow(() -> new EntidadeNotFoundException("Produto não encontrado pelo ID: " + id));
 
         if (produtoGenérico instanceof OutrosProduto outros) {
@@ -186,25 +187,17 @@ public class ProdutoService {
         }
     }
 
+    @Transactional
     public void deletarPorId(Integer id) {
-        if (!produtoRepository.existsById(id)) {
-            throw new EntidadeNotFoundException("Produto não encontrado pelo ID: " + id);
-        }
+        Produto produto = produtoRepository.findByIdAndAtivoTrue(id)
+                .orElseThrow(() -> new EntidadeNotFoundException("Produto não encontrado pelo ID: " + id));
 
-        Integer count = itensVendaRepository.countByProdutoId(id);
-
-        if (count > 0) {
-            throw new ProdutoEmUsoException(
-                    "Produto vinculado a uma ou mais vendas. Não é possível deletar."
-            );
-        }
-
-        produtoRepository.deleteById(id);
+        produtoRepository.softDeleteById(id);
     }
 
 
     public List<ProdutoResponse> buscarProdutoPorCategoria(String categoria) {
-        List<Produto> produtos = produtoRepository.findByCategoriaDescricaoContainingIgnoreCase(categoria);
+        List<Produto> produtos = produtoRepository.findByCategoriaDescricaoContainingIgnoreCaseAndAtivoTrue(categoria);
 
         return produtos.stream()
                 .map(produto -> {
@@ -221,7 +214,7 @@ public class ProdutoService {
     }
 
     public List<ProdutoResponse> buscarProdutoPorCategoriaOrdenadoPorPrecoDesc(String categoria) {
-        List<Produto> produtos = produtoRepository.findByCategoriaDescricaoContainingIgnoreCaseOrderByValorUnitarioDesc(categoria);
+        List<Produto> produtos = produtoRepository.findByCategoriaDescricaoContainingIgnoreCaseAndAtivoTrueOrderByValorUnitarioDesc(categoria);
         return produtos.stream()
                 .map(produto -> {
                     if (produto instanceof CalcadoProduto calcado) {
@@ -236,28 +229,32 @@ public class ProdutoService {
                 .collect(Collectors.toList());
     }
 
-    public CalcadoProdutoResponse buscarCalcadoPorModelo(String modelo){
-        return calcadoMapper.toResponse(produtoRepository.findByModeloContainingIgnoreCase(modelo));
+    public List<CalcadoProdutoResponse> buscarCalcadoPorModelo(String modelo){
+        return calcadoMapper.toResponseList(
+                produtoRepository.findByModeloContainingIgnoreCaseAndAtivoTrue(modelo)
+        );
     }
 
     public List<CalcadoProdutoResponse> buscarCalcadoPorMarca(String marca){
-        return calcadoMapper.toResponseList(produtoRepository.findByMarcaContainingIgnoreCase(marca));
+        return calcadoMapper.toResponseList(produtoRepository.findByMarcaContainingIgnoreCaseAndAtivoTrue(marca));
     }
 
     public List<CalcadoProdutoResponse> buscarCalcadoPorNumero(Integer numero){
-        return calcadoMapper.toResponseList(produtoRepository.findByNumero(numero));
+        return calcadoMapper.toResponseList(produtoRepository.findByNumeroAndAtivoTrue(numero));
     }
 
     public List<CalcadoProdutoResponse> buscarCalcadoPorCor(String cor){
-        return calcadoMapper.toResponseList(produtoRepository.findByCorContainingIgnoreCase(cor));
+        return calcadoMapper.toResponseList(produtoRepository.findByCorContainingIgnoreCaseAndAtivoTrue(cor));
     }
 
-    public OutrosProdutoResponse buscarOutrosPorNome(String nome) {
-        return outrosMapper.toResponse(produtoRepository.findByNomeContainingIgnoreCase(nome));
+    public List<OutrosProdutoResponse> buscarOutrosPorNome(String nome) {
+        return outrosMapper.toResponseList(
+                produtoRepository.findByNomeContainingIgnoreCaseAndAtivoTrue(nome)
+        );
     }
 
     public List<OutrosProdutoResponse> buscarOutrosPorDescricao(String descricao) {
-        return outrosMapper.toResponseList(produtoRepository.findByDescricaoContainingIgnoreCase(descricao));
+        return outrosMapper.toResponseList(produtoRepository.findByDescricaoContainingIgnoreCaseAndAtivoTrue(descricao));
     }
 
     public void diminuirEstoque(Integer idProduto, Integer quantidadeVendida){

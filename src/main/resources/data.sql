@@ -92,22 +92,22 @@ ALTER TABLE CATEGORIA ALTER COLUMN id RESTART WITH 20;
 -- 5. PRODUTOS
 -- ==================================================================
 
-INSERT INTO PRODUTO (id, nome, descricao, modelo, marca, numero, cor, preco_custo, valor_unitario, quantidade, fk_categoria) VALUES
-(1, 'Chinelo Havaianas Top', 'Chinelo tradicional de borracha, confortável para o uso diário.', 'Top Clássico', 'Havaianas', 38, 'Azul', 14.50, 29.90, 100, 6),
-(2, 'Tênis Nike Revolution 6', 'Tênis de corrida leve e respirável com amortecimento macio.', 'Revolution 6', 'Nike', 42, 'Preto', 195.00, 399.90, 50, 3),
-(3, 'Tênis Adidas Ultraboost 22', 'Tênis de alta performance com retorno de energia excepcional.', 'Ultraboost 22', 'Adidas', 40, 'Branco', 450.00, 799.90, 20, 3),
-(4, 'Sandália Vizzano Salto Fino', 'Sandália elegante com salto fino e fechamento ajustável.', 'Salto Fino', 'Vizzano', 37, 'Bege', 60.00, 149.90, 35, 5),
-(5, 'Bota Coturno Dakota Tratorado', 'Coturno robusto com sola tratorada e acabamento resistente.', 'Coturno Tratorado', 'Dakota', 36, 'Preto', 120.00, 249.90, 15, 7),
-(6, 'Sapato Social Pegada Couro', 'Sapato social masculino em couro legítimo, design clássico.', 'Social Couro', 'Pegada', 41, 'Marrom', 110.00, 229.90, 25, 8),
-(7, 'Tênis Mizuno Wave Titan', 'Tênis esportivo com placa Wave para maior estabilidade.', 'Wave Titan', 'Mizuno', 43, 'Cinza', 200.00, 499.90, 40, 3),
-(8, 'Chuteira Puma Future Match', 'Chuteira de campo para máximo controle de bola.', 'Future Match', 'Puma', 39, 'Laranja', 180.00, 349.90, 30, 9),
-(9, 'Tênis Converse Chuck Taylor', 'O clássico tênis de lona unissex com cano baixo.', 'Chuck Taylor', 'Converse', 38, 'Branco', 100.00, 229.90, 60, 4),
-(10, 'Tênis Vans Old Skool', 'Tênis casual de lona e camurça com a icônica sidestripe.', 'Old Skool', 'Vans', 40, 'Preto', 180.00, 379.90, 45, 4),
-(11, 'Kit 3 Pares de Meia Lupo', 'Meias esportivas de algodão com cano médio.', 'Kit 3 Pares', 'Lupo', 40, 'Branca', 15.00, 39.90, 200, 11),
-(12, 'Cinto Masculino Fasolo Couro', 'Cinto social masculino confeccionado em couro legítimo.', 'Cinto Couro', 'Fasolo', 100, 'Preto', 35.00, 79.90, 50, 10),
-(13, 'Mochila Nike Brasilia JDI', 'Mochila compacta com compartimento principal espaçoso.', 'Brasilia JDI', 'Nike', 0, 'Preto', 80.00, 179.90, 20, 12),
-(14, 'Sandália Kenner Rakuka', 'Sandália com palmilha extra macia e solado de borracha.', 'Rakuka', 'Kenner', 41, 'Vermelho', 45.00, 119.90, 80, 6),
-(15, 'Bota Chelsea Democrata', 'Bota masculina premium com elástico lateral para fácil calce.', 'Chelsea', 'Democrata', 42, 'Marrom', 160.00, 329.90, 18, 7);
+INSERT INTO PRODUTO (id, nome, descricao, modelo, marca, numero, cor, preco_custo, valor_unitario, quantidade, fk_categoria, ativo) VALUES
+(1, 'Chinelo Havaianas Top', 'Chinelo tradicional de borracha, confortável para o uso diário.', 'Top Clássico', 'Havaianas', 38, 'Azul', 14.50, 29.90, 100, 6, true),
+(2, 'Tênis Nike Revolution 6', 'Tênis de corrida leve e respirável com amortecimento macio.', 'Revolution 6', 'Nike', 42, 'Preto', 195.00, 399.90, 50, 3, true),
+(3, 'Tênis Adidas Ultraboost 22', 'Tênis de alta performance com retorno de energia excepcional.', 'Ultraboost 22', 'Adidas', 40, 'Branco', 450.00, 799.90, 20, 3, true),
+(4, 'Sandália Vizzano Salto Fino', 'Sandália elegante com salto fino e fechamento ajustável.', 'Salto Fino', 'Vizzano', 37, 'Bege', 60.00, 149.90, 35, 5, true),
+(5, 'Bota Coturno Dakota Tratorado', 'Coturno robusto com sola tratorada e acabamento resistente.', 'Coturno Tratorado', 'Dakota', 36, 'Preto', 120.00, 249.90, 15, 7, true),
+(6, 'Sapato Social Pegada Couro', 'Sapato social masculino em couro legítimo, design clássico.', 'Social Couro', 'Pegada', 41, 'Marrom', 110.00, 229.90, 25, 8, true),
+(7, 'Tênis Mizuno Wave Titan', 'Tênis esportivo com placa Wave para maior estabilidade.', 'Wave Titan', 'Mizuno', 43, 'Cinza', 200.00, 499.90, 40, 3, true),
+(8, 'Chuteira Puma Future Match', 'Chuteira de campo para máximo controle de bola.', 'Future Match', 'Puma', 39, 'Laranja', 180.00, 349.90, 30, 9, true),
+(9, 'Tênis Converse Chuck Taylor', 'O clássico tênis de lona unissex com cano baixo.', 'Chuck Taylor', 'Converse', 38, 'Branco', 100.00, 229.90, 60, 4, true),
+(10, 'Tênis Vans Old Skool', 'Tênis casual de lona e camurça com a icônica sidestripe.', 'Old Skool', 'Vans', 40, 'Preto', 180.00, 379.90, 45, 4, true),
+(11, 'Kit 3 Pares de Meia Lupo', 'Meias esportivas de algodão com cano médio.', 'Kit 3 Pares', 'Lupo', 40, 'Branca', 15.00, 39.90, 200, 11, true),
+(12, 'Cinto Masculino Fasolo Couro', 'Cinto social masculino confeccionado em couro legítimo.', 'Cinto Couro', 'Fasolo', 100, 'Preto', 35.00, 79.90, 50, 10, true),
+(13, 'Mochila Nike Brasilia JDI', 'Mochila compacta com compartimento principal espaçoso.', 'Brasilia JDI', 'Nike', 0, 'Preto', 80.00, 179.90, 20, 12, true),
+(14, 'Sandália Kenner Rakuka', 'Sandália com palmilha extra macia e solado de borracha.', 'Rakuka', 'Kenner', 41, 'Vermelho', 45.00, 119.90, 80, 6, true),
+(15, 'Bota Chelsea Democrata', 'Bota masculina premium com elástico lateral para fácil calce.', 'Chelsea', 'Democrata', 42, 'Marrom', 160.00, 329.90, 18, 7, true);
 
 ALTER TABLE PRODUTO ALTER COLUMN id RESTART WITH 20;
 

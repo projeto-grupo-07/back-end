@@ -106,7 +106,7 @@ public class CategoriaService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Categoria não encontrada");
         }
 
-        if (produtoRepository.existsByCategoriaId(id)) {
+        if (produtoRepository.existsByCategoriaIdAndAtivoTrue(id)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Não é possível deletar a categoria, pois existem produtos associados a ela.");
         }
 

@@ -37,4 +37,5 @@ public abstract class Produto {
     @ManyToOne
     @JoinColumn(name = "fk_categoria")
     private Categoria categoria;
+    private Boolean ativo = true;
 }

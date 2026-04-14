@@ -103,7 +103,7 @@ public class ProdutoController {
     @GetMapping("/calcado/por-modelo/{modelo}")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método lista o calcado pelo modelo")
-    public ResponseEntity<CalcadoProdutoResponse> buscarPorCalcadoModelo(@PathVariable String modelo) {
+    public ResponseEntity<List<CalcadoProdutoResponse>> buscarPorCalcadoModelo(@PathVariable String modelo) {
         log.info("Requisição para listar calçados por modelo recebida. Modelo: {}", modelo);
         return ResponseEntity.status(200).body(service.buscarCalcadoPorModelo(modelo));
     }
@@ -148,9 +148,9 @@ public class ProdutoController {
     @GetMapping("/outros/por-nome/{nome}")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Esse método lista os outros por nome")
-    public ResponseEntity<OutrosProdutoResponse> buscarOutrosPorNome(@PathVariable String nome) {
+    public ResponseEntity<List<OutrosProdutoResponse>> buscarOutrosPorNome(@PathVariable String nome) {
         log.info("Requisição para listar todos os outros produtos por nome recebida. Nome: {}", nome);
-        return ResponseEntity.status(200).body(service.buscarOutrosPorNome(nome));
+        return  ResponseEntity.status(200).body(service.buscarOutrosPorNome(nome));
     }
 
 

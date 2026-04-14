@@ -117,7 +117,7 @@ class CategoriaServiceTest {
     @DisplayName("Deletar: deve lançar exceção quando houver produtos associados")
     void deletarComProdutosAssociados() {
         when(categoriaRepository.existsById(1)).thenReturn(true);
-        when(produtoRepository.existsByCategoriaId(1)).thenReturn(true);
+        when(produtoRepository.existsByCategoriaIdAndAtivoTrue(1)).thenReturn(true);
 
         assertThrows(ResponseStatusException.class, () -> service.deletarPorId(1));
         verify(categoriaRepository, never()).deleteById(any());
@@ -127,7 +127,7 @@ class CategoriaServiceTest {
     @DisplayName("Deletar: deve deletar com sucesso quando não houver produtos associados")
     void deletarComSucesso() {
         when(categoriaRepository.existsById(1)).thenReturn(true);
-        when(produtoRepository.existsByCategoriaId(1)).thenReturn(false);
+        when(produtoRepository.existsByCategoriaIdAndAtivoTrue(1)).thenReturn(false);
 
         service.deletarPorId(1);
 
