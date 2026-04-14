@@ -1,8 +1,11 @@
 package school.sptech.crud_proj_v1.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import school.sptech.crud_proj_v1.entity.CalcadoProduto;
 import school.sptech.crud_proj_v1.entity.OutrosProduto;
 import school.sptech.crud_proj_v1.entity.abstrato.Produto;
@@ -38,4 +41,11 @@ public interface ProdutoRepository extends JpaRepository<Produto, Integer> {
     void softDeleteById(Integer id);
 
     Optional<Produto> findByIdAndAtivoTrue(Integer id);
+
+    // Paginação server-side — Offset (Spring Data Page)
+    Page<Produto> findAllByAtivoTrue(Pageable pageable);
+
+    // Paginação server-side — Cursor (WHERE id > :cursor LIMIT :tamanho)
+    @Query("SELECT p FROM Produto p WHERE p.id > :cursor AND p.ativo = true ORDER BY p.id ASC")
+    List<Produto> findByIdGreaterThanAndAtivoTrueOrderByIdAsc(@Param("cursor") int cursor, Pageable pageable);
 }
