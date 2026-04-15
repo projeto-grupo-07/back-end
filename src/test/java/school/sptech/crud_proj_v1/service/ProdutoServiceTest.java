@@ -16,6 +16,9 @@ import school.sptech.crud_proj_v1.event.ProdutoCadastradoEvent;
 import school.sptech.crud_proj_v1.exception.EntidadeNotFoundException;
 import school.sptech.crud_proj_v1.mapper.CalcadoProdutoMapper;
 import school.sptech.crud_proj_v1.mapper.OutrosProdutoMapper;
+import school.sptech.crud_proj_v1.paginacao.dominio.PaginaCursorProduto;
+import school.sptech.crud_proj_v1.paginacao.dominio.PaginaOffsetProduto;
+import school.sptech.crud_proj_v1.paginacao.dominio.PaginacaoStrategy;
 import school.sptech.crud_proj_v1.repository.CategoriaRepository;
 import school.sptech.crud_proj_v1.repository.ProdutoRepository;
 
@@ -40,6 +43,10 @@ class ProdutoServiceTest {
     private CalcadoProdutoMapper calcadoMapper;
     @Mock
     private OutrosProdutoMapper outrosMapper;
+    @Mock
+    private PaginacaoStrategy<PaginaOffsetProduto> offsetStrategy;
+    @Mock
+    private PaginacaoStrategy<PaginaCursorProduto> cursorStrategy;
 
     @InjectMocks
     private ProdutoService service;

@@ -47,5 +47,5 @@ public interface ProdutoRepository extends JpaRepository<Produto, Integer> {
 
     // Paginação server-side — Cursor (WHERE id > :cursor LIMIT :tamanho)
     @Query("SELECT p FROM Produto p WHERE p.id > :cursor AND p.ativo = true ORDER BY p.id ASC")
-    List<Produto> findByIdGreaterThanAndAtivoTrueOrderByIdAsc(@Param("cursor") int cursor, Pageable pageable);
+    List<Produto> findByIdGreaterThanAndAtivoTrueOrderByIdAsc(@Param("cursor") int cursor, @Param("tamanho") int tamanho);
 }

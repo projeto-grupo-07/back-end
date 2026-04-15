@@ -1,7 +1,6 @@
 package school.sptech.crud_proj_v1.service;
 
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
@@ -17,15 +16,18 @@ import school.sptech.crud_proj_v1.exception.EntidadeNotFoundException;
 import school.sptech.crud_proj_v1.exception.ProdutoEmUsoException;
 import school.sptech.crud_proj_v1.mapper.CalcadoProdutoMapper;
 import school.sptech.crud_proj_v1.mapper.OutrosProdutoMapper;
+import school.sptech.crud_proj_v1.paginacao.dominio.PaginaCursorProduto;
+import school.sptech.crud_proj_v1.paginacao.dominio.PaginaOffsetProduto;
+import school.sptech.crud_proj_v1.paginacao.dominio.PaginacaoStrategy;
 import school.sptech.crud_proj_v1.repository.CategoriaRepository;
 import school.sptech.crud_proj_v1.repository.VendaProdutoRepository;
 import school.sptech.crud_proj_v1.repository.ProdutoRepository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @Slf4j
 @Service
 public class ProdutoService {
@@ -36,6 +38,32 @@ public class ProdutoService {
     private final CalcadoProdutoMapper calcadoMapper;
     private final OutrosProdutoMapper outrosMapper;
     private final VendaProdutoRepository itensVendaRepository;
+    private final PaginacaoStrategy<PaginaOffsetProduto> offsetStrategy;
+    private final PaginacaoStrategy<PaginaCursorProduto> cursorStrategy;
+
+    public ProdutoService(
+            ProdutoRepository produtoRepository,
+            CategoriaRepository categoriaRepository,
+            ApplicationEventPublisher eventPublisher,
+            FuncionarioService funcionarioService,
+            CalcadoProdutoMapper calcadoMapper,
+            OutrosProdutoMapper outrosMapper,
+            VendaProdutoRepository itensVendaRepository,
+            @org.springframework.beans.factory.annotation.Qualifier("produtoOffsetStrategy")
+            PaginacaoStrategy<PaginaOffsetProduto> offsetStrategy,
+            @org.springframework.beans.factory.annotation.Qualifier("produtoCursorStrategy")
+            PaginacaoStrategy<PaginaCursorProduto> cursorStrategy
+    ) {
+        this.produtoRepository = produtoRepository;
+        this.categoriaRepository = categoriaRepository;
+        this.eventPublisher = eventPublisher;
+        this.funcionarioService = funcionarioService;
+        this.calcadoMapper = calcadoMapper;
+        this.outrosMapper = outrosMapper;
+        this.itensVendaRepository = itensVendaRepository;
+        this.offsetStrategy = offsetStrategy;
+        this.cursorStrategy = cursorStrategy;
+    }
 
     private void configurarCategoria(Produto produto, Integer categoriaId) {
         if (categoriaId != null) {
@@ -276,5 +304,13 @@ public class ProdutoService {
 
         produto.setQuantidade(produto.getQuantidade() + quantidade);
         produtoRepository.save(produto);
+    }
+
+    public PaginaOffsetProduto buscarPaginaOffset(int pagina, int tamanho) {
+        return offsetStrategy.paginar(Map.of("pagina", pagina, "tamanho", tamanho));
+    }
+
+    public PaginaCursorProduto buscarPaginaCursor(int cursor, int tamanho) {
+        return cursorStrategy.paginar(Map.of("cursor", cursor, "tamanho", tamanho));
     }
 }

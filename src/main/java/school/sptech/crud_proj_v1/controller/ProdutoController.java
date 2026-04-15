@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.sptech.crud_proj_v1.dto.Produto.*;
+import school.sptech.crud_proj_v1.dto.paginacao.PaginaCursorProdutoResposta;
+import school.sptech.crud_proj_v1.dto.paginacao.PaginaOffsetProdutoResposta;
 import school.sptech.crud_proj_v1.service.ProdutoService;
 
 import java.util.List;
@@ -253,5 +255,34 @@ public class ProdutoController {
     public ResponseEntity<Void> deletarProdutoPorId(@PathVariable Integer id) {
         service.deletarPorId(id);
         return ResponseEntity.status(204).build();
+    }
+
+    @GetMapping("/paginas")
+    @SecurityRequirement(name = "Bearer")
+    @Operation(summary = "Lista produtos com paginação offset")
+    public ResponseEntity<PaginaOffsetProdutoResposta> listarComOffset(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "20") int tamanho
+    ) {
+        log.info("Requisição para paginação offset: pagina={}, tamanho={}", pagina, tamanho);
+        PaginaOffsetProdutoResposta resposta = PaginaOffsetProdutoResposta.de(
+                service.buscarPaginaOffset(pagina, tamanho)
+        );
+        return ResponseEntity.ok(resposta);
+    }
+
+    @GetMapping("/cursor")
+    @SecurityRequirement(name = "Bearer")
+    @Operation(summary = "Lista produtos com paginação cursor")
+    public ResponseEntity<PaginaCursorProdutoResposta> listarComCursor(
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = "20") int tamanho
+    ) {
+        log.info("Requisição para paginação cursor: cursor={}, tamanho={}", cursor, tamanho);
+        int cursorId = PaginaCursorProdutoResposta.decodificarCursor(cursor);
+        PaginaCursorProdutoResposta resposta = PaginaCursorProdutoResposta.de(
+                service.buscarPaginaCursor(cursorId, tamanho)
+        );
+        return ResponseEntity.ok(resposta);
     }
 }
