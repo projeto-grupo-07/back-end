@@ -44,6 +44,7 @@ public class VendaMapper {
 
         if (venda.getFuncionario() != null) {
             dto.setIdVendedor(venda.getFuncionario().getId());
+            dto.setFuncionarioNome(venda.getFuncionario().getNome());
         }
 
         if (venda.getItens() != null) {

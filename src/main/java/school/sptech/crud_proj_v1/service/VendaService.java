@@ -20,11 +20,16 @@ import school.sptech.crud_proj_v1.projection.*;
 import school.sptech.crud_proj_v1.repository.FuncionarioRepository;
 import school.sptech.crud_proj_v1.repository.ProdutoRepository;
 import school.sptech.crud_proj_v1.repository.VendaRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
+import school.sptech.crud_proj_v1.paginacao.dominio.PaginaOffsetVenda;
+import school.sptech.crud_proj_v1.paginacao.dominio.PaginaCursorVenda;
+import school.sptech.crud_proj_v1.paginacao.dominio.PaginacaoStrategy;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -36,6 +41,8 @@ public class VendaService {
     private final VendaMapper vendaMapper;
     private final ComissaoService comissaoService;
     private final ProdutoService produtoService;
+    private final PaginacaoStrategy<PaginaOffsetVenda> offsetStrategy;
+    private final PaginacaoStrategy<PaginaCursorVenda> cursorStrategy;
 
 
 
@@ -283,6 +290,14 @@ public class VendaService {
         if (valor == null) return 0.0;
         return Double.valueOf(valor);
 
+    }
+
+    public PaginaOffsetVenda buscarPaginaOffset(int pagina, int tamanho) {
+        return offsetStrategy.paginar(Map.of("pagina", pagina, "tamanho", tamanho));
+    }
+
+    public PaginaCursorVenda buscarPaginaCursor(int cursor, int tamanho) {
+        return cursorStrategy.paginar(Map.of("cursor", cursor, "tamanho", tamanho));
     }
 
 }

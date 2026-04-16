@@ -18,6 +18,8 @@ import school.sptech.crud_proj_v1.projection.MetodoPagamentoProjection;
 import school.sptech.crud_proj_v1.projection.ProdutoRentavelProjection;
 import school.sptech.crud_proj_v1.repository.VendaRepository;
 import school.sptech.crud_proj_v1.service.VendaService;
+import school.sptech.crud_proj_v1.dto.paginacao.PaginaOffsetVendaResposta;
+import school.sptech.crud_proj_v1.dto.paginacao.PaginaCursorVendaResposta;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,6 +33,33 @@ public class VendaController {
 
     public VendaController(VendaService service) {
         this.service = service;
+    }
+
+    @GetMapping("/paginas")
+    @SecurityRequirement(name = "Bearer")
+    @Operation(summary = "Lista vendas com paginação offset")
+    public ResponseEntity<PaginaOffsetVendaResposta> listarComOffset(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "15") int tamanho
+    ) {
+        PaginaOffsetVendaResposta resposta = PaginaOffsetVendaResposta.de(
+                service.buscarPaginaOffset(pagina, tamanho)
+        );
+        return ResponseEntity.ok(resposta);
+    }
+
+    @GetMapping("/cursor")
+    @SecurityRequirement(name = "Bearer")
+    @Operation(summary = "Lista vendas com paginação cursor")
+    public ResponseEntity<PaginaCursorVendaResposta> listarComCursor(
+            @RequestParam(required = false) String cursor,
+            @RequestParam(defaultValue = "15") int tamanho
+    ) {
+        int cursorId = PaginaCursorVendaResposta.decodificarCursor(cursor);
+        PaginaCursorVendaResposta resposta = PaginaCursorVendaResposta.de(
+                service.buscarPaginaCursor(cursorId, tamanho)
+        );
+        return ResponseEntity.ok(resposta);
     }
 
     //endpoint Augusto (2)

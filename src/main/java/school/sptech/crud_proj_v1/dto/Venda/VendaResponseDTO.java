@@ -16,6 +16,9 @@ public class VendaResponseDTO {
     @Schema(example = "1", description = "Esse campo representa a chave estrangeira do funcionário que fez a venda")
     private Integer idVendedor;
 
+    @Schema(example = "João Silva", description = "Nome do funcionário que realizou a venda")
+    private String funcionarioNome;
+
     @Schema(example = "239.90", description = "Esse campo representa o valor final da venda a ser pago")
     private Double valorTotalDaVenda;
 
@@ -48,6 +51,14 @@ public class VendaResponseDTO {
 
     public void setIdVendedor(Integer idVendedor) {
         this.idVendedor = idVendedor;
+    }
+
+    public String getFuncionarioNome() {
+        return funcionarioNome;
+    }
+
+    public void setFuncionarioNome(String funcionarioNome) {
+        this.funcionarioNome = funcionarioNome;
     }
 
     public Double getValorTotalDaVenda() {
