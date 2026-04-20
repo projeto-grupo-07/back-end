@@ -81,4 +81,11 @@ public class ClienteService {
         }
         clienteRepository.deleteById(id);
     }
+
+    public List<ClienteResponseDto> buscarPorNome(String nome){
+        return clienteRepository.findByNomeContainingIgnoreCase(nome)
+                .stream()
+                .map(ClienteMapper::of)
+                .toList();
+    }
 }

@@ -88,6 +88,14 @@ public class ClienteController {
         return ResponseEntity.status(204).build();
     }
 
+    public ResponseEntity<List<ClienteResponseDto>> buscarPorNome(@RequestParam String nome){
+        log.info("Buscando clientes pelo nome: {}", nome);
+        List<ClienteResponseDto> clientes = service.buscarPorNome(nome);
+        if(clientes.isEmpty()){
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(200).body(clientes);
+    }
 }
 
 
