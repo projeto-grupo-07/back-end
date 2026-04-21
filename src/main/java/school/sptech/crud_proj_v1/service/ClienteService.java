@@ -1,5 +1,6 @@
 package school.sptech.crud_proj_v1.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.sptech.crud_proj_v1.dto.Cliente.ClienteRequestDto;
@@ -34,6 +35,7 @@ public class ClienteService {
         return ClienteMapper.of(cliente);
     }
 
+    @Transactional
     public ClienteResponseDto cadastrar(ClienteRequestDto dto){
         if (clienteRepository.existsByCpf(dto.getCpf())){
             throw new EntidadeConflitoException("Já existe um cliente com este CPF cadastrado: " + dto.getCpf());
@@ -43,12 +45,19 @@ public class ClienteService {
             throw new EntidadeConflitoException("Já existe um cliente com este email cadastrado: " + dto.getEmail());
         }
 
-        // ao cadastrar o cliente, checa se o endereço dele existe, e se não existir, ele da um exception de entidade not found
-        Endereco endereco = enderecoRepository.findById(dto.getIdEndereco())
-                .orElseThrow(() -> new EntidadeNotFoundException("Endereço não encontrado: " + dto.getIdEndereco()));
+        Endereco endereco = new Endereco();
+        endereco.setCep(dto.getCep());
+        endereco.setEstado(dto.getEstado());
+        endereco.setCidade(dto.getCidade());
+        endereco.setBairro(dto.getBairro());
+        endereco.setLogradouro(dto.getLogradouro());
+        endereco.setNumero(dto.getNumero());
+        endereco.setComplemento(dto.getComplemento());
+
+        Endereco enderecoSalvo = enderecoRepository.save(endereco);
 
         Cliente cliente = ClienteMapper.toEntity(dto);
-        cliente.setEndereco(endereco);
+        cliente.setEndereco(enderecoSalvo);
         cliente.setDtCadastro(LocalDate.now());
 
         return ClienteMapper.of(clienteRepository.save(cliente));
@@ -65,12 +74,12 @@ public class ClienteService {
         cliente.setTelefone(dto.getTelefone());
         cliente.setCpf(dto.getCpf());
 
-        if(dto.getIdEndereco() != null){
-            Endereco endereco = enderecoRepository.findById(dto.getIdEndereco())
-                    .orElseThrow(() -> new EntidadeNotFoundException("Endereço não encontrado: " + dto.getIdEndereco()));
+
+            Endereco endereco = enderecoRepository.findById(cliente.getEndereco().getId())
+                    .orElseThrow(() -> new EntidadeNotFoundException("Endereço não encontrado: " + cliente.getEndereco().getId()));
 
             cliente.setEndereco(endereco);
-        }
+
 
         return ClienteMapper.of(clienteRepository.save(cliente));
     }

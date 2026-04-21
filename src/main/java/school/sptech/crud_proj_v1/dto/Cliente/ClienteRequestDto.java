@@ -1,12 +1,12 @@
 package school.sptech.crud_proj_v1.dto.Cliente;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
+import lombok.Data;
 import org.hibernate.validator.constraints.br.CPF;
 
 import java.time.LocalDate;
 
+@Data
 public class ClienteRequestDto {
 
     @NotBlank
@@ -28,62 +28,31 @@ public class ClienteRequestDto {
     @CPF
     private String cpf;
 
-    @NotNull
-    private Integer idEndereco;
+    @NotBlank
+    @Size(min = 9, max = 9, message = "O CEP deve ter 9 caracteres (ex: 00000-000)")
+    @Pattern(regexp = "^\\d{5}-\\d{3}$", message = "O CEP deve seguir o formato 00000-000")
+    private String cep;
 
-    public String getNome() {
-        return nome;
-    }
+    @NotBlank
+    @Size(min = 2, max = 2, message = "O Estado deve ter 2 caracteres (ex: SP)")
+    private String estado;
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+    @NotBlank
+    @Size(max = 45)
+    private String cidade;
 
-    public LocalDate getDtNasc() {
-        return dtNasc;
-    }
+    @NotBlank
+    @Size(max = 45)
+    private String bairro;
 
-    public void setDtNasc(LocalDate dtNasc) {
-        this.dtNasc = dtNasc;
-    }
+    @NotBlank
+    @Size(max = 45)
+    private String logradouro;
 
-    public String getEmail() {
-        return email;
-    }
+    @NotNull(message = "O número é obrigatório")
+    @Positive(message = "O número deve ser positivo")
+    private Integer numero;
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Character getGenero() {
-        return genero;
-    }
-
-    public void setGenero(Character genero) {
-        this.genero = genero;
-    }
-
-    public String getTelefone() {
-        return telefone;
-    }
-
-    public void setTelefone(String telefone) {
-        this.telefone = telefone;
-    }
-
-    public String getCpf() {
-        return cpf;
-    }
-
-    public void setCpf(String cpf) {
-        this.cpf = cpf;
-    }
-
-    public Integer getIdEndereco() {
-        return idEndereco;
-    }
-
-    public void setIdEndereco(Integer idEndereco) {
-        this.idEndereco = idEndereco;
-    }
+    @Size(max = 100)
+    private String complemento;
 }

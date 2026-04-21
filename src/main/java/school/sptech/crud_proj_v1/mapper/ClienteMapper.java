@@ -43,7 +43,7 @@ public class ClienteMapper {
             Endereco endereco = cliente.getEndereco();
 
             EnderecoResponseDto enderecoDto = new EnderecoResponseDto();
-            
+
             enderecoDto.setId(endereco.getId());
             enderecoDto.setCep(endereco.getCep());
             enderecoDto.setEstado(endereco.getEstado());
@@ -53,7 +53,13 @@ public class ClienteMapper {
             enderecoDto.setNumero(endereco.getNumero());
             enderecoDto.setComplemento(endereco.getComplemento());
 
-            dto.setEndereco(enderecoDto);
+            dto.setCep(enderecoDto.getCep());
+            dto.setEstado(enderecoDto.getEstado());
+            dto.setCidade(enderecoDto.getCidade());
+            dto.setBairro(enderecoDto.getBairro());
+            dto.setLogradouro(enderecoDto.getLogradouro());
+            dto.setNumero(enderecoDto.getNumero());
+            dto.setComplemento(enderecoDto.getComplemento());
         }
 
         return dto;
