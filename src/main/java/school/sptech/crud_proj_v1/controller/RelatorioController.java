@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import school.sptech.crud_proj_v1.Relatorio.RabbitImportProducer;
+import school.sptech.crud_proj_v1.relatorio.RabbitImportProducer;
 import school.sptech.crud_proj_v1.dto.RabbitMQ.JobResponse;
 
 @RestController

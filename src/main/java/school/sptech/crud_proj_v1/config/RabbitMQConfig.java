@@ -7,25 +7,40 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    public static final String QUEUE = "import_csv_queue";
-    public static final String EXCHANGE = "import_exchange";
-    public static final String ROUTING_KEY = "import.csv";
+    public static final String IMPORT_QUEUE = "import_csv_queue";
+    public static final String EMAIL_QUEUE = "email_queue";
+    public static final String EXCHANGE = "brinks_exchange";
+    public static final String IMPORT_ROUTING_KEY = "import.csv";
+    public static final String EMAIL_ROUTING_KEY = "email.send";
 
     @Bean
     public Queue importQueue() {
-        return QueueBuilder.durable(QUEUE).build();
+        return QueueBuilder.durable(IMPORT_QUEUE).build();
     }
 
     @Bean
-    public DirectExchange importExchange() {
+    public Queue emailQueue(){
+        return QueueBuilder.durable(EMAIL_QUEUE).build();
+    }
+
+    @Bean
+    public DirectExchange Exchange() {
         return new DirectExchange(EXCHANGE);
     }
 
     @Bean
-    public Binding binding() {
+    public Binding importBinding() {
         return BindingBuilder
                 .bind(importQueue())
-                .to(importExchange())
-                .with(ROUTING_KEY);
+                .to(Exchange())
+                .with(IMPORT_ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding emailBinding() {
+        return BindingBuilder
+                .bind(emailQueue())
+                .to(Exchange())
+                .with(EMAIL_ROUTING_KEY);
     }
 }

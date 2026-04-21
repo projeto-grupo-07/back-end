@@ -1,4 +1,4 @@
-package school.sptech.crud_proj_v1.Relatorio;
+package school.sptech.crud_proj_v1.relatorio;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -30,11 +30,11 @@ public class RabbitImportProducer {
         try {
             rabbitTemplate.convertAndSend(
                     RabbitMQConfig.EXCHANGE,
-                    RabbitMQConfig.ROUTING_KEY,
+                    RabbitMQConfig.IMPORT_ROUTING_KEY,
                     jsonPayload
             );
             log.info("Mensagem publicada no RabbitMQ com sucesso. Exchange: {}, RoutingKey: {}, JobId: {}",
-                    RabbitMQConfig.EXCHANGE, RabbitMQConfig.ROUTING_KEY, compositeJobId);
+                    RabbitMQConfig.EXCHANGE, RabbitMQConfig.IMPORT_ROUTING_KEY, compositeJobId);
         } catch (Exception e) {
             log.error("Erro ao publicar mensagem no RabbitMQ para JobId: {}", compositeJobId, e);
             throw new RuntimeException("Falha ao publicar mensagem no RabbitMQ", e);
