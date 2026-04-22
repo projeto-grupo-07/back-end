@@ -1,6 +1,9 @@
 package school.sptech.crud_proj_v1.config;
 
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,6 +17,13 @@ public class RabbitMQConfig {
     public static final String EMAIL_ROUTING_KEY = "email.send";
 
     @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        RabbitTemplate template = new RabbitTemplate(connectionFactory);
+        template.setMessageConverter(new Jackson2JsonMessageConverter());
+        return template;
+    }
+
+    @Bean
     public Queue importQueue() {
         return QueueBuilder.durable(IMPORT_QUEUE).build();
     }
@@ -24,7 +34,7 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public DirectExchange Exchange() {
+    public DirectExchange brinksExchange() {
         return new DirectExchange(EXCHANGE);
     }
 
@@ -32,7 +42,7 @@ public class RabbitMQConfig {
     public Binding importBinding() {
         return BindingBuilder
                 .bind(importQueue())
-                .to(Exchange())
+                .to(brinksExchange())
                 .with(IMPORT_ROUTING_KEY);
     }
 
@@ -40,7 +50,7 @@ public class RabbitMQConfig {
     public Binding emailBinding() {
         return BindingBuilder
                 .bind(emailQueue())
-                .to(Exchange())
+                .to(brinksExchange())
                 .with(EMAIL_ROUTING_KEY);
     }
 }

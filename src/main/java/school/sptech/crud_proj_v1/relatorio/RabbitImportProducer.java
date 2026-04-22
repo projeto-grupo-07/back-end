@@ -33,7 +33,7 @@ public class RabbitImportProducer {
                     RabbitMQConfig.IMPORT_ROUTING_KEY,
                     jsonPayload
             );
-            log.info("Mensagem publicada no RabbitMQ com sucesso. Exchange: {}, RoutingKey: {}, JobId: {}",
+            log.info("Mensagem publicada no RabbitMQ com sucesso. brinksExchange: {}, RoutingKey: {}, JobId: {}",
                     RabbitMQConfig.EXCHANGE, RabbitMQConfig.IMPORT_ROUTING_KEY, compositeJobId);
         } catch (Exception e) {
             log.error("Erro ao publicar mensagem no RabbitMQ para JobId: {}", compositeJobId, e);

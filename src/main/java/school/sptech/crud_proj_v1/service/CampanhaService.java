@@ -149,10 +149,11 @@ public class CampanhaService {
                         campanha.getAssunto(),
                         campanha.getCorpoTexto()
                 ));
-            } catch (Exception e) {
-                failures++;
-                log.error("Erro ao enfileirar email para {}: {}", email, e.getMessage());
-            }
+            }catch (Exception e) {
+            failures++;
+            log.error("Erro ao enfileirar email para {}: {}", email, e.getMessage());
+            log.error("Stacktrace completo:", e);
+        }
         }
 
         campanha.setStatus(failures == 0 ? StatusCampanha.CONCLUIDA : StatusCampanha.CANCELADA);
