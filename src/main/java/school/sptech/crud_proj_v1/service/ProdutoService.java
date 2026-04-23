@@ -79,11 +79,9 @@ public class ProdutoService {
         CalcadoProduto novoCalcado = calcadoMapper.toEntity(dto);
         configurarCategoria(novoCalcado, dto.getIdCategoria());
 
+        CalcadoProduto salvo = produtoRepository.save(novoCalcado);
         var evento = new ProdutoCadastradoEvent(novoCalcado);
         eventPublisher.publishEvent(evento);
-        funcionarioService.handleProdutoCadastrado(evento);
-
-        CalcadoProduto salvo = produtoRepository.save(novoCalcado);
 
         log.info("Calçado {} salvo com sucesso.", salvo.getModelo());
 

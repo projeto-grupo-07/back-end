@@ -17,8 +17,10 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
     List<Venda> findByFuncionarioNomeContainingIgnoreCase(String nome);
 
     List<Venda> findByFormaDePagamento(school.sptech.crud_proj_v1.enumeration.FormaDePagamento formaDePagamento);
-    @Query("SELECT v FROM Venda v WHERE v.id > :cursor ORDER BY v.id ASC")
-    List<Venda> findByIdGreaterThanOrderByIdAsc(@Param("cursor") int cursor, Pageable pageable);
+
+    @Query("SELECT v FROM Venda v WHERE v.id < :cursor ORDER BY v.id DESC")
+    List<Venda> findByIdLessThanOrderByIdDesc(@Param("cursor") int cursor, Pageable pageable);
+
     // ========================================================================
     // --- KPIs EXISTENTES (DADOS ESTÁTICOS) ---
     // ========================================================================

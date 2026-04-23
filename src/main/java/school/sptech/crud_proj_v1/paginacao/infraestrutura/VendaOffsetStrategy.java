@@ -27,7 +27,7 @@ public class VendaOffsetStrategy implements PaginacaoStrategy<PaginaOffsetVenda>
         int pagina = (int) parametros.get("pagina");
         int tamanho = (int) parametros.get("tamanho");
 
-        PageRequest pageRequest = PageRequest.of(pagina, tamanho, Sort.by("id").ascending());
+        PageRequest pageRequest = PageRequest.of(pagina, tamanho, Sort.by("id").descending());
 
         long inicio = System.currentTimeMillis();
         Page<Venda> paginaResultado = vendaRepository.findAll(pageRequest);

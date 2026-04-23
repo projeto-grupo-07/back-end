@@ -23,10 +23,11 @@ public class VendaCursorStrategy implements PaginacaoStrategy<PaginaCursorVenda>
     @Override
     public PaginaCursorVenda paginar(Map<String, Object> parametros) {
         int cursor = (int) parametros.get("cursor");
+        int cursorEfetivo = cursor == 0 ? Integer.MAX_VALUE : cursor;
         int tamanho = (int) parametros.get("tamanho");
 
         long inicio = System.currentTimeMillis();
-        List<Venda> vendas = vendaRepository.findByIdGreaterThanOrderByIdAsc(cursor, PageRequest.of(0, tamanho));
+        List<Venda> vendas = vendaRepository.findByIdLessThanOrderByIdDesc(cursorEfetivo  , PageRequest.of(0, tamanho));
         long tempo = System.currentTimeMillis() - inicio;
 
         List<VendaResponseDTO> conteudo = vendaMapper.toVendaResponseDTO(vendas);
