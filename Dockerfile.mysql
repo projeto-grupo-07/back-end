@@ -1,0 +1,14 @@
+# Usamos a imagem oficial do MySQL 8.0 como base
+FROM mysql:8.0
+
+# Porta padrão do MySQL
+EXPOSE 3306
+
+# Variáveis de ambiente para configurar o banco inicial
+# Dica: No ambiente de produção, essas senhas devem vir de variáveis externas
+ENV MYSQL_DATABASE=db_brink_calcados
+ENV MYSQL_ROOT_PASSWORD=root
+
+
+# (Opcional) Define o charset para evitar problemas com acentuação brasileira
+CMD ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
