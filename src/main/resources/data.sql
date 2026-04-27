@@ -2,7 +2,7 @@
 -- SCRIPT DE CARGA COMPLETO (COMPATÍVEL COM H2) - BRINKS CALÇADOS
 -- ==================================================================
 
-SET REFERENTIAL_INTEGRITY FALSE;
+SET FOREIGN_KEY_CHECKS = 0;
 
 TRUNCATE TABLE itens_venda;
 TRUNCATE TABLE venda;
@@ -15,16 +15,15 @@ TRUNCATE TABLE perfil_tela;
 TRUNCATE TABLE perfil;
 TRUNCATE TABLE tela;
 
-SET REFERENTIAL_INTEGRITY TRUE;
 
 -- ==================================================================
 -- 1. ENDEREÇO E EMPRESA
 -- ==================================================================
 
-INSERT INTO ENDERECO (cep, estado, cidade, bairro, logradouro, numero, complemento) VALUES
+INSERT INTO endereco (cep, estado, cidade, bairro, logradouro, numero, complemento) VALUES
 ('01001-000', 'SP', 'São Paulo', 'Sé', 'Praça da Sé', '100', 'Bloco A');
 
-INSERT INTO EMPRESA (razao_social, cnpj, responsavel, fk_endereco) VALUES
+INSERT INTO empresa (razao_social, cnpj, responsavel, fk_endereco) VALUES
 ('Brinks Calçados LTDA', '12.345.678/0001-90', 'Pedro Admin', 1);
 
 -- ==================================================================
@@ -57,7 +56,7 @@ INSERT INTO perfil_tela (perfil_id, tela_id) VALUES
 -- 3. FUNCIONÁRIOS
 -- ==================================================================
 
-INSERT INTO FUNCIONARIO (nome, cpf, email, salario, comissao, senha, perfil_id, ativo   ) VALUES
+INSERT INTO funcionario (nome, cpf, email, salario, comissao, senha, perfil_id, ativo   ) VALUES
 ('Maria Admin', '116.580.380-10', 'maria.admin@brinks.com', 8000.00, 0.00, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 1, TRUE),
 ('Agenor Gerente', '188.116.470-53', 'agenor.gerente@brinks.com', 5000.00, 0.10, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 2,TRUE),
 ('Ana Vendedora', '864.793.360-54', 'ana.vendas@brinks.com', 2000.00, 0.05, '$2a$10$wvjZNbqbmybP4DTXgRvNLeVcAcWo3im2C2XogDRy5aNpQi2G7hZSi', 3, TRUE),
@@ -68,12 +67,12 @@ INSERT INTO FUNCIONARIO (nome, cpf, email, salario, comissao, senha, perfil_id, 
 -- ==================================================================
 
 -- Categorias Pai (fk_pai = NULL)
-INSERT INTO CATEGORIA (id, descricao, fk_pai) VALUES
+INSERT INTO categoria (id, descricao, fk_pai) VALUES
 (1, 'Calçados', NULL),
 (2, 'Outros', NULL);
 
 -- Subcategorias de Calçados (fk_pai = 1)
-INSERT INTO CATEGORIA (id, descricao, fk_pai) VALUES
+INSERT INTO categoria (id, descricao, fk_pai) VALUES
 (3, 'Tênis Esportivo', 1),
 (4, 'Tênis Casual', 1),
 (5, 'Sandália', 1),
@@ -83,19 +82,18 @@ INSERT INTO CATEGORIA (id, descricao, fk_pai) VALUES
 (9, 'Chuteira', 1);
 
 -- Subcategorias de Outros (fk_pai = 2)
-INSERT INTO CATEGORIA (id, descricao, fk_pai) VALUES
+INSERT INTO categoria (id, descricao, fk_pai) VALUES
 (10, 'Acessórios', 2),
 (11, 'Meias', 2),
 (12, 'Mochilas', 2);
 
 -- Previne conflito de ID ao criar novas categorias no FrontEnd
-ALTER TABLE CATEGORIA ALTER COLUMN id RESTART WITH 20;
-
+ALTER TABLE categoria AUTO_INCREMENT = 20;
 -- ==================================================================
 -- 5. PRODUTOS
 -- ==================================================================
 
-INSERT INTO PRODUTO (id, nome, descricao, modelo, marca, numero, cor, preco_custo, valor_unitario, quantidade, fk_categoria, ativo) VALUES
+INSERT INTO produto (id, nome, descricao, modelo, marca, numero, cor, preco_custo, valor_unitario, quantidade, fk_categoria, ativo) VALUES
 (1, 'Chinelo Havaianas Top', 'Chinelo tradicional de borracha, confortável para o uso diário.', 'Top Clássico', 'Havaianas', 38, 'Azul', 14.50, 29.90, 100, 6, true),
 (2, 'Tênis Nike Revolution 6', 'Tênis de corrida leve e respirável com amortecimento macio.', 'Revolution 6', 'Nike', 42, 'Preto', 195.00, 399.90, 50, 3, true),
 (3, 'Tênis Adidas Ultraboost 22', 'Tênis de alta performance com retorno de energia excepcional.', 'Ultraboost 22', 'Adidas', 40, 'Branco', 450.00, 799.90, 20, 3, true),
@@ -112,7 +110,7 @@ INSERT INTO PRODUTO (id, nome, descricao, modelo, marca, numero, cor, preco_cust
 (14, 'Sandália Kenner Rakuka', 'Sandália com palmilha extra macia e solado de borracha.', 'Rakuka', 'Kenner', 41, 'Vermelho', 45.00, 119.90, 80, 6, true),
 (15, 'Bota Chelsea Democrata', 'Bota masculina premium com elástico lateral para fácil calce.', 'Chelsea', 'Democrata', 42, 'Marrom', 160.00, 329.90, 18, 7, true);
 
-ALTER TABLE PRODUTO ALTER COLUMN id RESTART WITH 20;
+ALTER TABLE produto AUTO_INCREMENT = 20;
 
 -- ==================================================================
 -- 6. VENDAS (HISTÓRICO DENSO - OUT/2025 ATÉ MAR/2026)
@@ -174,8 +172,7 @@ INSERT INTO venda (id, data_hora, valor_total, forma_pagamento, fk_vendedor, per
 (34, '2026-03-17 17:20:00', 150.00, 'DINHEIRO', 4, 0.05, 7.50),
 (35, '2026-03-17 18:00:00', 650.00, 'CREDITO', 5, 0.05, 32.50);
 
-ALTER TABLE venda ALTER COLUMN id RESTART WITH 50;
-
+ALTER TABLE venda AUTO_INCREMENT = 50;
 -- ==================================================================
 -- 7. ITENS DE VENDA (DETALHAMENTO PARA RANKINGS)
 -- ==================================================================
@@ -237,3 +234,5 @@ ALTER TABLE venda ALTER COLUMN id RESTART WITH 50;
   INSERT INTO itens_venda (fk_produto, valor_desconto, fk_venda, quantidade_venda_produto, valor_total_venda_produto,
   preco_unitario_na_venda) VALUES
   (8, 0.0, 11, 1, 349.90, 349.90);
+
+  SET FOREIGN_KEY_CHECKS = 1;
