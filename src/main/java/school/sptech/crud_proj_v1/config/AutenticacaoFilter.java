@@ -25,67 +25,106 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
     private final AutenticacaoService autenticacaoService;
     private final GerenciadorTokenJwt jwtTokenManager;
 
-    public AutenticacaoFilter(AutenticacaoService autenticacaoService, GerenciadorTokenJwt jwtTokenManager) {
+    public AutenticacaoFilter(AutenticacaoService autenticacaoService,
+                              GerenciadorTokenJwt jwtTokenManager) {
         this.autenticacaoService = autenticacaoService;
         this.jwtTokenManager = jwtTokenManager;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
+
+        String path = request.getRequestURI();
+
+        // =========================
+        // BYPASS DE ENDPOINTS PÚBLICOS
+        // =========================
+        if (isPublicEndpoint(path)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String username = null;
         String jwtToken = null;
 
-        String requestTokenHeader = request.getHeader("Authorization");
-        if (Objects.nonNull(requestTokenHeader) && requestTokenHeader.startsWith("Bearer ")) {
-            jwtToken = requestTokenHeader.substring(7);
-            LOGGER.info(">>> [FILTER] Token encontrado no Header Authorization");
-        } else {
+        // =========================
+        // TOKEN VIA HEADER
+        // =========================
+        String authHeader = request.getHeader("Authorization");
+
+        if (Objects.nonNull(authHeader) && authHeader.startsWith("Bearer ")) {
+            jwtToken = authHeader.substring(7);
+            LOGGER.info(">>> TOKEN via HEADER encontrado");
+        }
+
+        // =========================
+        // TOKEN VIA COOKIE
+        // =========================
+        if (jwtToken == null) {
             Cookie[] cookies = request.getCookies();
+
             if (cookies != null) {
                 for (Cookie cookie : cookies) {
                     if ("jwt".equals(cookie.getName())) {
                         jwtToken = cookie.getValue();
-                        // Imprime apenas os primeiros caracteres para confirmar que leu
-                        String tokenPreview = jwtToken.length() > 10 ? jwtToken.substring(0, 10) + "..." : jwtToken;
-                        LOGGER.info(">>> [FILTER] Token encontrado no Cookie 'jwt': " + tokenPreview);
+                        LOGGER.info(">>> TOKEN via COOKIE encontrado");
                         break;
                     }
                 }
-            } else {
-                LOGGER.info(">>> [FILTER] Nenhum cookie encontrado na requisição para: " + request.getRequestURI());
             }
         }
 
+        // =========================
+        // EXTRAÇÃO DO USER
+        // =========================
         if (jwtToken != null) {
             try {
                 username = jwtTokenManager.getUsernameFromToken(jwtToken);
-                LOGGER.info(">>> [FILTER] Usuário extraído do token: " + username);
             } catch (ExpiredJwtException e) {
-                LOGGER.warn(">>> [FILTER] Token expirado");
+                LOGGER.warn("Token expirado");
             } catch (Exception e) {
-                LOGGER.error(">>> [FILTER] Token inválido ou erro ao extrair usuário: " + e.getMessage());
+                LOGGER.error("Token inválido: " + e.getMessage());
             }
-        } else {
-            LOGGER.warn(">>> [FILTER] Token é NULL ao final da varredura");
         }
 
+        // =========================
+        // AUTENTICAÇÃO NO CONTEXTO
+        // =========================
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             try {
                 UserDetails userDetails = autenticacaoService.loadUserByUsername(username);
 
                 if (jwtTokenManager.validateToken(jwtToken, userDetails)) {
-                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
+
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(auth);
-                    LOGGER.info(">>> [FILTER] Usuário autenticado com sucesso no contexto Spring Security: " + username);
-                } else {
-                    LOGGER.warn(">>> [FILTER] Validação do token falhou para usuário: " + username);
+
+                    LOGGER.info("Usuário autenticado: " + username);
                 }
+
             } catch (Exception e) {
-                LOGGER.error(">>> [FILTER] Falha ao carregar usuário do banco de dados: " + e.getMessage());
+                LOGGER.error("Erro ao autenticar usuário: " + e.getMessage());
             }
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private boolean isPublicEndpoint(String path) {
+        return path.equals("/health")
+                || path.startsWith("/swagger")
+                || path.startsWith("/v3/api-docs")
+                || path.equals("/funcionarios/login");
     }
 }

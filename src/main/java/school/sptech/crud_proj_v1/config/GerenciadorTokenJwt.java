@@ -22,7 +22,7 @@ public class GerenciadorTokenJwt {
 
     public GerenciadorTokenJwt(JwtProperties jwtProperties) {
         this.secret = jwtProperties.getSecret();
-        this.jwtTokenValidity = jwtProperties.getValidity();
+        this.jwtTokenValidity = 86400000L;
     }
 
     public String getUsernameFromToken(String token) { return getClaimForToken(token, Claims::getSubject); }

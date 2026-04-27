@@ -1,18 +1,37 @@
 package school.sptech.crud_proj_v1.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
-public class CorsConfig implements WebMvcConfigurer {
+public class CorsConfig {
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("http://localhost:5173")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "TRACE", "CONNECT")
-                .allowedHeaders("*")
-                .allowCredentials(true);
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        // Libera qualquer origem (resolve o problema do IP dinâmico)
+        configuration.setAllowedOriginPatterns(List.of("*"));
+
+        // Libera os métodos, INCLUSIVE o OPTIONS que estava sendo bloqueado
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+
+        // Libera todos os cabeçalhos (Headers)
+        configuration.setAllowedHeaders(List.of("*"));
+
+        // Permite envio de credenciais/tokens
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        // Aplica essas regras para todos os endpoints da API
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
     }
 }
