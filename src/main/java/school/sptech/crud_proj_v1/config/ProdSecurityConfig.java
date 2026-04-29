@@ -50,7 +50,11 @@ public class ProdSecurityConfig {
                                 "/health/**",
                                 "/swagger/**",
                                 "/v3/api-docs/**",
-                                "/funcionarios/login"
+                                "/funcionarios/login",
+                                "/relatorio/**",
+                                "/import/**",
+                                "/clientes/**",
+                                "/campanhas/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

@@ -21,6 +21,7 @@ public class RelatorioController {
 
     @PostMapping("/{*fileKey}")
     public ResponseEntity<JobResponse> emitirRelatorio(@PathVariable String fileKey) {
+
         String normalizedKey = fileKey.startsWith("/") ? fileKey.substring(1) : fileKey;
         log.info("Recebendo requisição de importação. FileKey: {}", normalizedKey);
         try {
