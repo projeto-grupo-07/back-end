@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 import school.sptech.crud_proj_v1.config.RabbitMQConfig;
+import school.sptech.crud_proj_v1.dto.RabbitMQ.JobMessage;
 
 import java.util.UUID;
 
@@ -25,13 +26,13 @@ public class RabbitImportProducer {
 
         String compositeJobId = path + "__" + jobId;
 
-        String jsonPayload = String.format("{\"jobId\":\"%s\", \"fileKey\":\"%s\"}", compositeJobId, fileKey);
+        JobMessage message = new JobMessage(compositeJobId, fileKey);
 
         try {
             rabbitTemplate.convertAndSend(
                     RabbitMQConfig.EXCHANGE,
                     RabbitMQConfig.IMPORT_ROUTING_KEY,
-                    jsonPayload
+                    message
             );
             log.info("Mensagem publicada no RabbitMQ com sucesso. brinksExchange: {}, RoutingKey: {}, JobId: {}",
                     RabbitMQConfig.EXCHANGE, RabbitMQConfig.IMPORT_ROUTING_KEY, compositeJobId);
