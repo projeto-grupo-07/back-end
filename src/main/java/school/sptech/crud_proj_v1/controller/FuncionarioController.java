@@ -69,7 +69,7 @@ public class FuncionarioController {
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .maxAge(3600)
+                .maxAge(86400)
                 .sameSite("Lax")
                 .build();
 
