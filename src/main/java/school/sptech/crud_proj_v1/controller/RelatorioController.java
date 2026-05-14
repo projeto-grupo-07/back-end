@@ -3,10 +3,7 @@ package school.sptech.crud_proj_v1.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import school.sptech.crud_proj_v1.relatorio.RabbitImportProducer;
 import school.sptech.crud_proj_v1.dto.RabbitMQ.JobResponse;
@@ -25,8 +22,8 @@ public class RelatorioController {
         this.producer = producer;
     }
 
-    @PostMapping("/{*fileKey}")
-    public ResponseEntity<JobResponse> gerarRelatorio(@PathVariable String fileKey) {
+    @PostMapping("/enfileirar/{*fileKey}")
+    public ResponseEntity<JobResponse> enfileirarRelatorio(@PathVariable String fileKey) {
 
         String normalizedKey = fileKey.startsWith("/") ? fileKey.substring(1) : fileKey;
         log.info("Recebendo requisição de importação. FileKey: {}", normalizedKey);
@@ -40,7 +37,8 @@ public class RelatorioController {
         }
     }
 
-    public ResponseEntity<String> emitirRelatorio(Integer ano, Integer mes) {
+    @PostMapping("/gerar")
+    public ResponseEntity<String> solicitarRelatorioNaLambdaAWS(@RequestParam Integer mes, @RequestParam Integer ano) {
         String url = String.format("%s/relatorio?ano=%d&mes=%d", apiGatewayURL, ano, mes);
         log.info("Enviando requisição para API externa. URL: {}", url);
         try {
