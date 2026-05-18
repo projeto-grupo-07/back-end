@@ -98,9 +98,6 @@ public class CampanhaService {
 
     public List<CampanhaResponseDto> listarCampanhas() {
         var response = campanhaRepository.findAll();
-        if (response.isEmpty()) {
-            throw new RuntimeException("Nenhuma campanha encontrada.");
-        }
 
         return response.stream()
                 .map(campanha -> campanhaMapper.toResponseDto(campanha, campanhaMapper.toRequestDto(campanha)))
@@ -119,7 +116,6 @@ public class CampanhaService {
 
         Specification<Cliente> spec = montarFiltro(campanhaRequestDTO);
 
-        // obter emails em páginas para evitar carregar todos os clientes na memória
         int page = 0;
         final int size = 1000;
         List<String> emails = new ArrayList<>();
@@ -150,13 +146,79 @@ public class CampanhaService {
                         campanha.getCorpoTexto()
                 ));
             }catch (Exception e) {
-            failures++;
-            log.error("Erro ao enfileirar email para {}: {}", email, e.getMessage());
-            log.error("Stacktrace completo:", e);
-        }
+                failures++;
+                log.error("Erro ao enfileirar email para {}: {}", email, e.getMessage());
+                log.error("Stacktrace completo:", e);
+            }
         }
 
         campanha.setStatus(failures == 0 ? StatusCampanha.CONCLUIDA : StatusCampanha.CANCELADA);
+        campanhaRepository.save(campanha);
+    }
+
+    public void deletarCampanha(Integer id) {
+        if (!campanhaRepository.existsById(id)) {
+            throw new RuntimeException("Campanha com id " + id + " não encontrada.");
+        }
+        campanhaRepository.deleteById(id);
+    }
+
+    public CampanhaResponseDto buscarCampanhaPorId(Integer id) {
+        Campanha campanha = campanhaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Campanha não encontrada."));
+        return campanhaMapper.toResponseDto(campanha, campanhaMapper.toRequestDto(campanha));
+    }
+
+    public CampanhaResponseDto atualizarCampanha(Integer id, CampanhaRequestDto dto) {
+        Campanha campanha = campanhaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Campanha não encontrada."));
+
+        if (campanha.getStatus() != StatusCampanha.PENDENTE) {
+            throw new RuntimeException("Apenas campanhas pendentes podem ser editadas.");
+        }
+
+        campanha.setNome(dto.getNome());
+        campanha.setAssunto(dto.getAssunto());
+        campanha.setCorpoTexto(dto.getCorpoTexto());
+
+        return campanhaMapper.toResponseDto(campanhaRepository.save(campanha), dto);
+    }
+
+    public List<Cliente> listarClientesDaCampanha(Integer campanhaId) {
+        Campanha campanha = campanhaRepository.findById(campanhaId)
+                .orElseThrow(() -> new RuntimeException("Campanha não encontrada."));
+        return campanha.getClientes();
+    }
+
+    public void adicionarCliente(Integer campanhaId, Integer clienteId) {
+        Campanha campanha = campanhaRepository.findById(campanhaId)
+                .orElseThrow(() -> new RuntimeException("Campanha não encontrada."));
+
+        if (campanha.getStatus() != StatusCampanha.PENDENTE) {
+            throw new RuntimeException("Apenas campanhas pendentes podem ser editadas.");
+        }
+
+        Cliente cliente = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado."));
+
+        if (!campanha.getClientes().contains(cliente)) {
+            campanha.getClientes().add(cliente);
+            campanhaRepository.save(campanha);
+        }
+    }
+
+    public void removerCliente(Integer campanhaId, Integer clienteId) {
+        Campanha campanha = campanhaRepository.findById(campanhaId)
+                .orElseThrow(() -> new RuntimeException("Campanha não encontrada."));
+
+        if (campanha.getStatus() != StatusCampanha.PENDENTE) {
+            throw new RuntimeException("Apenas campanhas pendentes podem ser editadas.");
+        }
+
+        Cliente cliente = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado."));
+
+        campanha.getClientes().remove(cliente);
         campanhaRepository.save(campanha);
     }
 }

@@ -37,7 +37,8 @@ INSERT INTO tela (titulo, path, component_key, ordem) VALUES
 ('Funcionários', '/funcionarios', 'FUNCIONARIOS_PAGE', 3),
 ('Comissão', '/comissao', 'COMISSAO_PAGE', 4),
 ('Desempenho', '/desempenho', 'DESEMPENHO_PAGE', 5),
-('Estrategica', '/estrategica', 'ESTRATEGICA_PAGE', 6)
+('Estrategica', '/estrategica', 'ESTRATEGICA_PAGE', 6),
+('Campanha', '/campanha', 'CAMPANHA_PAGE', 7)
 
 ;
 
@@ -48,7 +49,7 @@ INSERT INTO perfil (nome, descricao) VALUES
 
 -- Permissões
 INSERT INTO perfil_tela (perfil_id, tela_id) VALUES
-(1,1),(1,2),(1,3),(1,4),(1,5),(1,6), (1,7), -- Admin acessa tudo
+(1,1),(1,2),(1,3),(1,4),(1,5),(1,6), (1,7), (1,8), -- Admin acessa tudo
 (2,1),(2,2),(2,3),(2,4),(2,5),(2,6), (2,7), -- Gerente acessa tudo
 (3,1),(3,2);                         -- Vendedor só PDV e lista de Vendas
 

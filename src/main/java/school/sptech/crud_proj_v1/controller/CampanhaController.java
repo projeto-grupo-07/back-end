@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.sptech.crud_proj_v1.dto.Campanha.CampanhaRequestDto;
 import school.sptech.crud_proj_v1.dto.Campanha.CampanhaResponseDto;
+import school.sptech.crud_proj_v1.entity.Cliente;
 import school.sptech.crud_proj_v1.service.CampanhaService;
 
 import java.util.List;
@@ -45,6 +46,45 @@ public class CampanhaController {
             log.error("Erro ao iniciar campanha: {}", e.getMessage());
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarCampanha(@PathVariable Integer id) {
+        campanhaService.deletarCampanha(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CampanhaResponseDto> buscarCampanhaPorId(@PathVariable Integer id) {
+        return ResponseEntity.ok(campanhaService.buscarCampanhaPorId(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CampanhaResponseDto> atualizarCampanha(
+            @PathVariable Integer id,
+            @RequestBody CampanhaRequestDto dto) {
+        return ResponseEntity.ok(campanhaService.atualizarCampanha(id, dto));
+    }
+
+    @GetMapping("/{id}/clientes")
+    public ResponseEntity<List<Cliente>> listarClientesDaCampanha(@PathVariable Integer id) {
+        return ResponseEntity.ok(campanhaService.listarClientesDaCampanha(id));
+    }
+
+    @PostMapping("/{id}/clientes/{clienteId}")
+    public ResponseEntity<Void> adicionarCliente(
+            @PathVariable Integer id,
+            @PathVariable Integer clienteId) {
+        campanhaService.adicionarCliente(id, clienteId);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/clientes/{clienteId}")
+    public ResponseEntity<Void> removerCliente(
+            @PathVariable Integer id,
+            @PathVariable Integer clienteId) {
+        campanhaService.removerCliente(id, clienteId);
+        return ResponseEntity.noContent().build();
     }
 
 }

@@ -18,7 +18,7 @@ public class RelatorioController {
     private final RabbitImportProducer producer;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Value("${API_GATEWAY_URL}")
+    @Value("${api.gateway.url}")
     private String apiGatewayURL;
 
     public RelatorioController(RabbitImportProducer producer) {
