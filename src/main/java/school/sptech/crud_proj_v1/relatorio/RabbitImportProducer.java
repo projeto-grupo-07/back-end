@@ -17,16 +17,12 @@ public class RabbitImportProducer {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public String publish(String fileKey){
+    public String publish(String fileKey, Integer ano, String mes){
         String jobId = UUID.randomUUID().toString();
 
-        String path = fileKey.contains("/") ? fileKey.substring(0, fileKey.lastIndexOf("/") + 1) : "";
+        log.debug("Gerando novo JobId: {} para FileKey: {}", jobId, fileKey);
 
-        log.debug("Gerando novo JobId: {} para FileKey: {} com o path: {}", jobId, fileKey, path);
-
-        String compositeJobId = path + "__" + jobId;
-
-        JobMessage message = new JobMessage(compositeJobId, fileKey);
+        JobMessage message = new JobMessage(ano, mes, jobId, fileKey);
 
         try {
             rabbitTemplate.convertAndSend(
@@ -35,12 +31,12 @@ public class RabbitImportProducer {
                     message
             );
             log.info("Mensagem publicada no RabbitMQ com sucesso. brinksExchange: {}, RoutingKey: {}, JobId: {}",
-                    RabbitMQConfig.EXCHANGE, RabbitMQConfig.IMPORT_ROUTING_KEY, compositeJobId);
+                    RabbitMQConfig.EXCHANGE, RabbitMQConfig.IMPORT_ROUTING_KEY, jobId);
         } catch (Exception e) {
-            log.error("Erro ao publicar mensagem no RabbitMQ para JobId: {}", compositeJobId, e);
+            log.error("Erro ao publicar mensagem no RabbitMQ para JobId: {}", jobId, e);
             throw new RuntimeException("Falha ao publicar mensagem no RabbitMQ", e);
         }
 
-        return compositeJobId;
+        return jobId;
     }
 }
