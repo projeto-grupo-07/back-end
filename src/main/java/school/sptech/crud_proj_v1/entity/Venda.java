@@ -1,45 +1,52 @@
-    package school.sptech.crud_proj_v1.entity;
+package school.sptech.crud_proj_v1.entity;
 
-    import io.swagger.v3.oas.annotations.media.Schema;
-    import jakarta.persistence.*;
-    import lombok.Data;
-    import school.sptech.crud_proj_v1.enumeration.FormaDePagamento;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+import lombok.Data;
+import school.sptech.crud_proj_v1.enumeration.FormaDePagamento;
 
-    import java.time.LocalDateTime;
-    import java.util.List;
+import java.time.LocalDateTime;
+import java.util.List;
 
-    @Entity
-    @Data
-    public class Venda {
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        @Schema(example = "1", description = "Esse campo representa o identificador único dos vendas. Ele se auto incrementa")
-        private Integer id;
+@Entity
+@Data
+public class Venda {
 
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "FK_VENDEDOR")
-        @Schema(description = "Esse campo é um objeto da classe Funcionario. Representa o funcionário que fez a venda")
-        private Funcionario funcionario;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(example = "1", description = "Esse campo representa o identificador único dos vendas. Ele se auto incrementa")
+    private Integer id;
 
-        @Column(name = "FORMA_PAGAMENTO")
-        @Enumerated(EnumType.STRING)
-        @Schema(example = "PIX", description = "Esse campo representa qual foi a forma de pagamento da venda (DEBITO, CREDITO, PIX)")
-        private FormaDePagamento formaDePagamento;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_VENDEDOR")
+    @Schema(description = "Esse campo é um objeto da classe Funcionario. Representa o funcionário que fez a venda")
+    private Funcionario funcionario;
 
-        @Column(name = "VALOR_TOTAL")
-        @Schema(example = "239.90", description = "Esse campo representa o valor final da venda a ser pago ")
-        private Double totalVenda;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "FK_CLIENTE")
+    @Schema(description = "Esse campo é um objeto da classe Cliente. Representa o cliente que realizou a compra")
+    private Cliente cliente;
 
-        @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, orphanRemoval = true)
-        private List<VendaProduto> itens;
+    @Column(name = "FORMA_PAGAMENTO")
+    @Enumerated(EnumType.STRING)
+    @Schema(example = "PIX", description = "Esse campo representa qual foi a forma de pagamento da venda (DEBITO, CREDITO, PIX)")
+    private FormaDePagamento formaDePagamento;
 
-        private LocalDateTime dataHora;
-        @OneToOne(mappedBy = "venda", cascade = CascadeType.ALL)
-        private Comissao comissao;
+    @Column(name = "VALOR_TOTAL")
+    @Schema(example = "239.90", description = "Esse campo representa o valor final da venda a ser pago ")
+    private Double totalVenda;
 
-        @Column(name = "percentual_comissao_aplicado")
-        private Double percentualComissaoAplicado;
-        @Column(name = "valor_comissao")
-        private Double valorComissao;
+    @OneToMany(mappedBy = "venda", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VendaProduto> itens;
 
-    }
+    private LocalDateTime dataHora;
+
+    @OneToOne(mappedBy = "venda", cascade = CascadeType.ALL)
+    private Comissao comissao;
+
+    @Column(name = "percentual_comissao_aplicado")
+    private Double percentualComissaoAplicado;
+
+    @Column(name = "valor_comissao")
+    private Double valorComissao;
+}

@@ -8,6 +8,7 @@ import school.sptech.crud_proj_v1.dto.VendaProduto.VendaProdutoRequestDTO;
 import school.sptech.crud_proj_v1.dto.Venda.VendaRequestDTO;
 import school.sptech.crud_proj_v1.dto.Venda.VendaResponseDTO;
 
+import school.sptech.crud_proj_v1.entity.Cliente;
 import school.sptech.crud_proj_v1.entity.Funcionario;
 import school.sptech.crud_proj_v1.entity.abstrato.Produto;
 import school.sptech.crud_proj_v1.entity.VendaProduto;
@@ -17,6 +18,7 @@ import school.sptech.crud_proj_v1.enumeration.FormaDePagamento;
 import school.sptech.crud_proj_v1.exception.EntidadeNotFoundException;
 import school.sptech.crud_proj_v1.mapper.VendaMapper;
 import school.sptech.crud_proj_v1.projection.*;
+import school.sptech.crud_proj_v1.repository.ClienteRepository;
 import school.sptech.crud_proj_v1.repository.FuncionarioRepository;
 import school.sptech.crud_proj_v1.repository.ProdutoRepository;
 import school.sptech.crud_proj_v1.repository.VendaRepository;
@@ -36,6 +38,7 @@ import java.util.Map;
 public class VendaService {
 
     private final VendaRepository vendaRepository;
+    private final ClienteRepository clienteRepository;
     private final FuncionarioRepository funcionarioRepository;
     private final ProdutoRepository produtoRepository;
     private final VendaMapper vendaMapper;
@@ -53,6 +56,12 @@ public class VendaService {
         Funcionario funcionario = funcionarioRepository.findById(dto.getIdVendedor())
                 .orElseThrow(() -> new EntidadeNotFoundException("Vendedor não encontrado"));
         novaVenda.setFuncionario(funcionario);
+
+        if (dto.getIdCliente() != null) {
+            Cliente cliente = clienteRepository.findById(dto.getIdCliente())
+                    .orElseThrow(() -> new EntidadeNotFoundException("Cliente não encontrado"));
+            novaVenda.setCliente(cliente);
+        }
 
         novaVenda.setDataHora(LocalDateTime.now());
         novaVenda.setPercentualComissaoAplicado(funcionario.getComissao());
@@ -73,28 +82,22 @@ public class VendaService {
             itemVenda.setQuantidadeVendaProduto(itemDto.getQuantidadeVendaProduto());
             itemVenda.setVenda(novaVenda);
 
-            // 1. Extrai o desconto (Se vier nulo, assume 0.0)
             Double descontoAplicado = itemDto.getDesconto() != null ? itemDto.getDesconto() : 0.0;
 
-            // 2. Calcula o subtotal bruto
             Double subtotalBruto = produto.getValorUnitario() * itemDto.getQuantidadeVendaProduto();
 
-            // 3. Valida se o desconto faz sentido
             if (descontoAplicado > subtotalBruto) {
                 throw new IllegalArgumentException("O desconto de R$ " + descontoAplicado + " excede o valor do item.");
             }
 
-            // 4. Aplica o desconto no valor final
             Double valorFinalItem = subtotalBruto - descontoAplicado;
 
-            // 5. INJETA NA ENTIDADE PARA O HIBERNATE SALVAR
             itemVenda.setDesconto(descontoAplicado);
             itemVenda.setPrecoUnitarioNaVenda(produto.getValorUnitario());
             itemVenda.setValorTotalVendaProduto(valorFinalItem);
 
             novosItensDeVenda.add(itemVenda);
 
-            // Soma no total da venda geral
             valorTotal += itemVenda.getValorTotalVendaProduto();
         }
 

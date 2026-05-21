@@ -9,8 +9,11 @@ import school.sptech.crud_proj_v1.dto.Campanha.CampanhaRequestDto;
 import school.sptech.crud_proj_v1.dto.Campanha.CampanhaResponseDto;
 import school.sptech.crud_proj_v1.entity.Cliente;
 import school.sptech.crud_proj_v1.service.CampanhaService;
+import school.sptech.crud_proj_v1.service.GeminiService;
+
 
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "Campanha")
 @RestController
@@ -18,7 +21,9 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class CampanhaController {
+
     private final CampanhaService campanhaService;
+    private final GeminiService geminiService;
 
     @GetMapping
     public ResponseEntity<List<CampanhaResponseDto>> listarCampanhas() {
@@ -37,7 +42,7 @@ public class CampanhaController {
         }
     }
 
-    @PostMapping("/iniciar/{id}")
+    @PostMapping("/{id}/iniciar")
     public ResponseEntity<Void> iniciarCampanha(@PathVariable Integer id) {
         try {
             campanhaService.iniciarCampanha(id);
@@ -87,4 +92,31 @@ public class CampanhaController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/filtro")
+    public ResponseEntity<List<CampanhaResponseDto>> filtrarCampanhas(
+            @RequestParam(required = false) String assunto,
+            @RequestParam(required = false) String status) {
+
+        List<CampanhaResponseDto> campanhas = campanhaService.filtrarCampanhas(assunto, status);
+
+        if (campanhas.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(campanhas);
+    }
+
+    // Não esqueça de injetar o GeminiService no topo do Controller junto com o CampanhaService!
+    // private final GeminiService geminiService;
+
+    @PostMapping("/gerar-texto")
+    public ResponseEntity<Map<String, String>> gerarTextoComIA(@RequestBody Map<String, String> payload) {
+        String tema = payload.get("tema");
+        if (tema == null || tema.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        // Agora retorna um JSON estruturado: {"assunto": "...", "corpo": "..."}
+        Map<String, String> resultado = geminiService.gerarTextoCampanha(tema);
+        return ResponseEntity.ok(resultado);
+    }
 }

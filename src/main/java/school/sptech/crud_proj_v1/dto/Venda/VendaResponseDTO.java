@@ -19,6 +19,12 @@ public class VendaResponseDTO {
     @Schema(example = "João Silva", description = "Nome do funcionário que realizou a venda")
     private String funcionarioNome;
 
+    @Schema(example = "2", description = "Esse campo representa a chave estrangeira do cliente que realizou a compra")
+    private Integer idCliente;
+
+    @Schema(example = "Maria Oliveira", description = "Nome do cliente que realizou a compra")
+    private String clienteNome;
+
     @Schema(example = "239.90", description = "Esse campo representa o valor final da venda a ser pago")
     private Double valorTotalDaVenda;
 
@@ -27,7 +33,6 @@ public class VendaResponseDTO {
 
     private LocalDateTime dataHora;
 
-    // NOVOS CAMPOS DE COMISSÃO
     @Schema(example = "0.10", description = "Percentual de comissão que o vendedor tinha no momento exato desta venda")
     private Double percentualComissaoAplicado;
 
@@ -36,7 +41,6 @@ public class VendaResponseDTO {
 
     private List<VendaProdutoResponseDTO> itensDaVenda;
 
-    // GETTERS E SETTERS
     public Integer getId() {
         return id;
     }
@@ -59,6 +63,22 @@ public class VendaResponseDTO {
 
     public void setFuncionarioNome(String funcionarioNome) {
         this.funcionarioNome = funcionarioNome;
+    }
+
+    public Integer getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(Integer idCliente) {
+        this.idCliente = idCliente;
+    }
+
+    public String getClienteNome() {
+        return clienteNome;
+    }
+
+    public void setClienteNome(String clienteNome) {
+        this.clienteNome = clienteNome;
     }
 
     public Double getValorTotalDaVenda() {

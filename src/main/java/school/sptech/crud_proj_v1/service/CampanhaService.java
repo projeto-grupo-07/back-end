@@ -1,6 +1,7 @@
 package school.sptech.crud_proj_v1.service;
 
 import jakarta.persistence.criteria.JoinType;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
@@ -105,53 +106,47 @@ public class CampanhaService {
     }
 
     @Async
+    @Transactional // Garante que a lista de clientes seja carregada do banco sem erro de Lazy Loading
     public void iniciarCampanha(Integer campanhaId) {
         Campanha campanha = campanhaRepository.findById(campanhaId)
                 .orElseThrow(() -> new RuntimeException("Campanha com id " + campanhaId + " não encontrada."));
 
+        // 1. Muda o status para não permitir mais edições
         campanha.setStatus(StatusCampanha.EM_ANDAMENTO);
         campanhaRepository.save(campanha);
 
-        CampanhaRequestDto campanhaRequestDTO = campanhaMapper.toRequestDto(campanha);
+        // 2. Pega EXATAMENTE os clientes que estão salvos nesta campanha (incluindo os manuais)
+        List<Cliente> clientesDaCampanha = campanha.getClientes();
 
-        Specification<Cliente> spec = montarFiltro(campanhaRequestDTO);
-
-        int page = 0;
-        final int size = 1000;
-        List<String> emails = new ArrayList<>();
-        Page<Cliente> pageResult;
-        do {
-            PageRequest pr = PageRequest.of(page, size);
-            pageResult = clienteRepository.findAll(spec, pr);
-            emails.addAll(pageResult.getContent().stream()
-                    .map(Cliente::getEmail)
-                    .filter(Objects::nonNull)
-                    .toList());
-            page++;
-        } while (page < pageResult.getTotalPages());
-
-        if (emails.isEmpty()) {
+        if (clientesDaCampanha.isEmpty()) {
             campanha.setStatus(StatusCampanha.CONCLUIDA);
             campanhaRepository.save(campanha);
             return;
         }
 
         int failures = 0;
-        for (String email : emails) {
+
+        // 3. Enfileira o e-mail para cada cliente da lista
+        for (Cliente cliente : clientesDaCampanha) {
+            // Pula se o cliente estiver sem e-mail cadastrado
+            if (cliente.getEmail() == null || cliente.getEmail().isBlank()) {
+                continue;
+            }
+
             try {
-                log.info("Enfileirando email para {}: Assunto: {}, Corpo: {}", email, campanha.getAssunto(), campanha.getCorpoTexto());
+                log.info("Enfileirando email para {}: Assunto: {}", cliente.getEmail(), campanha.getAssunto());
                 rabbitEmailProducer.sendEmail(new EmailMessage(
-                        email,
+                        cliente.getEmail(),
                         campanha.getAssunto(),
                         campanha.getCorpoTexto()
                 ));
-            }catch (Exception e) {
+            } catch (Exception e) {
                 failures++;
-                log.error("Erro ao enfileirar email para {}: {}", email, e.getMessage());
-                log.error("Stacktrace completo:", e);
+                log.error("Erro ao enfileirar email para {}: {}", cliente.getEmail(), e.getMessage());
             }
         }
 
+        // 4. Finaliza a campanha
         campanha.setStatus(failures == 0 ? StatusCampanha.CONCLUIDA : StatusCampanha.CANCELADA);
         campanhaRepository.save(campanha);
     }
@@ -220,5 +215,19 @@ public class CampanhaService {
 
         campanha.getClientes().remove(cliente);
         campanhaRepository.save(campanha);
+    }
+
+    public List<CampanhaResponseDto> filtrarCampanhas(String assunto, String status) {
+        StatusCampanha statusEnum = (status != null && !status.isBlank())
+                ? StatusCampanha.valueOf(status)
+                : null;
+
+        String assuntoFilter = (assunto != null && !assunto.isBlank()) ? assunto : null;
+
+        List<Campanha> campanhas = campanhaRepository.filtrarCampanhas(assuntoFilter, statusEnum);
+
+        return campanhas.stream()
+                .map(campanhaMapper::toDto)
+                .toList();
     }
 }
