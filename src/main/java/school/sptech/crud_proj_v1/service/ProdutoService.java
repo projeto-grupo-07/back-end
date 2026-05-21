@@ -2,6 +2,10 @@ package school.sptech.crud_proj_v1.service;
 
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -75,6 +79,7 @@ public class ProdutoService {
         }
     }
 
+    @CachePut(cacheNames = "produtos", key = "#result.id")
     public CalcadoProdutoResponse cadastrarCalcado(CalcadoProdutoRequest dto) {
         CalcadoProduto novoCalcado = calcadoMapper.toEntity(dto);
         configurarCategoria(novoCalcado, dto.getIdCategoria());
@@ -88,6 +93,7 @@ public class ProdutoService {
         return calcadoMapper.toResponse(salvo);
     }
 
+    @CachePut(cacheNames = "produtos", key = "#novoOutros.id")
     public OutrosProdutoResponse cadastrarOutros(OutrosProdutoRequest dto) {
         OutrosProduto novoOutros = outrosMapper.toEntity(dto);
 
@@ -120,10 +126,12 @@ public class ProdutoService {
     }
 
 
+    @Cacheable(cacheNames = "produtos", key = "'calcados'")
     public List<CalcadoProdutoResponse> listarApenasCalcados() {
         return calcadoMapper.toResponseList(produtoRepository.findAllCalcados());
     }
 
+    @Cacheable(cacheNames = "produtos", key = "'outros'")
     public List<OutrosProdutoResponse> listarApenasOutros() {
         return outrosMapper.toResponseList(produtoRepository.findAllOutros());
     }
@@ -159,6 +167,7 @@ public class ProdutoService {
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(cacheNames = "produtos", key = "#id")
     public ProdutoResponse buscarProdutoPorId(Integer id){
         Produto produto = produtoRepository.findByIdAndAtivoTrue(id)
                 .orElseThrow(() -> new EntidadeNotFoundException("Produto com id não encontrado: " + id));
@@ -172,6 +181,15 @@ public class ProdutoService {
         throw new EntidadeNotFoundException("Tipo desconhecido.");
     }
 
+    @Caching(
+            put = {
+                    @CachePut(cacheNames = "produtos", key = "#id")
+            },
+            evict = {
+                    @CacheEvict(cacheNames = "produtos", key = "'calcados'"),
+                    @CacheEvict(cacheNames = "produtos", key = "'outros'")
+            }
+    )
     public CalcadoProdutoResponse atualizarCalcado(Integer id, CalcadoProdutoRequest dto) {
 
         Produto produtoGenerico = produtoRepository.findByIdAndAtivoTrue(id)
@@ -192,6 +210,7 @@ public class ProdutoService {
         }
     }
 
+    @CachePut(cacheNames = "produtos", key = "#id")
     public OutrosProdutoResponse atualizarOutros(Integer id, OutrosProdutoRequest dto) {
         Produto produtoGenérico = produtoRepository.findByIdAndAtivoTrue(id)
                 .orElseThrow(() -> new EntidadeNotFoundException("Produto não encontrado pelo ID: " + id));
@@ -213,6 +232,7 @@ public class ProdutoService {
         }
     }
 
+    @CacheEvict(cacheNames = "produtos", key = "#id")
     @Transactional
     public void deletarPorId(Integer id) {
         Produto produto = produtoRepository.findByIdAndAtivoTrue(id)
