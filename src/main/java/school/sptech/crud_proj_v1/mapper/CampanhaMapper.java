@@ -9,6 +9,7 @@ import java.util.List;
 
 @Component
 public class CampanhaMapper {
+
     public CampanhaResponseDto toResponseDto(Campanha campanha, CampanhaRequestDto dto) {
         CampanhaResponseDto responseDto = new CampanhaResponseDto();
         responseDto.setId(campanha.getId());
@@ -58,5 +59,30 @@ public class CampanhaMapper {
             }
         }
         return requestDto;
+    }
+
+    public CampanhaResponseDto toDto(Campanha campanha) {
+        CampanhaResponseDto responseDto = new CampanhaResponseDto();
+        responseDto.setId(campanha.getId());
+        responseDto.setNome(campanha.getNome());
+        responseDto.setAssunto(campanha.getAssunto());
+        responseDto.setCorpoTexto(campanha.getCorpoTexto());
+        responseDto.setStatus(campanha.getStatus().toString());
+
+        if (campanha.getClientes() != null && !campanha.getClientes().isEmpty()) {
+            var primeiro = campanha.getClientes().getFirst();
+            if (primeiro != null) {
+                responseDto.setGenero(primeiro.getGenero());
+                if (primeiro.getEndereco() != null) {
+                    responseDto.setBairro(primeiro.getEndereco().getBairro());
+                    responseDto.setCidade(primeiro.getEndereco().getCidade());
+                    responseDto.setEstado(primeiro.getEndereco().getEstado());
+                }
+                if (primeiro.getDtNasc() != null) {
+                    responseDto.setMesAniversario(primeiro.getDtNasc().getMonthValue());
+                }
+            }
+        }
+        return responseDto;
     }
 }

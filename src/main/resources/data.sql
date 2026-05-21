@@ -38,7 +38,8 @@ INSERT INTO tela (titulo, path, component_key, ordem) VALUES
 ('Comissão', '/comissao', 'COMISSAO_PAGE', 4),
 ('Desempenho', '/desempenho', 'DESEMPENHO_PAGE', 5),
 ('Estrategica', '/estrategica', 'ESTRATEGICA_PAGE', 6),
-('Campanha', '/campanha', 'CAMPANHA_PAGE', 7)
+('Campanha', '/campanha', 'CAMPANHA_PAGE', 7),
+('Clientes', '/clientes', 'CLIENTES_PAGE', 8)
 
 ;
 
@@ -49,7 +50,7 @@ INSERT INTO perfil (nome, descricao) VALUES
 
 -- Permissões
 INSERT INTO perfil_tela (perfil_id, tela_id) VALUES
-(1,1),(1,2),(1,3),(1,4),(1,5),(1,6), (1,7), (1,8), -- Admin acessa tudo
+(1,1),(1,2),(1,3),(1,4),(1,5),(1,6), (1,7), (1,8), (1, 9), -- Admin acessa tudo
 (2,1),(2,2),(2,3),(2,4),(2,5),(2,6), (2,7), -- Gerente acessa tudo
 (3,1),(3,2);                         -- Vendedor só PDV e lista de Vendas
 
@@ -236,4 +237,27 @@ ALTER TABLE venda AUTO_INCREMENT = 50;
   preco_unitario_na_venda) VALUES
   (8, 0.0, 11, 1, 349.90, 349.90);
 
+
+  INSERT INTO endereco (id, estado, numero, cep, bairro, cidade, logradouro, complemento) VALUES
+  (2, 'RJ', 200, '20000-000', 'Centro', 'Rio de Janeiro', 'Av Rio Branco', 'Apto 12'),
+  (3, 'MG', 300, '30000-000', 'Savassi', 'Belo Horizonte', 'Rua Pernambuco', NULL),
+  (4, 'SP', 400, '04000-000', 'Vila Mariana', 'São Paulo', 'Rua Vergueiro', 'Casa 2'),
+  (5, 'PR', 500, '80000-000', 'Batel', 'Curitiba', 'Av Batel', NULL),
+  (6, 'RS', 600, '90000-000', 'Moinhos de Vento', 'Porto Alegre', 'Rua Padre Chagas', 'Sala 4'),
+  (7, 'BA', 700, '40000-000', 'Pelourinho', 'Salvador', 'Largo do Pelourinho', NULL),
+  (8, 'PE', 800, '50000-000', 'Boa Viagem', 'Recife', 'Av Boa Viagem', 'Apto 101'),
+  (9, 'DF', 900, '70000-000', 'Asa Sul', 'Brasília', 'SQS 101', 'Bloco B');
+
+  INSERT INTO cliente (dt_cadastro, dt_nasc, endereco_id, genero, cpf, email, nome, telefone) VALUES
+ ('2026-02-15', '1985-08-22', 2, 'M', '22233344455', 'joao.souza@email.com', 'João Souza', '11988882222'),
+  ('2026-03-20', '1995-12-05', 3, 'F', '33344455566', 'ana.costa@email.com', 'Ana Costa', '21977773333'),
+  ('2026-04-05', '1988-05-10', 4, 'M', '44455566677', 'pedro.oliveira@email.com', 'Pedro Oliveira', '31966664444'),
+  ('2026-04-25', '2000-01-30', 5, 'O', '55566677788', 'alex.santos@email.com', 'Alex Santos', '41955555555'),
+  ('2026-05-01', '1992-05-20', NULL, 'F', '66677788899', 'carla.dias@email.com', 'Carla Dias', '51944446666'),
+  ('2026-05-10', '1978-10-12', 6, 'M', '77788899900', 'marcos.lima@email.com', 'Marcos Lima', '61933337777'),
+  ('2026-05-15', '1999-02-28', 7, 'F', '88899900011', 'juliana.mendes@email.com', 'Juliana Mendes', '71922228888'),
+  ('2026-05-17', '1982-07-07', 8, 'M', '99900011122', 'lucas.fernandes@email.com', 'Lucas Fernandes', '81911119999'),
+  (NULL, '1996-05-01', 9, 'O', NULL, 'sam.ribeiro@email.com', 'Sam Ribeiro', '91900000000');
+
   SET FOREIGN_KEY_CHECKS = 1;
+

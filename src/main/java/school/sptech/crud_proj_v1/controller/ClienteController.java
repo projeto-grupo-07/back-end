@@ -88,6 +88,9 @@ public class ClienteController {
         return ResponseEntity.status(204).build();
     }
 
+    @GetMapping("/busca")
+    @SecurityRequirement(name = "Bearer")
+    @Operation(summary = "Busca clientes pelo nome")
     public ResponseEntity<List<ClienteResponseDto>> buscarPorNome(@RequestParam String nome){
         log.info("Buscando clientes pelo nome: {}", nome);
         List<ClienteResponseDto> clientes = service.buscarPorNome(nome);
@@ -95,6 +98,29 @@ public class ClienteController {
             return ResponseEntity.status(204).build();
         }
         return ResponseEntity.status(200).body(clientes);
+    }
+
+    @GetMapping("/filtro")
+    @SecurityRequirement(name = "Bearer")
+    public ResponseEntity<List<ClienteResponseDto>> filtrar(
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String genero) {
+
+        List<ClienteResponseDto> clientes = service.filtrarClientes(nome, genero);
+
+        if (clientes.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+        return ResponseEntity.status(200).body(clientes);
+    }
+
+    @GetMapping("/cpf/{cpf}")
+    @SecurityRequirement(name = "Bearer")
+    @Operation(summary = "Busca um cliente pelo CPF")
+    public ResponseEntity<ClienteResponseDto> buscarPorCpf(@PathVariable String cpf) {
+        log.info("Buscando cliente por CPF: {}", cpf);
+        ClienteResponseDto dto = service.buscarPorCpf(cpf);
+        return ResponseEntity.status(200).body(dto);
     }
 }
 

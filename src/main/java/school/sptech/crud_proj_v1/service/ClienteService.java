@@ -97,4 +97,22 @@ public class ClienteService {
                 .map(ClienteMapper::of)
                 .toList();
     }
+
+    public List<ClienteResponseDto> filtrarClientes(String nome, String genero) {
+        Character generoFilter = (genero != null && !genero.isBlank()) ? genero.charAt(0) : null;
+        String nomeFilter = (nome != null && !nome.isBlank()) ? nome : null;
+
+        List<Cliente> clientes = clienteRepository.filtrarClientes(nomeFilter, generoFilter);
+
+        return clientes.stream()
+                .map(ClienteMapper::of)
+                .toList();
+    }
+
+    public ClienteResponseDto buscarPorCpf(String cpf) {
+        Cliente cliente = clienteRepository.findByCpf(cpf)
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                        org.springframework.http.HttpStatus.NOT_FOUND, "Cliente não encontrado"));
+        return ClienteMapper.of(cliente);
+    }
 }
