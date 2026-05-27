@@ -1,11 +1,11 @@
-name: Docker Back-end Update
+name: Docker Back-end Update & JMeter Test
 
 on:
   push:
     branches: [ "main" ]
 
 jobs:
-  build-and-push:
+  build-test-push:
     runs-on: ubuntu-latest
     
     steps:
@@ -24,6 +24,55 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # 1. Constrói a imagem e carrega no runner (NÃO faz o push ainda)
+      - name: Build Docker image for testing
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true # <-- Essencial: disponibiliza a imagem localmente no runner
+          tags: brinks-backend-test:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # 2. Sobe a aplicação em background para o teste
+      - name: Start Backend Container
+        run: |
+          docker run -d -p 8080:8080 --name backend-app brinks-backend-test:latest
+          
+          # Aguarda o Spring Boot terminar de inicializar
+          # Aumente ou diminua esse tempo de acordo com o peso da sua aplicação
+          sleep 20 
+
+      # 3. Prepara o ambiente para o JMeter
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install Apache JMeter
+        run: |
+          JMETER_VERSION="5.6.3"
+          wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz
+          tar -xzf apache-jmeter-${JMETER_VERSION}.tgz
+          mv apache-jmeter-${JMETER_VERSION} /opt/jmeter
+
+      # 4. Executa o teste contra a aplicação rodando no runner
+      - name: Run JMeter Test
+        run: |
+          # Importante: Seu arquivo .jmx deve estar configurado para disparar contra localhost na porta 8080
+          /opt/jmeter/bin/jmeter -n -t ./jmeter/teste.jmx -l results.jtl -e -o jmeter-report/
+
+      # Opcional: Salva o relatório do JMeter como artefato no GitHub
+      - name: Upload JMeter Report
+        if: always() # Salva o relatório mesmo se o teste falhar
+        uses: actions/upload-artifact@v4
+        with:
+          name: jmeter-report
+          path: jmeter-report/
+
+      # 5. Se o teste passar, constrói e faz o push oficial
+      # (O build será quase instantâneo graças ao cache das etapas anteriores)
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
