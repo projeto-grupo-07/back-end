@@ -31,5 +31,6 @@ public class Campanha {
     )
     private List<Cliente> clientes;
 
+    @Enumerated(EnumType.STRING)
     private StatusCampanha status;
 }
