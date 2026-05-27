@@ -215,13 +215,15 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
      * 3. Margem de Lucro por Categoria
      * Retorna o ID da categoria (fk_categoria) e a margem percentual média.
      */
-    @Query(value = "SELECT p.fk_categoria AS categoria, " +
-            "ROUND((SUM((p.valor_unitario - p.preco_custo) * iv.quantidade_venda_produto) / SUM(p.valor_unitario * iv.quantidade_venda_produto)) * 100, 2) AS margem " +
+    @Query(value = "SELECT c.descricao AS categoria, " +
+            "ROUND((SUM((p.valor_unitario - p.preco_custo) * iv.quantidade_venda_produto) / " +
+            "SUM(p.valor_unitario * iv.quantidade_venda_produto)) * 100, 2) AS margem " +
             "FROM itens_venda iv " +
             "JOIN produto p ON p.id = iv.fk_produto " +
+            "JOIN categoria c ON c.id = p.fk_categoria " +
             "JOIN venda v ON v.id = iv.fk_venda " +
             "WHERE v.data_hora >= :inicio AND v.data_hora <= :fim " +
-            "GROUP BY p.fk_categoria " +
+            "GROUP BY c.id, c.descricao " +
             "ORDER BY margem DESC", nativeQuery = true)
     List<MargemCategoriaProjection> buscarMargemPorCategoriaDinamico(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
 
