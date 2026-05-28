@@ -22,7 +22,6 @@ import school.sptech.crud_proj_v1.repository.ClienteRepository;
 import school.sptech.crud_proj_v1.repository.FuncionarioRepository;
 import school.sptech.crud_proj_v1.repository.ProdutoRepository;
 import school.sptech.crud_proj_v1.repository.VendaRepository;
-import org.springframework.beans.factory.annotation.Qualifier;
 import school.sptech.crud_proj_v1.paginacao.dominio.PaginaOffsetVenda;
 import school.sptech.crud_proj_v1.paginacao.dominio.PaginaCursorVenda;
 import school.sptech.crud_proj_v1.paginacao.dominio.PaginacaoStrategy;
@@ -70,7 +69,7 @@ public class VendaService {
         if (itensDto == null || itensDto.isEmpty()) {
             throw new IllegalArgumentException("A venda deve ter pelo menos um item.");
         }
-        Double valorTotal = 0.0;
+        BigDecimal valorTotal = BigDecimal.ZERO;
         List<VendaProduto> novosItensDeVenda = new ArrayList<>();
 
         for (VendaProdutoRequestDTO itemDto : itensDto) {
@@ -82,27 +81,29 @@ public class VendaService {
             itemVenda.setQuantidadeVendaProduto(itemDto.getQuantidadeVendaProduto());
             itemVenda.setVenda(novaVenda);
 
-            Double descontoAplicado = itemDto.getDesconto() != null ? itemDto.getDesconto() : 0.0;
+            BigDecimal descontoAplicado = itemDto.getDesconto() != null ? new BigDecimal(itemDto.getDesconto().toString()) : BigDecimal.ZERO;
 
-            Double subtotalBruto = produto.getValorUnitario() * itemDto.getQuantidadeVendaProduto();
+            BigDecimal valorUnitario = new BigDecimal(produto.getValorUnitario().toString());
+            BigDecimal quantidade = new BigDecimal(itemDto.getQuantidadeVendaProduto());
+            BigDecimal subtotalBruto = valorUnitario.multiply(quantidade);
 
-            if (descontoAplicado > subtotalBruto) {
+            if (descontoAplicado.compareTo(subtotalBruto) > 0) {
                 throw new IllegalArgumentException("O desconto de R$ " + descontoAplicado + " excede o valor do item.");
             }
 
-            Double valorFinalItem = subtotalBruto - descontoAplicado;
+            BigDecimal valorFinalItem = subtotalBruto.subtract(descontoAplicado);
 
-            itemVenda.setDesconto(descontoAplicado);
-            itemVenda.setPrecoUnitarioNaVenda(produto.getValorUnitario());
-            itemVenda.setValorTotalVendaProduto(valorFinalItem);
+            itemVenda.setDesconto(descontoAplicado.doubleValue());
+            itemVenda.setPrecoUnitarioNaVenda(valorUnitario.doubleValue());
+            itemVenda.setValorTotalVendaProduto(valorFinalItem.doubleValue());
 
             novosItensDeVenda.add(itemVenda);
 
-            valorTotal += itemVenda.getValorTotalVendaProduto();
+            valorTotal = valorTotal.add(valorFinalItem);
         }
 
         novaVenda.setItens(novosItensDeVenda);
-        novaVenda.setTotalVenda(arredondar(valorTotal));
+        novaVenda.setTotalVenda(valorTotal.doubleValue());
 
         Venda vendaSalva = vendaRepository.save(novaVenda);
 
@@ -168,7 +169,7 @@ public class VendaService {
 
         // 7. MAPEIA QUANTIDADES NOVAS POR PRODUTO E VALIDA DESCONTOS
         java.util.Map<Integer, Integer> qtdNovaPorProduto = new java.util.HashMap<>();
-        Double valorTotal = 0.0;
+        BigDecimal valorTotal = BigDecimal.ZERO;
 
         for (VendaProdutoRequestDTO itemDto : itensDto) {
             Produto produto = produtoRepository.findById(itemDto.getIdProduto())
@@ -178,15 +179,17 @@ public class VendaService {
             int qtd = itemDto.getQuantidadeVendaProduto();
             qtdNovaPorProduto.merge(itemDto.getIdProduto(), qtd, Integer::sum);
 
-            Double descontoAplicado = itemDto.getDesconto() != null ? itemDto.getDesconto() : 0.0;
-            Double subtotalBruto = produto.getValorUnitario() * itemDto.getQuantidadeVendaProduto();
+            BigDecimal descontoAplicado = itemDto.getDesconto() != null ? new BigDecimal(itemDto.getDesconto().toString()) : BigDecimal.ZERO;
+            BigDecimal valorUnitario = new BigDecimal(produto.getValorUnitario().toString());
+            BigDecimal quantidade = new BigDecimal(itemDto.getQuantidadeVendaProduto());
+            BigDecimal subtotalBruto = valorUnitario.multiply(quantidade);
 
-            if (descontoAplicado > subtotalBruto) {
+            if (descontoAplicado.compareTo(subtotalBruto) > 0) {
                 throw new IllegalArgumentException("O desconto de R$ " + descontoAplicado + " excede o valor do item.");
             }
 
-            Double valorFinalItem = subtotalBruto - descontoAplicado;
-            valorTotal += valorFinalItem;
+            BigDecimal valorFinalItem = subtotalBruto.subtract(descontoAplicado);
+            valorTotal = valorTotal.add(valorFinalItem);
         }
 
         // 8. AJUSTE DE ESTOQUE (o que saiu ou reduziu volta, o que aumentou sai)
@@ -238,20 +241,22 @@ public class VendaService {
             itemVenda.setProduto(produto);
             itemVenda.setQuantidadeVendaProduto(itemDto.getQuantidadeVendaProduto());
 
-            Double descontoAplicado = itemDto.getDesconto() != null ? itemDto.getDesconto() : 0.0;
-            Double subtotalBruto = produto.getValorUnitario() * itemDto.getQuantidadeVendaProduto();
-            Double valorFinalItem = subtotalBruto - descontoAplicado;
+            BigDecimal descontoAplicado = itemDto.getDesconto() != null ? new BigDecimal(itemDto.getDesconto().toString()) : BigDecimal.ZERO;
+            BigDecimal valorUnitario = new BigDecimal(produto.getValorUnitario().toString());
+            BigDecimal quantidade = new BigDecimal(itemDto.getQuantidadeVendaProduto());
+            BigDecimal subtotalBruto = valorUnitario.multiply(quantidade);
+            BigDecimal valorFinalItem = subtotalBruto.subtract(descontoAplicado);
 
-            itemVenda.setDesconto(descontoAplicado);
-            itemVenda.setPrecoUnitarioNaVenda(produto.getValorUnitario());
-            itemVenda.setValorTotalVendaProduto(valorFinalItem);
+            itemVenda.setDesconto(descontoAplicado.doubleValue());
+            itemVenda.setPrecoUnitarioNaVenda(valorUnitario.doubleValue());
+            itemVenda.setValorTotalVendaProduto(valorFinalItem.doubleValue());
             itemVenda.setVenda(vendaParaAtualizar);
 
             vendaParaAtualizar.getItens().add(itemVenda);
         }
 
         // 10. Atualiza o total
-        vendaParaAtualizar.setTotalVenda(valorTotal);
+        vendaParaAtualizar.setTotalVenda(valorTotal.doubleValue());
 
         // 11. Persiste
         Venda vendaSalva = vendaRepository.save(vendaParaAtualizar);
@@ -269,12 +274,12 @@ public class VendaService {
         vendaRepository.deleteById(id);
     }
 
-    public Double calcularTotal() {
+    public BigDecimal calcularTotal() {
         List<Venda> vendas = vendaRepository.findAll();
 
         return vendas.stream()
-                .mapToDouble(Venda::getTotalVenda)
-                .sum();
+                .map(v -> new BigDecimal(v.getTotalVenda().toString()))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public List<MetodoPagamentoProjection> buscarDesempenhoPagamentos(LocalDateTime inicio, LocalDateTime fim) {
@@ -289,11 +294,6 @@ public class VendaService {
         return vendaRepository.buscarMargemPorCategoriaDinamico(inicio, fim);
     }
 
-    private double arredondar(Double valor) {
-        if (valor == null) return 0.0;
-        return Double.valueOf(valor);
-
-    }
 
     public PaginaOffsetVenda buscarPaginaOffset(int pagina, int tamanho) {
         return offsetStrategy.paginar(Map.of("pagina", pagina, "tamanho", tamanho));

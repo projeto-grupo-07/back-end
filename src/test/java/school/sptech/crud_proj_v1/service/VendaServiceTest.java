@@ -93,9 +93,9 @@ class VendaServiceTest {
 
         when(vendaRepository.findAll()).thenReturn(List.of(v1, v2));
 
-        Double resultado = service.calcularTotal();
+        java.math.BigDecimal resultado = service.calcularTotal();
 
-        assertEquals(300.0, resultado);
+        assertEquals(new java.math.BigDecimal("300"), resultado);
     }
 
     @Test

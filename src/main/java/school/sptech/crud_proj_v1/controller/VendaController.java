@@ -121,13 +121,13 @@ public class VendaController {
     @Operation(summary = "Esse método retorna o valor total de todas as vendas cadastradas")
     public ResponseEntity<Double> calcularTotalVendas() {
         log.info("Requisição para calcular total de vendas recebida");
-        Double total = service.calcularTotal();
-        if(total == null || total == 0){
+        java.math.BigDecimal total = service.calcularTotal();
+        if(total == null || total.compareTo(java.math.BigDecimal.ZERO) == 0){
             log.warn("Nenhuma venda encontrada no momento");
             return ResponseEntity.status(204).build();
         }
         log.info("Total de venda calculado com sucesso: {}", total);
-        return ResponseEntity.status(200).body(total);
+        return ResponseEntity.status(200).body(total.doubleValue());
     }
 
     @PostMapping
