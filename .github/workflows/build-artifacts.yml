@@ -47,15 +47,18 @@ jobs:
         run: |
           echo "Aguardando o Spring Boot iniciar..."
           for i in {1..30}; do
-            RESPONSE=$(curl -s http://localhost:8080/health)
+            # O '|| true' impede que o mecanismo do GitHub Actions aborte o script quando o curl falhar por falta de conexão inicial
+            RESPONSE=$(curl -s http://localhost:8080/health || true)
+            
             if [ "$RESPONSE" == "OK" ]; then
-              echo "API pronta!"
+              echo "API pronta e respondendo!"
               exit 0
             fi
-            echo "Aguardando... tentativa $i (Resposta atual: '$RESPONSE')"
+            
+            echo "Tentativa $i: A aplicação ainda está subindo..."
             sleep 5
           done
-          echo "Timeout: A API não subiu a tempo."
+          echo "Timeout: A API não subiu dentro do tempo esperado."
           docker logs backend-app
           exit 1
 
