@@ -37,7 +37,10 @@ jobs:
       # 2. Sobe a aplicação em background para o teste
       - name: Start Backend Container
         run: |
-          docker run -d -p 8080:8080 --name backend-app brinks-backend-test:latest
+          docker run -d -p 8080:8080 \
+          -e SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb \
+          -e SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver \
+          --name backend-app brinks-backend-test:latest
 
       - name: Wait for Backend to be ready
         run: |
