@@ -38,11 +38,22 @@ jobs:
       - name: Start Backend Container
         run: |
           docker run -d -p 8080:8080 --name backend-app brinks-backend-test:latest
-          
-          # Aguarda o Spring Boot terminar de inicializar
-          # Aumente ou diminua esse tempo de acordo com o peso da sua aplicação
-          sleep 20 
 
+      - name: Wait for Backend to be ready
+        run: |
+          echo "Aguardando o Spring Boot iniciar..."
+          for i in {1..30}; do
+            # Usamos -f para falhar caso o servidor retorne erro
+            if curl -s -f http://localhost:8080/health | grep "UP"; then
+              echo "API pronta!"
+              exit 0
+            fi
+            echo "Aguardando... tentativa $i"
+            sleep 5
+          done
+          echo "Timeout: A API não subiu a tempo."
+          docker logs backend-app # Isso ajuda a debugar se falhar
+          exit 1
       # 3. Prepara o ambiente para o JMeter
       - name: Set up Java
         uses: actions/setup-java@v4
@@ -56,6 +67,8 @@ jobs:
           wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz
           tar -xzf apache-jmeter-${JMETER_VERSION}.tgz
           mv apache-jmeter-${JMETER_VERSION} /opt/jmeter
+
+          
 
       # 4. Executa o teste contra a aplicação rodando no runner
       - name: Run JMeter Test
