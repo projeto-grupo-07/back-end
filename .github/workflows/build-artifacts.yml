@@ -35,12 +35,12 @@ jobs:
           cache-to: type=gha,mode=max
 
       # 2. Sobe a aplicação em background para o teste
+      # 2. Sobe a aplicação em background garantindo o perfil de teste
       - name: Start Backend Container
         run: |
           docker run -d -p 8080:8080 \
-          -e SPRING_DATASOURCE_URL=jdbc:h2:mem:testdb \
-          -e SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.h2.Driver \
-          --name backend-app brinks-backend-test:latest
+            -e SPRING_PROFILES_ACTIVE=test \
+            --name backend-app brinks-backend-test:latestatest
 
       - name: Wait for Backend to be ready
         run: |
