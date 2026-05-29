@@ -40,7 +40,7 @@ jobs:
         run: |
           docker run -d -p 8080:8080 \
             -e SPRING_PROFILES_ACTIVE=test \
-            --name backend-app brinks-backend-prod:latestatest
+            --name backend-app brinks-backend-prod:latest
 
       - name: Wait for Backend to be ready
         run: |
