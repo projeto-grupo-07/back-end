@@ -24,40 +24,42 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 1. Constrói a imagem e carrega no runner (NÃO faz o push ainda)
+      # 1. Constrói a imagem temporária e carrega no runner (NÃO faz o push)
       - name: Build Docker image for testing
         uses: docker/build-push-action@v5
         with:
           context: .
-          load: true # <-- Essencial: disponibiliza a imagem localmente no runner
+          load: true 
           tags: brinks-backend-test:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # 2. Sobe a aplicação em background para o teste
-      # 2. Sobe a aplicação em background garantindo o perfil de teste
+      # 2. Sobe o container local de teste usando o perfil 'test'
       - name: Start Backend Container
         run: |
           docker run -d -p 8080:8080 \
             -e SPRING_PROFILES_ACTIVE=test \
-            --name backend-app brinks-backend-prod:latest
+            --name backend-app \
+            brinks-backend-test:latest
 
+      # 3. Aguarda o endpoint customizado /health responder "OK"
       - name: Wait for Backend to be ready
         run: |
           echo "Aguardando o Spring Boot iniciar..."
           for i in {1..30}; do
-            # Usamos -f para falhar caso o servidor retorne erro
-            if curl -s -f http://localhost:8080/health | grep "UP"; then
+            RESPONSE=$(curl -s http://localhost:8080/health)
+            if [ "$RESPONSE" == "OK" ]; then
               echo "API pronta!"
               exit 0
             fi
-            echo "Aguardando... tentativa $i"
+            echo "Aguardando... tentativa $i (Resposta atual: '$RESPONSE')"
             sleep 5
           done
           echo "Timeout: A API não subiu a tempo."
-          docker logs backend-app # Isso ajuda a debugar se falhar
+          docker logs backend-app
           exit 1
-      # 3. Prepara o ambiente para o JMeter
+
+      # 4. Prepara o ambiente para o JMeter
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
@@ -71,24 +73,20 @@ jobs:
           tar -xzf apache-jmeter-${JMETER_VERSION}.tgz
           mv apache-jmeter-${JMETER_VERSION} /opt/jmeter
 
-          
-
-      # 4. Executa o teste contra a aplicação rodando no runner
+      # 5. Executa o teste contra a aplicação rodando no runner
       - name: Run JMeter Test
         run: |
-          # Importante: Seu arquivo .jmx deve estar configurado para disparar contra localhost na porta 8080
           /opt/jmeter/bin/jmeter -n -t ./jmeter/teste.jmx -l results.jtl -e -o jmeter-report/
 
-      # Opcional: Salva o relatório do JMeter como artefato no GitHub
+      # 6. Salva o relatório do JMeter como artefato no GitHub
       - name: Upload JMeter Report
-        if: always() # Salva o relatório mesmo se o teste falhar
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: jmeter-report
           path: jmeter-report/
 
-      # 5. Se o teste passar, constrói e faz o push oficial
-      # (O build será quase instantâneo graças ao cache das etapas anteriores)
+      # 7. Se o teste passar, constrói e faz o push oficial para o Docker Hub
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
