@@ -110,9 +110,13 @@ public class ProdutoService {
     }
 
     public List<ProdutoResponse> listarTodos() {
+        // Se mudou o repository, use: produtoRepository.findAllByAtivoTrueAndQuantidadeGreaterThan(0);
+        // Caso contrário, mantemos a busca padrão e filtramos no Stream abaixo:
         List<Produto> produtos = produtoRepository.findAllByAtivoTrue();
 
         return produtos.stream()
+                // 🔴 NOVA VALIDAÇÃO: Filtra no backend tirando produtos com estoque zerado
+                .filter(produto -> produto.getQuantidade() != null && produto.getQuantidade() > 0)
                 .map(produto -> {
                     if (produto instanceof CalcadoProduto) {
                         return calcadoMapper.toResponse((CalcadoProduto) produto);
