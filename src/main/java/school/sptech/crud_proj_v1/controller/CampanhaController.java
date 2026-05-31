@@ -1,5 +1,7 @@
 package school.sptech.crud_proj_v1.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.sptech.crud_proj_v1.dto.Campanha.CampanhaRequestDto;
 import school.sptech.crud_proj_v1.dto.Campanha.CampanhaResponseDto;
+import school.sptech.crud_proj_v1.dto.paginacao.PaginaOffsetCampanhaResposta;
 import school.sptech.crud_proj_v1.entity.Cliente;
 import school.sptech.crud_proj_v1.service.CampanhaService;
 import school.sptech.crud_proj_v1.service.GeminiService;
@@ -118,5 +121,19 @@ public class CampanhaController {
         // Agora retorna um JSON estruturado: {"assunto": "...", "corpo": "..."}
         Map<String, String> resultado = geminiService.gerarTextoCampanha(tema);
         return ResponseEntity.ok(resultado);
+    }
+
+    @GetMapping("/paginas")
+    @SecurityRequirement(name = "Bearer")
+    @Operation(summary = "Lista campanhas com paginação offset")
+    public ResponseEntity<PaginaOffsetCampanhaResposta> listarComOffset(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "15") int tamanho
+    ) {
+        log.info("Requisição para paginação offset de campanhas: pagina={}, tamanho={}", pagina, tamanho);
+        PaginaOffsetCampanhaResposta resposta = PaginaOffsetCampanhaResposta.de(
+                campanhaService.buscarPaginaOffset(pagina, tamanho)
+        );
+        return ResponseEntity.ok(resposta);
     }
 }

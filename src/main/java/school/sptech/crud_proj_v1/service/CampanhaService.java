@@ -11,6 +11,8 @@ import school.sptech.crud_proj_v1.dto.Campanha.CampanhaRequestDto;
 import school.sptech.crud_proj_v1.dto.Campanha.CampanhaResponseDto;
 import school.sptech.crud_proj_v1.enumeration.StatusCampanha;
 import school.sptech.crud_proj_v1.mapper.CampanhaMapper;
+import school.sptech.crud_proj_v1.paginacao.dominio.PaginaOffsetCampanha;
+import school.sptech.crud_proj_v1.paginacao.dominio.PaginacaoStrategy;
 import school.sptech.crud_proj_v1.projection.EmailProjection;
 import school.sptech.crud_proj_v1.dto.RabbitMQ.EmailMessage;
 import school.sptech.crud_proj_v1.email.RabbitEmailProducer;
@@ -19,6 +21,7 @@ import school.sptech.crud_proj_v1.entity.Cliente;
 import school.sptech.crud_proj_v1.repository.CampanhaRepository;
 import school.sptech.crud_proj_v1.repository.ClienteRepository;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.ArrayList;
 import org.springframework.data.domain.Page;
@@ -32,6 +35,7 @@ public class CampanhaService {
     private final ClienteRepository clienteRepository;
     private final RabbitEmailProducer rabbitEmailProducer;
     private final CampanhaMapper campanhaMapper;
+    private final PaginacaoStrategy<PaginaOffsetCampanha> offsetStrategy;
 
     public CampanhaResponseDto criarCampanha(CampanhaRequestDto campanhaRequestDTO) {
         Specification<Cliente> spec = montarFiltro(campanhaRequestDTO);
@@ -229,5 +233,9 @@ public class CampanhaService {
         return campanhas.stream()
                 .map(campanhaMapper::toDto)
                 .toList();
+    }
+
+    public PaginaOffsetCampanha buscarPaginaOffset(int pagina, int tamanho) {
+        return offsetStrategy.paginar(Map.of("pagina", pagina, "tamanho", tamanho));
     }
 }
