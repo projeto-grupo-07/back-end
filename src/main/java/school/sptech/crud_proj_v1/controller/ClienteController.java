@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.sptech.crud_proj_v1.dto.Cliente.ClienteRequestDto;
 import school.sptech.crud_proj_v1.dto.Cliente.ClienteResponseDto;
+import school.sptech.crud_proj_v1.dto.paginacao.PaginaOffsetClienteResposta;
 import school.sptech.crud_proj_v1.repository.ClienteRepository;
 import school.sptech.crud_proj_v1.service.ClienteService;
 
@@ -121,6 +122,20 @@ public class ClienteController {
         log.info("Buscando cliente por CPF: {}", cpf);
         ClienteResponseDto dto = service.buscarPorCpf(cpf);
         return ResponseEntity.status(200).body(dto);
+    }
+
+    @GetMapping("/paginas")
+    @SecurityRequirement(name = "Bearer")
+    @Operation(summary = "Lista clientes com paginação offset")
+    public ResponseEntity<PaginaOffsetClienteResposta> listarComOffset(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "15") int tamanho
+    ) {
+        log.info("Requisição para paginação offset de clientes: pagina={}, tamanho={}", pagina, tamanho);
+        PaginaOffsetClienteResposta resposta = PaginaOffsetClienteResposta.de(
+                service.buscarPaginaOffset(pagina, tamanho)
+        );
+        return ResponseEntity.ok(resposta);
     }
 }
 

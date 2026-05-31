@@ -10,17 +10,21 @@ import school.sptech.crud_proj_v1.entity.Endereco;
 import school.sptech.crud_proj_v1.exception.EntidadeConflitoException;
 import school.sptech.crud_proj_v1.exception.EntidadeNotFoundException;
 import school.sptech.crud_proj_v1.mapper.ClienteMapper;
+import school.sptech.crud_proj_v1.paginacao.dominio.PaginaOffsetCliente;
+import school.sptech.crud_proj_v1.paginacao.dominio.PaginacaoStrategy;
 import school.sptech.crud_proj_v1.repository.ClienteRepository;
 import school.sptech.crud_proj_v1.repository.EnderecoRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class ClienteService {
     private final ClienteRepository clienteRepository;
     private final EnderecoRepository enderecoRepository;
+    private final PaginacaoStrategy<PaginaOffsetCliente> offsetStrategy;
 
     public List<ClienteResponseDto> listar(){
         return clienteRepository.findAll()
@@ -114,5 +118,9 @@ public class ClienteService {
                 .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
                         org.springframework.http.HttpStatus.NOT_FOUND, "Cliente não encontrado"));
         return ClienteMapper.of(cliente);
+    }
+
+    public PaginaOffsetCliente buscarPaginaOffset(int pagina, int tamanho) {
+        return offsetStrategy.paginar(Map.of("pagina", pagina, "tamanho", tamanho));
     }
 }

@@ -47,7 +47,7 @@ public class FuncionarioController {
         log.info("Listagem finalizada. Total de registros: {}", all.size());
         return ResponseEntity.status(200).body(all);
     }
-    
+
     @GetMapping("/paginas")
     @SecurityRequirement(name = "Bearer")
     @Operation(summary = "Lista funcionários com paginação offset")
