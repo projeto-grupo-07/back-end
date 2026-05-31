@@ -17,6 +17,7 @@ import school.sptech.crud_proj_v1.mapper.FuncionarioMapper;
 import school.sptech.crud_proj_v1.repository.FuncionarioRepository;
 import school.sptech.crud_proj_v1.service.FuncionarioService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import school.sptech.crud_proj_v1.dto.paginacao.PaginaOffsetFuncionarioResposta;
 
 import java.util.List;
 
@@ -45,6 +46,20 @@ public class FuncionarioController {
         }
         log.info("Listagem finalizada. Total de registros: {}", all.size());
         return ResponseEntity.status(200).body(all);
+    }
+    
+    @GetMapping("/paginas")
+    @SecurityRequirement(name = "Bearer")
+    @Operation(summary = "Lista funcionários com paginação offset")
+    public ResponseEntity<PaginaOffsetFuncionarioResposta> listarComOffset(
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "15") int tamanho
+    ) {
+        log.info("Requisição para paginação offset de funcionários: pagina={}, tamanho={}", pagina, tamanho);
+        PaginaOffsetFuncionarioResposta resposta = PaginaOffsetFuncionarioResposta.de(
+                service.buscarPaginaOffset(pagina, tamanho)
+        );
+        return ResponseEntity.ok(resposta);
     }
 
     @PostMapping

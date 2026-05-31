@@ -25,6 +25,9 @@ import school.sptech.crud_proj_v1.exception.EntidadeNotFoundException;
 import school.sptech.crud_proj_v1.mapper.FuncionarioMapper;
 import school.sptech.crud_proj_v1.repository.FuncionarioRepository;
 import school.sptech.crud_proj_v1.repository.PerfilRepository;
+import school.sptech.crud_proj_v1.paginacao.dominio.PaginaOffsetFuncionario;
+import school.sptech.crud_proj_v1.paginacao.dominio.PaginacaoStrategy;
+import java.util.Map;
 
 import java.util.List;
 
@@ -43,6 +46,7 @@ public class FuncionarioService {
     private final PerfilRepository perfilRepository;
     private final FuncionarioMapper funcionarioMapper;
     private final TentativaLoginService tentativaLoginService;
+    private final PaginacaoStrategy<PaginaOffsetFuncionario> offsetStrategy;
 
 
     public List<FuncionarioResponseDto> listar(){
@@ -140,5 +144,9 @@ public class FuncionarioService {
         for (Funcionario f : funcionarios) {
             System.out.println("Enviando email para " + f.getEmail() + " sobre adição do produto: " + produto.getId());
         }
+    }
+
+    public PaginaOffsetFuncionario buscarPaginaOffset(int pagina, int tamanho) {
+        return offsetStrategy.paginar(Map.of("pagina", pagina, "tamanho", tamanho));
     }
 }
