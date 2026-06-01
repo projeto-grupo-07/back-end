@@ -25,6 +25,7 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
     // --- KPIs EXISTENTES (DADOS ESTÁTICOS) ---
     // ========================================================================
 
+    // FATURAMENTO ========================================================================
     @Query(value = "SELECT SUM(valor_total) FROM venda WHERE DATE(data_hora) = CURDATE()", nativeQuery = true)
     Double buscarFaturamentoDia();
 
@@ -34,6 +35,10 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
     @Query(value = "SELECT SUM(valor_total) FROM venda WHERE MONTH(data_hora) = MONTH(CURDATE()) AND YEAR(data_hora) = YEAR(CURDATE())", nativeQuery = true)
     Double buscarFaturamentoMes();
 
+    @Query(value = "SELECT ROUND(SUM(valor_total), 2) AS faturamento_semestre_atual FROM venda WHERE YEAR(data_hora) = YEAR(CURDATE()) AND MONTH(data_hora) BETWEEN 1 AND 6", nativeQuery = true)
+    Double buscarFaturamentoSemestre();
+
+    // CONTAGEM DE VENDAS ========================================================================
     @Query(value = "SELECT COUNT(id) FROM venda WHERE DATE(data_hora) = CURDATE()", nativeQuery = true)
     Integer contarVendasDiarias();
 
@@ -43,6 +48,10 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
     @Query(value = "SELECT COUNT(id) FROM venda WHERE MONTH(data_hora) = MONTH(CURDATE()) AND YEAR(data_hora) = YEAR(CURDATE())", nativeQuery = true)
     Integer contarVendasMensais();
 
+    @Query(value = "SELECT COUNT(*) FROM venda WHERE YEAR(data_hora) = YEAR(CURDATE()) AND MONTH(data_hora) BETWEEN 1 AND 6", nativeQuery = true)
+    Integer contarVendasSemestrais();
+
+    // TICKET MÉDIO ========================================================================
     @Query(value = "SELECT AVG(valor_total) FROM venda WHERE DATE(data_hora) = CURDATE()", nativeQuery = true)
     Double contarTicketMedioDiario();
 
@@ -52,6 +61,10 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
     @Query(value = "SELECT AVG(valor_total) FROM venda WHERE MONTH(data_hora) = MONTH(CURDATE()) AND YEAR(data_hora) = YEAR(CURDATE())", nativeQuery = true)
     Double contarTicketMedioMensal();
 
+    @Query(value = "SELECT (AVG(valor_total) FROM venda WHERE YEAR(data_hora) = YEAR(CURDATE()) AND MONTH(data_hora) BETWEEN 1 AND 6", nativeQuery = true)
+    Double contarTicketMedioSemestral();
+
+    // FATURAMENTO TOTAL POR VENDEDOR
     @Query(value = "SELECT SUM(valor_total) FROM venda WHERE fk_vendedor = :idFuncionario", nativeQuery = true)
     Double buscarFaturamentoTotalPorVendedor(@Param("idFuncionario") Integer idFuncionario);
 
@@ -61,6 +74,7 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
     @Query(value = "SELECT COUNT(id) FROM venda WHERE fk_vendedor = :id", nativeQuery = true)
     Integer contarQtdVendasPorVendedor(@Param("id") Integer id);
 
+    // TOTAL EM DESCONTOS
     @Query(value = "SELECT SUM(valor_desconto) FROM itens_venda iv JOIN venda v ON v.id = iv.fk_venda WHERE DATE(v.data_hora) = CURDATE()", nativeQuery = true)
     Double buscarTotalDescontoDia();
 
@@ -70,6 +84,10 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
     @Query(value = "SELECT SUM(valor_desconto) FROM itens_venda iv JOIN venda v ON v.id = iv.fk_venda WHERE MONTH(v.data_hora) = MONTH(CURDATE()) AND YEAR(v.data_hora) = YEAR(CURDATE())", nativeQuery = true)
     Double buscarTotalDescontoMes();
 
+    @Query(value = "SELECT (SUM(iv.valor_desconto) FROM itens_venda iv JOIN venda v ON iv.fk_venda = v.id WHERE YEAR(v.data_hora) = YEAR(CURDATE()) AND MONTH(v.data_hora) BETWEEN 1 AND 6", nativeQuery = true)
+    Double buscarTotalDescontoSemestre();
+
+    // QUANTIDADE VENDAS PRODUTO
     @Query(value = "SELECT SUM(quantidade_venda_produto) FROM itens_venda iv JOIN venda v ON v.id = iv.fk_venda WHERE DATE(v.data_hora) = CURDATE()", nativeQuery = true)
     Integer buscarQuantidadeUnidadesDia();
 
@@ -79,9 +97,14 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
     @Query(value = "SELECT SUM(quantidade_venda_produto) FROM itens_venda iv JOIN venda v ON v.id = iv.fk_venda WHERE MONTH(v.data_hora) = MONTH(CURDATE()) AND YEAR(v.data_hora) = YEAR(CURDATE())", nativeQuery = true)
     Integer buscarQuantidadeUnidadesMes();
 
+    @Query(value = "SELECT SUM(quantidade_venda_produto) FROM itens_venda iv JOIN venda v ON v.id = iv.fk_venda WHERE YEAR(v.data_hora) = YEAR(CURDATE()) AND MONTH(v.data_hora) BETWEEN 1 AND 6", nativeQuery = true)
+    Integer buscarQuantidadeUnidadesSemestre();
+
     // ========================================================================
     // --- VIEWS ESTÁTICAS DELEGADAS ---
     // ========================================================================
+
+    // FATURAMENTO AO LONGO DO TEMPO
     @Query(value = "SELECT * FROM faturamento_ao_longo_mensal", nativeQuery = true)
     List<GraficoTempoProjection> buscarFaturamentoTempoMensal();
 
@@ -91,12 +114,15 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
     @Query(value = "SELECT * FROM dia_mais_movimentado_semana_atual", nativeQuery = true)
     List<DiaMovimentadoProjection> buscarDiaMaisMovimentadoSemanaAtual();
 
+
+    // PRODUTO MAIS VENDIDO
     @Query(value = "SELECT * FROM produtos_mais_vendidos_mes", nativeQuery = true)
     List<RankingVendasProjection> buscarProdutosMaisVendidosMes();
 
     @Query(value = "SELECT * FROM marcas_mais_vendidas_mes", nativeQuery = true)
     List<RankingVendasProjection> buscarMarcasMaisVendidasMes();
 
+    // DESEMPENHO FUNCIONARIO
     @Query(value = "SELECT * FROM desempenho_funcionario_mes", nativeQuery = true)
     List<DesempenhoFuncionarioProjection> buscarDesempenhoFuncionarioMes();
 
