@@ -93,7 +93,8 @@ public class ProdutoService {
         return calcadoMapper.toResponse(salvo);
     }
 
-    @CachePut(cacheNames = "produtos", key = "#novoOutros.id")
+    
+    @CachePut(cacheNames = "produtos", key = "#result.id")
     public OutrosProdutoResponse cadastrarOutros(OutrosProdutoRequest dto) {
         OutrosProduto novoOutros = outrosMapper.toEntity(dto);
 
