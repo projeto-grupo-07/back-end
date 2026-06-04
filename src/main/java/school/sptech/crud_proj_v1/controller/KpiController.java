@@ -39,6 +39,11 @@ public class KpiController {
         return ResponseEntity.status(200).body(kpiService.buscarFaturamentoMes());
     }
 
+    @GetMapping("/faturamento-semestral")
+    public ResponseEntity<Double> getFaturamentoSemestral(){
+        return ResponseEntity.status(200).body(kpiService.buscarFaturamentoSemestre());
+    }
+
     @GetMapping("/total-vendas-diario")
     public ResponseEntity<Integer> getTotalVendasDiario() {
         return ResponseEntity.status(200).body(kpiService.buscarTotalVendasDiarias());
@@ -54,6 +59,11 @@ public class KpiController {
         return ResponseEntity.status(200).body(kpiService.buscarTotalVendasMensais());
     }
 
+    @GetMapping("/total-vendas-semestral")
+    public ResponseEntity<Integer> getTotalVendasSemestral() {
+        return ResponseEntity.status(200).body(kpiService.buscarTotalVendasSemestrais());
+    }
+
     @GetMapping("/ticket-medio-diario")
     public ResponseEntity<Double> getTicketMedioDiario(){
         return ResponseEntity.status(200).body(kpiService.contarTicketMedioDiario());
@@ -67,6 +77,11 @@ public class KpiController {
     @GetMapping("/ticket-medio-mensal")
     public ResponseEntity<Double> getTicketMedioMensal(){
         return ResponseEntity.status(200).body(kpiService.contarTicketMedioMensal());
+    }
+
+    @GetMapping("/ticket-medio-semestral")
+    public ResponseEntity<Double> getTicketMedioSemestral(){
+        return ResponseEntity.status(200).body(kpiService.contarTicketMedioSemestral());
     }
 
     @GetMapping("/vendedor/{id}/faturamento")
@@ -103,6 +118,11 @@ public class KpiController {
         return ResponseEntity.status(200).body(kpiService.buscarTotalDescontoMes());
     }
 
+    @GetMapping("/desconto-semestral")
+    public ResponseEntity<Double> getDescontoSemestral() {
+        return ResponseEntity.status(200).body(kpiService.buscarTotalDescontoSemestre());
+    }
+
     // ========================================================================
     // --- NOVOS ENDPOINTS: UNIDADES VENDIDAS (CARDS ESQUERDOS) ---
     // ========================================================================
@@ -120,6 +140,11 @@ public class KpiController {
     @GetMapping("/unidades-mensal")
     public ResponseEntity<Integer> getUnidadesMensal() {
         return ResponseEntity.status(200).body(kpiService.buscarQuantidadeUnidadesMes());
+    }
+
+    @GetMapping("/unidades-semestral")
+    public ResponseEntity<Integer> getUnidadesSemestral() {
+        return ResponseEntity.status(200).body(kpiService.buscarQuantidadeUnidadesSemestre());
     }
 
     // ========================================================================

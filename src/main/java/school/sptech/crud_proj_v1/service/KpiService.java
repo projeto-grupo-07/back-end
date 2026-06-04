@@ -33,6 +33,10 @@ public class KpiService {
         return vendaRepository.buscarFaturamentoMes();
     }
 
+    public Double buscarFaturamentoSemestre(){
+        return vendaRepository.buscarFaturamentoSemestre();
+    }
+
     public Integer buscarTotalVendasDiarias() {
         Integer qtd = vendaRepository.contarVendasDiarias();
         return (qtd != null) ? qtd : 0;
@@ -48,8 +52,17 @@ public class KpiService {
         return (qtd != null) ? qtd : 0;
     }
 
+    public Integer buscarTotalVendasSemestrais() {
+        Integer qtd = vendaRepository.contarVendasSemestrais();
+        return (qtd != null) ? qtd : 0;
+    }
+
     public Double contarTicketMedioMensal(){
         return vendaRepository.contarTicketMedioMensal();
+    }
+
+    public Double contarTicketMedioSemestral(){
+        return vendaRepository.contarTicketMedioSemestral();
     }
 
     public Double contarTicketMedioSemanal(){
@@ -91,6 +104,10 @@ public class KpiService {
         return vendaRepository.buscarTotalDescontoMes();
     }
 
+    public Double buscarTotalDescontoSemestre() {
+        return vendaRepository.buscarTotalDescontoSemestre();
+    }
+
     public Integer buscarQuantidadeUnidadesDia() {
         return vendaRepository.buscarQuantidadeUnidadesDia();
     }
@@ -101,6 +118,10 @@ public class KpiService {
 
     public Integer buscarQuantidadeUnidadesMes() {
         return vendaRepository.buscarQuantidadeUnidadesMes();
+    }
+
+    public Integer buscarQuantidadeUnidadesSemestre() {
+        return vendaRepository.buscarQuantidadeUnidadesSemestre();
     }
 
     // ========================================================================
