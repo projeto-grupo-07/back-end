@@ -87,17 +87,17 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
     @Query(value = "SELECT (SUM(iv.valor_desconto) FROM itens_venda iv JOIN venda v ON iv.fk_venda = v.id WHERE YEAR(v.data_hora) = YEAR(CURDATE()) AND MONTH(v.data_hora) BETWEEN 1 AND 6", nativeQuery = true)
     Double buscarTotalDescontoSemestre();
 
-    // QUANTIDADE VENDAS PRODUTO
-    @Query(value = "SELECT SUM(quantidade_venda_produto) FROM itens_venda iv JOIN venda v ON v.id = iv.fk_venda WHERE DATE(v.data_hora) = CURDATE()", nativeQuery = true)
+    // QUANTIDADE DE VENDAS
+    @Query(value = "SELECT COUNT(id) FROM venda WHERE DATE(data_hora) = CURDATE()", nativeQuery = true)
     Integer buscarQuantidadeUnidadesDia();
 
-    @Query(value = "SELECT SUM(quantidade_venda_produto) FROM itens_venda iv JOIN venda v ON v.id = iv.fk_venda WHERE YEARWEEK(v.data_hora, 1) = YEARWEEK(CURDATE(), 1)", nativeQuery = true)
+    @Query(value = "SELECT COUNT(id) FROM venda WHERE YEARWEEK(data_hora, 1) = YEARWEEK(CURDATE(), 1)", nativeQuery = true)
     Integer buscarQuantidadeUnidadesSemana();
 
-    @Query(value = "SELECT SUM(quantidade_venda_produto) FROM itens_venda iv JOIN venda v ON v.id = iv.fk_venda WHERE MONTH(v.data_hora) = MONTH(CURDATE()) AND YEAR(v.data_hora) = YEAR(CURDATE())", nativeQuery = true)
+    @Query(value = "SELECT COUNT(id) FROM venda WHERE MONTH(data_hora) = MONTH(CURDATE()) AND YEAR(data_hora) = YEAR(CURDATE())", nativeQuery = true)
     Integer buscarQuantidadeUnidadesMes();
 
-    @Query(value = "SELECT SUM(quantidade_venda_produto) FROM itens_venda iv JOIN venda v ON v.id = iv.fk_venda WHERE YEAR(v.data_hora) = YEAR(CURDATE()) AND MONTH(v.data_hora) BETWEEN 1 AND 6", nativeQuery = true)
+    @Query(value = "SELECT COUNT(id) FROM venda WHERE YEAR(data_hora) = YEAR(CURDATE()) AND MONTH(data_hora) BETWEEN 1 AND 6", nativeQuery = true)
     Integer buscarQuantidadeUnidadesSemestre();
 
     // ========================================================================
