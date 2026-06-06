@@ -52,7 +52,8 @@ public class DevSecurityConfig {
                                 "/swagger/**",
                                 "/v3/api-docs/**",
                                 "/funcionarios/login",
-                                "/error"
+                                "/error",
+                                "/kpis/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
