@@ -90,6 +90,11 @@ public class KpiService {
         return vendaRepository.buscarGraficoFaturamentoDiarioDinamico(d[0], d[1]);
     }
 
+    public List<PicoDiaProjection> getGraficoPicoDia(String tipo, LocalDateTime inicio, LocalDateTime fim) {
+        LocalDateTime[] d = calcularPeriodo(tipo, inicio, fim);
+        return vendaRepository.buscarGraficoPicoDiaDinamico(d[0], d[1]);
+    }
+
     public List<RankingVendasProjection> getRankingProdutos(String tipo, LocalDateTime inicio, LocalDateTime fim) {
         LocalDateTime[] d = calcularPeriodo(tipo, inicio, fim);
         return vendaRepository.buscarRankingProdutosDinamico(d[0], d[1]);

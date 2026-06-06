@@ -77,6 +77,14 @@ public class KpiController {
         return ResponseEntity.ok(kpiService.getGraficoFaturamento(tipo, inicio, fim));
     }
 
+    @GetMapping("/grafico-pico-dia")
+    public ResponseEntity<List<PicoDiaProjection>> getGraficoPicoDia(
+            @RequestParam(required = false, defaultValue = "Este Mês") String tipo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
+        return ResponseEntity.ok(kpiService.getGraficoPicoDia(tipo, inicio, fim));
+    }
+
     @GetMapping("/ranking-produtos")
     public ResponseEntity<List<RankingVendasProjection>> getRankingProdutos(
             @RequestParam(required = false, defaultValue = "Este Mês") String tipo,
