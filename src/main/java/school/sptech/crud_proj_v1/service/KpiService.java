@@ -3,11 +3,9 @@ package school.sptech.crud_proj_v1.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import school.sptech.crud_proj_v1.repository.VendaRepository;
-import school.sptech.crud_proj_v1.projection.*; // Importante para as listas
+import school.sptech.crud_proj_v1.projection.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,152 +16,18 @@ public class KpiService {
     private final VendaRepository vendaRepository;
 
     // ========================================================================
-    // --- KPIs EXISTENTES ---
+    // --- LÓGICA DE DATAS (O CÉREBRO) ---
     // ========================================================================
-
-    public Double buscarFaturamentoDia(){
-        return vendaRepository.buscarFaturamentoDia();
-    }
-
-    public Double buscarFaturamentoSemana(){
-        return vendaRepository.buscarFaturamentoSemana();
-    }
-
-    public Double buscarFaturamentoMes(){
-        return vendaRepository.buscarFaturamentoMes();
-    }
-
-    public Double buscarFaturamentoSemestre(){
-        return vendaRepository.buscarFaturamentoSemestre();
-    }
-
-    public Integer buscarTotalVendasDiarias() {
-        Integer qtd = vendaRepository.contarVendasDiarias();
-        return (qtd != null) ? qtd : 0;
-    }
-
-    public Integer buscarTotalVendasSemanais() {
-        Integer qtd = vendaRepository.contarVendasSemanais();
-        return (qtd != null) ? qtd : 0;
-    }
-
-    public Integer buscarTotalVendasMensais() {
-        Integer qtd = vendaRepository.contarVendasMensais();
-        return (qtd != null) ? qtd : 0;
-    }
-
-    public Integer buscarTotalVendasSemestrais() {
-        Integer qtd = vendaRepository.contarVendasSemestrais();
-        return (qtd != null) ? qtd : 0;
-    }
-
-    public Double contarTicketMedioMensal(){
-        return vendaRepository.contarTicketMedioMensal();
-    }
-
-    public Double contarTicketMedioSemestral(){
-        return vendaRepository.contarTicketMedioSemestral();
-    }
-
-    public Double contarTicketMedioSemanal(){
-        return vendaRepository.contarTicketMedioSemanal();
-    }
-
-    public Double contarTicketMedioDiario(){
-        return vendaRepository.contarTicketMedioDiario();
-    }
-
-    public Double buscarFaturamentoTotalPorVendedor(Integer idFuncionario) {
-        Double faturamento = vendaRepository.buscarFaturamentoTotalPorVendedor(idFuncionario);
-        return Optional.ofNullable(faturamento).orElse(0.0);
-    }
-
-    public Double buscarComissaoTotalPorVendedor(Integer idFuncionario) {
-        Double comissao = vendaRepository.buscarComissaoTotalPorVendedor(idFuncionario);
-        return Optional.ofNullable(comissao).orElse(0.0);
-    }
-
-    public Integer buscarQtdVendasPorVendedor(Integer id) {
-        Integer qtd = vendaRepository.contarQtdVendasPorVendedor(id);
-        return (qtd != null) ? qtd : 0;
-    }
-
-    // ========================================================================
-    // --- NOVOS MÉTODOS: DESCONTOS E UNIDADES (CARDS) ---
-    // ========================================================================
-
-    public Double buscarTotalDescontoDia() {
-        return vendaRepository.buscarTotalDescontoDia();
-    }
-
-    public Double buscarTotalDescontoSemana() {
-        return vendaRepository.buscarTotalDescontoSemana();
-    }
-
-    public Double buscarTotalDescontoMes() {
-        return vendaRepository.buscarTotalDescontoMes();
-    }
-
-    public Double buscarTotalDescontoSemestre() {
-        return vendaRepository.buscarTotalDescontoSemestre();
-    }
-
-    public Integer buscarQuantidadeUnidadesDia() {
-        return vendaRepository.buscarQuantidadeUnidadesDia();
-    }
-
-    public Integer buscarQuantidadeUnidadesSemana() {
-        return vendaRepository.buscarQuantidadeUnidadesSemana();
-    }
-
-    public Integer buscarQuantidadeUnidadesMes() {
-        return vendaRepository.buscarQuantidadeUnidadesMes();
-    }
-
-    public Integer buscarQuantidadeUnidadesSemestre() {
-        return vendaRepository.buscarQuantidadeUnidadesSemestre();
-    }
-
-    // ========================================================================
-    // --- DADOS ESTÁTICOS (MANTIDOS POR SEGURANÇA) ---
-    // ========================================================================
-
-    public List<GraficoTempoProjection> buscarFaturamentoTempoMensal() {
-        return vendaRepository.buscarFaturamentoTempoMensal();
-    }
-
-    public List<GraficoTempoProjection> buscarFaturamentoTempoSemanal() {
-        return vendaRepository.buscarFaturamentoTempoSemanal();
-    }
-
-    public List<DiaMovimentadoProjection> buscarDiaMaisMovimentadoSemanaAtual() {
-        return vendaRepository.buscarDiaMaisMovimentadoSemanaAtual();
-    }
-
-    public List<RankingVendasProjection> buscarProdutosMaisVendidosMes() {
-        return vendaRepository.buscarProdutosMaisVendidosMes();
-    }
-
-    public List<RankingVendasProjection> buscarMarcasMaisVendidasMes() {
-        return vendaRepository.buscarMarcasMaisVendidasMes();
-    }
-
-    public List<DesempenhoFuncionarioProjection> buscarDesempenhoFuncionarioMes() {
-        return vendaRepository.buscarDesempenhoFuncionarioMes();
-    }
-
-    public List<DesempenhoFuncionarioProjection> buscarDesempenhoFuncionarioSemana() {
-        return vendaRepository.buscarDesempenhoFuncionarioSemana();
-    }
-
-    // ========================================================================
-    // --- LÓGICA DINÂMICA (DASHBOARD) ---
-    // ========================================================================
-
-    // Helper para converter o texto do React em datas reais
     private LocalDateTime[] calcularPeriodo(String tipo, LocalDateTime inicio, LocalDateTime fim) {
+        if ("Personalizado".equals(tipo)) {
+            return new LocalDateTime[]{
+                    inicio != null ? inicio : LocalDate.now().atStartOfDay(),
+                    fim != null ? fim : LocalDateTime.now()
+            };
+        }
+
         LocalDateTime dataInicio;
-        LocalDateTime dataFim = LocalDateTime.now(); // default
+        LocalDateTime dataFim = LocalDateTime.now(); // Fim padrão é agora
 
         if (tipo == null) tipo = "Este Mês";
 
@@ -174,63 +38,79 @@ public class KpiService {
                 break;
             case "Esta Semana":
                 dataInicio = LocalDate.now().with(java.time.DayOfWeek.MONDAY).atStartOfDay();
-                dataFim = LocalDate.now().with(java.time.DayOfWeek.SUNDAY).atTime(LocalTime.MAX);
+                // dataFim continua sendo o .now() do topo
                 break;
             case "Este Mês":
                 dataInicio = LocalDate.now().withDayOfMonth(1).atStartOfDay();
-                dataFim = LocalDate.now().with(java.time.temporal.TemporalAdjusters.lastDayOfMonth()).atTime(LocalTime.MAX);
                 break;
             case "Este Semestre":
-                dataInicio = LocalDate.now().minusMonths(6).withDayOfMonth(1).atStartOfDay();
-                break;
-            case "Personalizado":
-                dataInicio = inicio != null ? inicio.toLocalDate().atStartOfDay() : LocalDate.now().withDayOfMonth(1).atStartOfDay();
-                dataFim = fim != null ? fim.toLocalDate().atTime(LocalTime.MAX) : LocalDate.now().atTime(LocalTime.MAX);
+                dataInicio = LocalDate.of(LocalDate.now().getYear(), 1, 1).atStartOfDay();
                 break;
             default:
                 dataInicio = LocalDate.now().withDayOfMonth(1).atStartOfDay();
         }
+
+        System.out.println("DEBUG SQL: Tipo=" + tipo + " | Inicio=" + dataInicio + " | Fim=" + dataFim);
         return new LocalDateTime[]{dataInicio, dataFim};
     }
 
-    // --- Gráficos Dinâmicos ---
-    public List<FaturamentoTempoProjection> buscarGraficoFaturamentoDinamico(String tipo, LocalDateTime inicio, LocalDateTime fim) {
-        LocalDateTime[] datas = calcularPeriodo(tipo, inicio, fim);
-        long dias = java.time.temporal.ChronoUnit.DAYS.between(datas[0], datas[1]);
-
-        // MÁGICA: Se o filtro for mais de 2 meses, agrupa por Mês. Senão, mostra dia a dia.
-        if (dias > 60) {
-            return vendaRepository.buscarGraficoFaturamentoMensalDinamico(datas[0], datas[1]);
-        } else {
-            return vendaRepository.buscarGraficoFaturamentoDiarioDinamico(datas[0], datas[1]);
-        }
+    // ========================================================================
+    // --- MÉTODOS DE KPIS (SUBSTITUEM OS ANTIGOS) ---
+    // ========================================================================
+    public Double getFaturamento(String tipo) {
+        LocalDateTime[] d = calcularPeriodo(tipo, null, null);
+        return Optional.ofNullable(vendaRepository.somarFaturamento(d[0], d[1])).orElse(0.0);
     }
 
-    public List<PicoDiaProjection> buscarGraficoPicoDiaDinamico(String tipo, LocalDateTime inicio, LocalDateTime fim) {
-        LocalDateTime[] datas = calcularPeriodo(tipo, inicio, fim);
-        return vendaRepository.buscarGraficoPicoDiaDinamico(datas[0], datas[1]);
+    public Integer getTotalVendas(String tipo) {
+        LocalDateTime[] d = calcularPeriodo(tipo, null, null);
+        return Optional.ofNullable(vendaRepository.contarVendas(d[0], d[1])).orElse(0);
     }
 
-    // --- Tabelas Dinâmicas (MÉTODOS QUE ESTAVAM FALTANDO) ---
-    public List<RankingVendasProjection> buscarRankingProdutosDinamico(String tipo, LocalDateTime LocalDateInicio, LocalDateTime LocalDateFim) {
-        LocalDateTime[] datas = calcularPeriodo(tipo, LocalDateInicio, LocalDateFim);
-        return vendaRepository.buscarRankingProdutosDinamico(datas[0], datas[1]);
+    public Double getTicketMedio(String tipo) {
+        LocalDateTime[] d = calcularPeriodo(tipo, null, null);
+        return Optional.ofNullable(vendaRepository.calcularTicketMedio(d[0], d[1])).orElse(0.0);
     }
 
-    public List<RankingVendasProjection> buscarRankingMarcasDinamico(String tipo, LocalDateTime LocalDateInicio, LocalDateTime LocalDateFim) {
-        LocalDateTime[] datas = calcularPeriodo(tipo, LocalDateInicio, LocalDateFim);
-        return vendaRepository.buscarRankingMarcasDinamico(datas[0], datas[1]);
+    public Double getTotalDescontos(String tipo) {
+        LocalDateTime[] d = calcularPeriodo(tipo, null, null);
+        return Optional.ofNullable(vendaRepository.somarDescontos(d[0], d[1])).orElse(0.0);
     }
 
-    public List<DesempenhoFuncionarioProjection> buscarDesempenhoEquipeDinamico(String tipo, LocalDateTime LocalDateInicio, LocalDateTime LocalDateFim) {
-        LocalDateTime[] datas = calcularPeriodo(tipo, LocalDateInicio, LocalDateFim);
-        return vendaRepository.buscarDesempenhoEquipeDinamico(datas[0], datas[1]);
+    public Integer getTotalUnidades(String tipo) {
+        LocalDateTime[] d = calcularPeriodo(tipo, null, null);
+        return Optional.ofNullable(vendaRepository.somarUnidades(d[0], d[1])).orElse(0);
+    }
+
+    // ========================================================================
+    // --- MÉTODOS DE GRÁFICOS E TABELAS (DINÂMICOS) ---
+    // ========================================================================
+    public List<FaturamentoTempoProjection> getGraficoFaturamento(String tipo, LocalDateTime inicio, LocalDateTime fim) {
+        LocalDateTime[] d = calcularPeriodo(tipo, inicio, fim);
+        return vendaRepository.buscarGraficoFaturamentoDiarioDinamico(d[0], d[1]);
+    }
+
+    public List<RankingVendasProjection> getRankingProdutos(String tipo, LocalDateTime inicio, LocalDateTime fim) {
+        LocalDateTime[] d = calcularPeriodo(tipo, inicio, fim);
+        return vendaRepository.buscarRankingProdutosDinamico(d[0], d[1]);
+    }
+
+    public List<RankingVendasProjection> getRankingMarcas(String tipo, LocalDateTime inicio, LocalDateTime fim) {
+        LocalDateTime[] d = calcularPeriodo(tipo, inicio, fim);
+        return vendaRepository.buscarRankingMarcasDinamico(d[0], d[1]);
+    }
+
+    public List<DesempenhoFuncionarioProjection> getDesempenhoEquipe(String tipo, LocalDateTime inicio, LocalDateTime fim) {
+        LocalDateTime[] d = calcularPeriodo(tipo, inicio, fim);
+        return vendaRepository.buscarDesempenhoEquipeDinamico(d[0], d[1]);
     }
 
     public List<SazonalidadeProjection> buscarMapaSazonalidade(Integer ano) {
-        if (ano == null) {
-            ano = java.time.LocalDate.now().getYear();
-        }
-        return vendaRepository.buscarMapaSazonalidade(ano);
+        return vendaRepository.buscarMapaSazonalidade(ano != null ? ano : LocalDate.now().getYear());
     }
+
+    // --- MANTEMOS OS DE VENDEDOR PORQUE SÃO ESPECÍFICOS ---
+    public Double buscarFaturamentoTotalPorVendedor(Integer id) { return Optional.ofNullable(vendaRepository.buscarFaturamentoTotalPorVendedor(id)).orElse(0.0); }
+    public Double buscarComissaoTotalPorVendedor(Integer id) { return Optional.ofNullable(vendaRepository.buscarComissaoTotalPorVendedor(id)).orElse(0.0); }
+    public Integer buscarQtdVendasPorVendedor(Integer id) { return Optional.ofNullable(vendaRepository.contarQtdVendasPorVendedor(id)).orElse(0); }
 }

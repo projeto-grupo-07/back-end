@@ -4,11 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import school.sptech.crud_proj_v1.repository.VendaRepository;
 import school.sptech.crud_proj_v1.service.KpiService;
-import school.sptech.crud_proj_v1.projection.*; // Traz as interfaces para o Controller
+import school.sptech.crud_proj_v1.projection.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,223 +16,94 @@ import java.util.List;
 public class KpiController {
 
     private final KpiService kpiService;
-    private final VendaRepository vendaRepository;
 
     // ========================================================================
-    // --- KPIs EXISTENTES (Faturamento, Vendas, Ticket e Vendedor Único) ---
+    // --- MÉTODOS UNIFICADOS (CARDS DA ESQUERDA) ---
     // ========================================================================
 
-    @GetMapping("/faturamento-diario")
-    public ResponseEntity<Double> getFaturamentoDiario(){
-        return ResponseEntity.status(200).body(kpiService.buscarFaturamentoDia());
+    @GetMapping("/faturamento")
+    public ResponseEntity<Double> getFaturamento(@RequestParam(required = false, defaultValue = "Este Mês") String tipo) {
+        return ResponseEntity.ok(kpiService.getFaturamento(tipo));
     }
 
-    @GetMapping("/faturamento-semanal")
-    public ResponseEntity<Double> getFaturamentoSemanal(){
-        return ResponseEntity.status(200).body(kpiService.buscarFaturamentoSemana());
+    @GetMapping("/total-vendas")
+    public ResponseEntity<Integer> getTotalVendas(@RequestParam(required = false, defaultValue = "Este Mês") String tipo) {
+        return ResponseEntity.ok(kpiService.getTotalVendas(tipo));
     }
 
-    @GetMapping("/faturamento-mensal")
-    public ResponseEntity<Double> getFaturamentoMensal(){
-        return ResponseEntity.status(200).body(kpiService.buscarFaturamentoMes());
+    @GetMapping("/ticket-medio")
+    public ResponseEntity<Double> getTicketMedio(@RequestParam(required = false, defaultValue = "Este Mês") String tipo) {
+        return ResponseEntity.ok(kpiService.getTicketMedio(tipo));
     }
 
-    @GetMapping("/faturamento-semestral")
-    public ResponseEntity<Double> getFaturamentoSemestral(){
-        return ResponseEntity.status(200).body(kpiService.buscarFaturamentoSemestre());
+    @GetMapping("/total-descontos")
+    public ResponseEntity<Double> getTotalDescontos(@RequestParam(required = false, defaultValue = "Este Mês") String tipo) {
+        return ResponseEntity.ok(kpiService.getTotalDescontos(tipo));
     }
 
-    @GetMapping("/total-vendas-diario")
-    public ResponseEntity<Integer> getTotalVendasDiario() {
-        return ResponseEntity.status(200).body(kpiService.buscarTotalVendasDiarias());
+    @GetMapping("/total-unidades")
+    public ResponseEntity<Integer> getTotalUnidades(@RequestParam(required = false, defaultValue = "Este Mês") String tipo) {
+        return ResponseEntity.ok(kpiService.getTotalUnidades(tipo));
     }
 
-    @GetMapping("/total-vendas-semanal")
-    public ResponseEntity<Integer> getTotalVendasSemanal() {
-        return ResponseEntity.status(200).body(kpiService.buscarTotalVendasSemanais());
-    }
-
-    @GetMapping("/total-vendas-mensal")
-    public ResponseEntity<Integer> getTotalVendasMensal() {
-        return ResponseEntity.status(200).body(kpiService.buscarTotalVendasMensais());
-    }
-
-    @GetMapping("/total-vendas-semestral")
-    public ResponseEntity<Integer> getTotalVendasSemestral() {
-        return ResponseEntity.status(200).body(kpiService.buscarTotalVendasSemestrais());
-    }
-
-    @GetMapping("/ticket-medio-diario")
-    public ResponseEntity<Double> getTicketMedioDiario(){
-        return ResponseEntity.status(200).body(kpiService.contarTicketMedioDiario());
-    }
-
-    @GetMapping("/ticket-medio-semanal")
-    public ResponseEntity<Double> getTicketMedioSemanal(){
-        return ResponseEntity.status(200).body(kpiService.contarTicketMedioSemanal());
-    }
-
-    @GetMapping("/ticket-medio-mensal")
-    public ResponseEntity<Double> getTicketMedioMensal(){
-        return ResponseEntity.status(200).body(kpiService.contarTicketMedioMensal());
-    }
-
-    @GetMapping("/ticket-medio-semestral")
-    public ResponseEntity<Double> getTicketMedioSemestral(){
-        return ResponseEntity.status(200).body(kpiService.contarTicketMedioSemestral());
-    }
+    // ========================================================================
+    // --- RENDIMENTO INDIVIDUAL (VENDEDOR) ---
+    // ========================================================================
 
     @GetMapping("/vendedor/{id}/faturamento")
     public ResponseEntity<Double> getFaturamentoPorVendedor(@PathVariable Integer id) {
-        return ResponseEntity.status(200).body(kpiService.buscarFaturamentoTotalPorVendedor(id));
+        return ResponseEntity.ok(kpiService.buscarFaturamentoTotalPorVendedor(id));
     }
 
     @GetMapping("/vendedor/{id}/comissao")
     public ResponseEntity<Double> getComissaoPorVendedor(@PathVariable Integer id) {
-        return ResponseEntity.status(200).body(kpiService.buscarComissaoTotalPorVendedor(id));
+        return ResponseEntity.ok(kpiService.buscarComissaoTotalPorVendedor(id));
     }
 
     @GetMapping("/vendedor/{id}/quantidade")
     public ResponseEntity<Integer> getQuantidadeVendasPorVendedor(@PathVariable Integer id) {
-        return ResponseEntity.status(200).body(kpiService.buscarQtdVendasPorVendedor(id));
+        return ResponseEntity.ok(kpiService.buscarQtdVendasPorVendedor(id));
     }
 
     // ========================================================================
-    // --- NOVOS ENDPOINTS: DESCONTOS (CARDS ESQUERDOS) ---
+    // --- MÉTODOS DINÂMICOS (GRÁFICOS E TABELAS DA DIREITA) ---
     // ========================================================================
 
-    @GetMapping("/desconto-diario")
-    public ResponseEntity<Double> getDescontoDiario() {
-        return ResponseEntity.status(200).body(kpiService.buscarTotalDescontoDia());
-    }
-
-    @GetMapping("/desconto-semanal")
-    public ResponseEntity<Double> getDescontoSemanal() {
-        return ResponseEntity.status(200).body(kpiService.buscarTotalDescontoSemana());
-    }
-
-    @GetMapping("/desconto-mensal")
-    public ResponseEntity<Double> getDescontoMensal() {
-        return ResponseEntity.status(200).body(kpiService.buscarTotalDescontoMes());
-    }
-
-    @GetMapping("/desconto-semestral")
-    public ResponseEntity<Double> getDescontoSemestral() {
-        return ResponseEntity.status(200).body(kpiService.buscarTotalDescontoSemestre());
-    }
-
-    // ========================================================================
-    // --- NOVOS ENDPOINTS: UNIDADES VENDIDAS (CARDS ESQUERDOS) ---
-    // ========================================================================
-
-    @GetMapping("/unidades-diario")
-    public ResponseEntity<Integer> getUnidadesDiario() {
-        return ResponseEntity.status(200).body(kpiService.buscarQuantidadeUnidadesDia());
-    }
-
-    @GetMapping("/unidades-semanal")
-    public ResponseEntity<Integer> getUnidadesSemanal() {
-        return ResponseEntity.status(200).body(kpiService.buscarQuantidadeUnidadesSemana());
-    }
-
-    @GetMapping("/unidades-mensal")
-    public ResponseEntity<Integer> getUnidadesMensal() {
-        return ResponseEntity.status(200).body(kpiService.buscarQuantidadeUnidadesMes());
-    }
-
-    @GetMapping("/unidades-semestral")
-    public ResponseEntity<Integer> getUnidadesSemestral() {
-        return ResponseEntity.status(200).body(kpiService.buscarQuantidadeUnidadesSemestre());
-    }
-
-    // ========================================================================
-    // --- NOVOS ENDPOINTS: GRÁFICOS E TABELAS (RETORNAM LISTAS) ---
-    // ========================================================================
-
-    @GetMapping("/grafico-faturamento-mensal")
-    public ResponseEntity<List<GraficoTempoProjection>> getGraficoFaturamentoMensal() {
-        return ResponseEntity.status(200).body(kpiService.buscarFaturamentoTempoMensal());
-    }
-
-    @GetMapping("/grafico-faturamento-semanal")
-    public ResponseEntity<List<GraficoTempoProjection>> getGraficoFaturamentoSemanal() {
-        return ResponseEntity.status(200).body(kpiService.buscarFaturamentoTempoSemanal());
-    }
-
-    @GetMapping("/grafico-pico-dia")
-    public ResponseEntity<List<DiaMovimentadoProjection>> getGraficoPicoDia() {
-        return ResponseEntity.status(200).body(kpiService.buscarDiaMaisMovimentadoSemanaAtual());
-    }
-
-    @GetMapping("/ranking-produtos-mes")
-    public ResponseEntity<List<RankingVendasProjection>> getRankingProdutosMes() {
-        return ResponseEntity.status(200).body(kpiService.buscarProdutosMaisVendidosMes());
-    }
-
-    @GetMapping("/ranking-marcas-mes")
-    public ResponseEntity<List<RankingVendasProjection>> getRankingMarcasMes() {
-        return ResponseEntity.status(200).body(kpiService.buscarMarcasMaisVendidasMes());
-    }
-
-    @GetMapping("/desempenho-equipe-mes")
-    public ResponseEntity<List<DesempenhoFuncionarioProjection>> getDesempenhoEquipeMes() {
-        return ResponseEntity.status(200).body(kpiService.buscarDesempenhoFuncionarioMes());
-    }
-
-    @GetMapping("/desempenho-equipe-semana")
-    public ResponseEntity<List<DesempenhoFuncionarioProjection>> getDesempenhoEquipeSemana() {
-        return ResponseEntity.status(200).body(kpiService.buscarDesempenhoFuncionarioSemana());
-    }
-
-
-
-    @GetMapping("/graficos/faturamento-dinamico")
-    public ResponseEntity<List<FaturamentoTempoProjection>> getGraficoFaturamentoDinamico(
-            @RequestParam(required = false) String tipo,
+    @GetMapping("/grafico-faturamento")
+    public ResponseEntity<List<FaturamentoTempoProjection>> getGraficoFaturamento(
+            @RequestParam(required = false, defaultValue = "Este Mês") String tipo,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim
-    ) {
-        return ResponseEntity.ok(kpiService.buscarGraficoFaturamentoDinamico(tipo, inicio, fim));
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
+        return ResponseEntity.ok(kpiService.getGraficoFaturamento(tipo, inicio, fim));
     }
 
-    @GetMapping("/graficos/pico-dia-dinamico")
-    public ResponseEntity<List<PicoDiaProjection>> getGraficoPicoDiaDinamico(
-            @RequestParam(required = false) String tipo,
-            @RequestParam(required = false) LocalDateTime inicio,
-            @RequestParam(required = false) LocalDateTime fim
-    ) {
-        return ResponseEntity.ok(kpiService.buscarGraficoPicoDiaDinamico(tipo, inicio, fim));
+    @GetMapping("/ranking-produtos")
+    public ResponseEntity<List<RankingVendasProjection>> getRankingProdutos(
+            @RequestParam(required = false, defaultValue = "Este Mês") String tipo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
+        return ResponseEntity.ok(kpiService.getRankingProdutos(tipo, inicio, fim));
     }
 
-    @GetMapping("/tabelas/ranking-produtos-dinamico")
-    public ResponseEntity<List<school.sptech.crud_proj_v1.projection.RankingVendasProjection>> getRankingProdutosDinamico(
-            @RequestParam(required = false) String tipo,
-            @RequestParam(required = false) java.time.LocalDateTime inicio,
-            @RequestParam(required = false) java.time.LocalDateTime fim) {
-        return ResponseEntity.ok(kpiService.buscarRankingProdutosDinamico(tipo, inicio, fim));
+    @GetMapping("/ranking-marcas")
+    public ResponseEntity<List<RankingVendasProjection>> getRankingMarcas(
+            @RequestParam(required = false, defaultValue = "Este Mês") String tipo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
+        return ResponseEntity.ok(kpiService.getRankingMarcas(tipo, inicio, fim));
     }
 
-    @GetMapping("/tabelas/ranking-marcas-dinamico")
-    public ResponseEntity<List<school.sptech.crud_proj_v1.projection.RankingVendasProjection>> getRankingMarcasDinamico(
-            @RequestParam(required = false) String tipo,
-            @RequestParam(required = false) java.time.LocalDateTime inicio,
-            @RequestParam(required = false) java.time.LocalDateTime fim) {
-        return ResponseEntity.ok(kpiService.buscarRankingMarcasDinamico(tipo, inicio, fim));
+    @GetMapping("/desempenho-equipe")
+    public ResponseEntity<List<DesempenhoFuncionarioProjection>> getDesempenhoEquipe(
+            @RequestParam(required = false, defaultValue = "Este Mês") String tipo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
+        return ResponseEntity.ok(kpiService.getDesempenhoEquipe(tipo, inicio, fim));
     }
 
-    @GetMapping("/tabelas/desempenho-equipe-dinamico")
-    public ResponseEntity<List<school.sptech.crud_proj_v1.projection.DesempenhoFuncionarioProjection>> getDesempenhoEquipeDinamico(
-            @RequestParam(required = false) String tipo,
-            @RequestParam(required = false) java.time.LocalDateTime inicio,
-            @RequestParam(required = false) java.time.LocalDateTime fim) {
-        return ResponseEntity.ok(kpiService.buscarDesempenhoEquipeDinamico(tipo, inicio, fim));
-    }
-
-    @GetMapping("/graficos/sazonalidade")
-    public ResponseEntity<List<school.sptech.crud_proj_v1.projection.SazonalidadeProjection>> getMapaSazonalidade(
+    @GetMapping("/sazonalidade")
+    public ResponseEntity<List<SazonalidadeProjection>> getMapaSazonalidade(
             @RequestParam(required = false) Integer ano) {
-
         return ResponseEntity.ok(kpiService.buscarMapaSazonalidade(ano));
     }
-
 }

@@ -282,18 +282,6 @@ public class VendaService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public List<MetodoPagamentoProjection> buscarDesempenhoPagamentos(LocalDateTime inicio, LocalDateTime fim) {
-        return vendaRepository.buscarDesempenhoPagamentosDinamico(inicio, fim);
-    }
-
-    public List<ProdutoRentavelProjection> buscarProdutosRentaveis(LocalDateTime inicio, LocalDateTime fim) {
-        return vendaRepository.buscarProdutosMaisRentaveisDinamico(inicio, fim);
-    }
-
-    public List<MargemCategoriaProjection> buscarMargemCategoria(LocalDateTime inicio, LocalDateTime fim) {
-        return vendaRepository.buscarMargemPorCategoriaDinamico(inicio, fim);
-    }
-
 
     public PaginaOffsetVenda buscarPaginaOffset(int pagina, int tamanho) {
         return offsetStrategy.paginar(Map.of("pagina", pagina, "tamanho", tamanho));

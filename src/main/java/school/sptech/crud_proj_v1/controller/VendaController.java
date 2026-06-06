@@ -165,6 +165,7 @@ public class VendaController {
     // ========================================================================
     // --- ENDPOINTS DASHBOARD ESTRATÉGICA ---
     // ========================================================================
+    /*
 
     @GetMapping("/estrategico/pagamentos")
     @SecurityRequirement(name = "Bearer")
@@ -205,6 +206,6 @@ public class VendaController {
         return ResponseEntity.status(200).body(result);
     }
 
-
+*/
 
 }
