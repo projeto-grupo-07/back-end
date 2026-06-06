@@ -95,6 +95,7 @@ public class KpiService {
         return vendaRepository.buscarGraficoPicoDiaDinamico(d[0], d[1]);
     }
 
+
     public List<RankingVendasProjection> getRankingProdutos(String tipo, LocalDateTime inicio, LocalDateTime fim) {
         LocalDateTime[] d = calcularPeriodo(tipo, inicio, fim);
         return vendaRepository.buscarRankingProdutosDinamico(d[0], d[1]);
@@ -114,8 +115,29 @@ public class KpiService {
         return vendaRepository.buscarMapaSazonalidade(ano != null ? ano : LocalDate.now().getYear());
     }
 
+
+
     // --- MANTEMOS OS DE VENDEDOR PORQUE SÃO ESPECÍFICOS ---
     public Double buscarFaturamentoTotalPorVendedor(Integer id) { return Optional.ofNullable(vendaRepository.buscarFaturamentoTotalPorVendedor(id)).orElse(0.0); }
     public Double buscarComissaoTotalPorVendedor(Integer id) { return Optional.ofNullable(vendaRepository.buscarComissaoTotalPorVendedor(id)).orElse(0.0); }
     public Integer buscarQtdVendasPorVendedor(Integer id) { return Optional.ofNullable(vendaRepository.contarQtdVendasPorVendedor(id)).orElse(0); }
+
+    // ========================================================================
+    // --- MÉTODOS DA DASHBOARD ESTRATÉGICA ---
+    // ========================================================================
+
+    public List<MetodoPagamentoProjection> getDesempenhoPagamentos(String tipo, LocalDateTime inicio, LocalDateTime fim) {
+        LocalDateTime[] d = calcularPeriodo(tipo, inicio, fim);
+        return vendaRepository.buscarDesempenhoPagamentosDinamico(d[0], d[1]);
+    }
+
+    public List<ProdutoRentavelProjection> getProdutosRentaveis(String tipo, LocalDateTime inicio, LocalDateTime fim) {
+        LocalDateTime[] d = calcularPeriodo(tipo, inicio, fim);
+        return vendaRepository.buscarProdutosMaisRentaveisDinamico(d[0], d[1]);
+    }
+
+    public List<MargemCategoriaProjection> getMargemCategoria(String tipo, LocalDateTime inicio, LocalDateTime fim) {
+        LocalDateTime[] d = calcularPeriodo(tipo, inicio, fim);
+        return vendaRepository.buscarMargemPorCategoriaDinamico(d[0], d[1]);
+    }
 }

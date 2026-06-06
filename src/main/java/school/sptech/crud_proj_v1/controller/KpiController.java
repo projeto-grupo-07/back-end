@@ -84,6 +84,7 @@ public class KpiController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
         return ResponseEntity.ok(kpiService.getGraficoPicoDia(tipo, inicio, fim));
     }
+    
 
     @GetMapping("/ranking-produtos")
     public ResponseEntity<List<RankingVendasProjection>> getRankingProdutos(
@@ -113,5 +114,35 @@ public class KpiController {
     public ResponseEntity<List<SazonalidadeProjection>> getMapaSazonalidade(
             @RequestParam(required = false) Integer ano) {
         return ResponseEntity.ok(kpiService.buscarMapaSazonalidade(ano));
+    }
+
+
+
+    // ========================================================================
+    // --- ENDPOINTS: DASHBOARD ESTRATÉGICA ---
+    // ========================================================================
+
+    @GetMapping("/estrategico/pagamentos")
+    public ResponseEntity<List<MetodoPagamentoProjection>> getDesempenhoPagamentos(
+            @RequestParam(required = false, defaultValue = "Este Mês") String tipo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
+        return ResponseEntity.ok(kpiService.getDesempenhoPagamentos(tipo, inicio, fim));
+    }
+
+    @GetMapping("/estrategico/produtos-rentaveis")
+    public ResponseEntity<List<ProdutoRentavelProjection>> getProdutosRentaveis(
+            @RequestParam(required = false, defaultValue = "Este Mês") String tipo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
+        return ResponseEntity.ok(kpiService.getProdutosRentaveis(tipo, inicio, fim));
+    }
+
+    @GetMapping("/estrategico/margem-categoria")
+    public ResponseEntity<List<MargemCategoriaProjection>> getMargemCategoria(
+            @RequestParam(required = false, defaultValue = "Este Mês") String tipo,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime inicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
+        return ResponseEntity.ok(kpiService.getMargemCategoria(tipo, inicio, fim));
     }
 }

@@ -50,12 +50,14 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
             "GROUP BY DATE_FORMAT(data_hora, '%Y-%m') ORDER BY periodo", nativeQuery = true)
     List<FaturamentoTempoProjection> buscarGraficoFaturamentoMensalDinamico(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
 
-    @Query(value = "SELECT CASE DAYOFWEEK(data_hora) WHEN 1 THEN 'Dom' WHEN 2 THEN 'Seg' WHEN 3 THEN 'Ter' " +
-            "WHEN 4 THEN 'Qua' WHEN 5 THEN 'Qui' WHEN 6 THEN 'Sex' WHEN 7 THEN 'Sáb' END AS diaSemana, " +
-            "SUM(valor_total) AS faturamento FROM venda WHERE data_hora >= :inicio AND data_hora <= :fim " +
-            "GROUP BY diaSemana ORDER BY DAYOFWEEK(data_hora)", nativeQuery = true)
+    @Query(value = "SELECT MAX(CASE DAYOFWEEK(data_hora) WHEN 1 THEN 'Dom' WHEN 2 THEN 'Seg' WHEN 3 THEN 'Ter' " +
+            "WHEN 4 THEN 'Qua' WHEN 5 THEN 'Qui' WHEN 6 THEN 'Sex' WHEN 7 THEN 'Sáb' END) AS diaSemana, " +
+            "SUM(valor_total) AS faturamento " +
+            "FROM venda " +
+            "WHERE data_hora >= :inicio AND data_hora <= :fim " +
+            "GROUP BY DAYOFWEEK(data_hora) " +
+            "ORDER BY DAYOFWEEK(data_hora)", nativeQuery = true)
     List<PicoDiaProjection> buscarGraficoPicoDiaDinamico(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
-
     @Query(value = "SELECT p.modelo AS nome, SUM(iv.quantidade_venda_produto) AS totalVendidas FROM itens_venda iv " +
             "JOIN produto p ON p.id = iv.fk_produto JOIN venda v ON v.id = iv.fk_venda WHERE v.data_hora >= :inicio AND v.data_hora <= :fim " +
             "GROUP BY p.id, p.modelo ORDER BY totalVendidas DESC LIMIT 5", nativeQuery = true)
@@ -88,4 +90,41 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
 
     @Query(value = "SELECT COUNT(id) FROM venda WHERE fk_vendedor = :id", nativeQuery = true)
     Integer contarQtdVendasPorVendedor(@Param("id") Integer id);
+
+    // ========================================================================
+    // --- QUERIES DINÂMICAS: DASHBOARD ESTRATÉGICA ---
+    // ========================================================================
+
+    @Query(value = "SELECT v.forma_pagamento AS metodo, " +
+            "COUNT(v.id) AS qtdVendas, " +
+            "SUM(v.valor_total) AS valorTotal " +
+            "FROM venda v " +
+            "WHERE v.data_hora >= :inicio AND v.data_hora <= :fim " +
+            "GROUP BY v.forma_pagamento " +
+            "ORDER BY valorTotal DESC", nativeQuery = true)
+    List<MetodoPagamentoProjection> buscarDesempenhoPagamentosDinamico(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
+
+    @Query(value = "SELECT p.modelo AS nome, " +
+            "SUM(iv.quantidade_venda_produto) AS vendas, " +
+            "SUM((p.valor_unitario - p.preco_custo) * iv.quantidade_venda_produto) AS lucro " +
+            "FROM itens_venda iv " +
+            "JOIN produto p ON p.id = iv.fk_produto " +
+            "JOIN venda v ON v.id = iv.fk_venda " +
+            "WHERE v.data_hora >= :inicio AND v.data_hora <= :fim " +
+            "GROUP BY p.id, p.modelo " +
+            "ORDER BY lucro DESC LIMIT 5", nativeQuery = true)
+    List<ProdutoRentavelProjection> buscarProdutosMaisRentaveisDinamico(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
+
+    @Query(value = "SELECT c.descricao AS categoria, " +
+            "ROUND((SUM((p.valor_unitario - p.preco_custo) * iv.quantidade_venda_produto) / " +
+            "SUM(p.valor_unitario * iv.quantidade_venda_produto)) * 100, 2) AS margem " +
+            "FROM itens_venda iv " +
+            "JOIN produto p ON p.id = iv.fk_produto " +
+            "JOIN categoria c ON c.id = p.fk_categoria " +
+            "JOIN venda v ON v.id = iv.fk_venda " +
+            "WHERE v.data_hora >= :inicio AND v.data_hora <= :fim " +
+            "GROUP BY c.id, c.descricao " +
+            "ORDER BY margem DESC", nativeQuery = true)
+    List<MargemCategoriaProjection> buscarMargemPorCategoriaDinamico(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
+
 }
