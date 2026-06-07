@@ -84,7 +84,7 @@ public class KpiController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
         return ResponseEntity.ok(kpiService.getGraficoPicoDia(tipo, inicio, fim));
     }
-    
+
 
     @GetMapping("/ranking-produtos")
     public ResponseEntity<List<RankingVendasProjection>> getRankingProdutos(
