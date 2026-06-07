@@ -55,7 +55,8 @@ public class ProdSecurityConfig {
                                 "/import/**",
                                 "/clientes/**",
                                 "/campanhas/**",
-                                "/kpis/**"
+                                "/kpis/**",
+                                "/admin/seed"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

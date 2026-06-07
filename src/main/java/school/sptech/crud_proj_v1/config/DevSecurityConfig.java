@@ -53,7 +53,8 @@ public class DevSecurityConfig {
                                 "/v3/api-docs/**",
                                 "/funcionarios/login",
                                 "/error",
-                                "/kpis/**"
+                                "/kpis/**",
+                                "/admin/seed"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
