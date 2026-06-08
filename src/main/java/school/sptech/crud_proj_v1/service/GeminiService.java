@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -70,9 +71,21 @@ public class GeminiService {
 
             return objectMapper.readValue(textoGerado, HashMap.class);
 
+        } catch (HttpClientErrorException e) {
+            // Captura erros HTTP (4xx) vindos da API do Google
+            if (e.getStatusCode().value() == 429) {
+                log.warn("Limite de requisições do Gemini atingido.");
+                // Lançamos a exceção que o seu Controller já sabe ler e mandar pro React!
+                throw new IllegalArgumentException("A IA está sobrecarregada (Limite de requisições atingido). Aguarde 1 minuto e tente novamente.");
+            }
+
+            log.error("Erro HTTP da IA: {}", e.getResponseBodyAsString());
+            throw new IllegalArgumentException("A IA não conseguiu entender a solicitação. Tente reescrever o tema.");
+
         } catch (Exception e) {
-            log.error("Erro ao chamar API do Gemini: ", e);
-            throw new RuntimeException("Falha ao gerar texto com IA. Tente novamente mais tarde.");
+            // Erros gerais de código ou JSON
+            log.error("Erro interno ao chamar API do Gemini: ", e);
+            throw new IllegalArgumentException("Falha ao gerar texto com IA. Tente novamente mais tarde.");
         }
     }
 }

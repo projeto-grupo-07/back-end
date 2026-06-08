@@ -13,7 +13,7 @@ import school.sptech.crud_proj_v1.dto.paginacao.PaginaOffsetCampanhaResposta;
 import school.sptech.crud_proj_v1.entity.Cliente;
 import school.sptech.crud_proj_v1.service.CampanhaService;
 import school.sptech.crud_proj_v1.service.GeminiService;
-
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -35,13 +35,21 @@ public class CampanhaController {
     }
 
     @PostMapping("/criar")
-    public ResponseEntity<CampanhaResponseDto> criarCampanha(@RequestBody CampanhaRequestDto campanhaRequestDTO) {
+    public ResponseEntity<?> criarCampanha(@RequestBody CampanhaRequestDto campanhaRequestDTO) {
         try {
             CampanhaResponseDto novaCampanha = campanhaService.criarCampanha(campanhaRequestDTO);
-            return ResponseEntity.ok(novaCampanha);
+            return ResponseEntity.status(201).body(novaCampanha); // 201 Created é mais semântico para criações
+
+        } catch (IllegalArgumentException e) {
+            // Captura o nosso erro específico de "Nenhum cliente encontrado"
+            log.warn("Validação de campanha: {}", e.getMessage());
+
+            // AGORA SIM: Envia o texto da exceção para o React ler!
+            return ResponseEntity.status(400).body(e.getMessage());
+
         } catch (RuntimeException e) {
-            log.error("Erro ao criar campanha: {}", e.getMessage());
-            return ResponseEntity.badRequest().body(null);
+            log.error("Erro interno ao criar campanha: {}", e.getMessage());
+            return ResponseEntity.status(500).body("Erro interno ao processar a campanha.");
         }
     }
 
@@ -135,5 +143,13 @@ public class CampanhaController {
                 campanhaService.buscarPaginaOffset(pagina, tamanho)
         );
         return ResponseEntity.ok(resposta);
+    }
+
+    // Adicione esta importação lá em cima, se não tiver:
+    //
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleValidacaoErro(IllegalArgumentException ex) {
+        return ResponseEntity.status(400).body(ex.getMessage());
     }
 }

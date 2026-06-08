@@ -43,7 +43,7 @@ public class CampanhaService {
         List<Cliente> clientesEncontrados = clienteRepository.findAll(spec);
 
         if (clientesEncontrados.isEmpty()) {
-            throw new RuntimeException("Nenhum cliente encontrado para os critérios da campanha.");
+            throw new IllegalArgumentException("Nenhum cliente encontrado para os critérios da campanha.");
         }
 
         Campanha campanha = campanhaMapper.toEntity(campanhaRequestDTO);
