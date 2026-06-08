@@ -140,4 +140,16 @@ public class KpiService {
         LocalDateTime[] d = calcularPeriodo(tipo, inicio, fim);
         return vendaRepository.buscarMargemPorCategoriaDinamico(d[0], d[1]);
     }
+
+    public List<VolumeTempoProjection> buscarGraficoVolumeDinamico(String tipo, LocalDateTime inicio, LocalDateTime fim) {
+        LocalDateTime[] datas = calcularPeriodo(tipo, inicio, fim);
+        LocalDateTime dataInicio = datas[0];
+        LocalDateTime dataFim = datas[1];
+
+        if (tipo != null && (tipo.equalsIgnoreCase("Este Ano") || tipo.equalsIgnoreCase("Último Ano") || tipo.equalsIgnoreCase("Ultimo Ano"))) {
+            return vendaRepository.buscarGraficoVolumeMensalDinamico(dataInicio, dataFim);
+        } else {
+            return vendaRepository.buscarGraficoVolumeDiarioDinamico(dataInicio, dataFim);
+        }
+    }
 }

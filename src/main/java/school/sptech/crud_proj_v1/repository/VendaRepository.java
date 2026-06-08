@@ -127,4 +127,14 @@ public interface VendaRepository extends JpaRepository<Venda, Integer> {
             "ORDER BY margem DESC", nativeQuery = true)
     List<MargemCategoriaProjection> buscarMargemPorCategoriaDinamico(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
 
+
+    @Query(value = "SELECT DATE_FORMAT(data_hora, '%d/%m') AS periodo, COUNT(id) AS volume " +
+            "FROM venda WHERE data_hora >= :inicio AND data_hora <= :fim " +
+            "GROUP BY DATE_FORMAT(data_hora, '%d/%m') ORDER BY MIN(data_hora)", nativeQuery = true)
+    List<VolumeTempoProjection> buscarGraficoVolumeDiarioDinamico(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
+
+    @Query(value = "SELECT DATE_FORMAT(data_hora, '%Y-%m') AS periodo, COUNT(id) AS volume " +
+            "FROM venda WHERE data_hora >= :inicio AND data_hora <= :fim " +
+            "GROUP BY DATE_FORMAT(data_hora, '%Y-%m') ORDER BY periodo", nativeQuery = true)
+    List<VolumeTempoProjection> buscarGraficoVolumeMensalDinamico(@Param("inicio") LocalDateTime inicio, @Param("fim") LocalDateTime fim);
 }

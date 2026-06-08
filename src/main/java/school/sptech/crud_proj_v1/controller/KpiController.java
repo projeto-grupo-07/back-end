@@ -145,4 +145,19 @@ public class KpiController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fim) {
         return ResponseEntity.ok(kpiService.getMargemCategoria(tipo, inicio, fim));
     }
+
+    @GetMapping("/grafico-volume")
+    public ResponseEntity<List<VolumeTempoProjection>> getGraficoVolume(
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) LocalDateTime inicio,
+            @RequestParam(required = false) LocalDateTime fim) {
+
+        List<VolumeTempoProjection> grafico = kpiService.buscarGraficoVolumeDinamico(tipo, inicio, fim);
+
+        if (grafico.isEmpty()) {
+            return ResponseEntity.noContent().build(); // Retorna 204 se não tiver vendas no período
+        }
+
+        return ResponseEntity.ok(grafico); // Retorna 200 com a lista de volumes
+    }
 }
